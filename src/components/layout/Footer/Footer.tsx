@@ -47,7 +47,7 @@ const Footer = () => {
                         <div className="flex items-center gap-3 ">
                             <div className="relative w-[50px] h-[50px]">
                                 <Image
-                                    src="/logoPuskesmas.webp"
+                                    src="/logo_puskesmas.webp"
                                     alt="Logo Puskesmas"
                                     fill
                                     className="object-contain"

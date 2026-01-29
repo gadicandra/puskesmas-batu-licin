@@ -1,26 +1,229 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ========================================
+   PUSKESMAS BATU LICIN - DESIGN SYSTEM
+   ======================================== */
+
+/* Font Face - Avenir */
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/Avenir Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
 
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/Avenir Book.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/Avenir Regular.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/Avenir Heavy.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/Avenir Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ========================================
+   CSS VARIABLES - COLOR PALETTE
+   ======================================== */
+:root {
+  /* Base Colors */
+  --color-base: #FFFFFF;
+  --color-primary: #2B3D4F;
+  --color-secondary: #28AF60;
+  --color-tertiary: #6B7584;
+
+  /* Primary Color Shades */
+  --color-primary-50: #f4f6f7;
+  --color-primary-100: #e2e7eb;
+  --color-primary-200: #c8d1d9;
+  --color-primary-300: #a1b0be;
+  --color-primary-400: #738899;
+  --color-primary-500: #586d7f;
+  --color-primary-600: #4b5c6b;
+  --color-primary-700: #414e5a;
+  --color-primary-800: #3a444d;
+  --color-primary-900: #2B3D4F;
+  --color-primary-950: #1f2936;
+
+  /* Secondary Color Shades (Green) */
+  --color-secondary-50: #eefbf3;
+  --color-secondary-100: #d6f5e1;
+  --color-secondary-200: #b0eac8;
+  --color-secondary-300: #7cd9a7;
+  --color-secondary-400: #45c182;
+  --color-secondary-500: #28AF60;
+  --color-secondary-600: #188550;
+  --color-secondary-700: #136a42;
+  --color-secondary-800: #125436;
+  --color-secondary-900: #10452e;
+  --color-secondary-950: #08271a;
+
+  /* Tertiary Color Shades (Gray) */
+  --color-tertiary-50: #f6f7f8;
+  --color-tertiary-100: #ebedef;
+  --color-tertiary-200: #d3d7dc;
+  --color-tertiary-300: #adb5be;
+  --color-tertiary-400: #818c99;
+  --color-tertiary-500: #6B7584;
+  --color-tertiary-600: #555d6a;
+  --color-tertiary-700: #464c56;
+  --color-tertiary-800: #3d424a;
+  --color-tertiary-900: #363a40;
+  --color-tertiary-950: #24262a;
+
+  /* Background & Foreground */
+  --background: var(--color-base);
+  --foreground: var(--color-primary);
+}
+
+/* ========================================
+   TAILWIND THEME EXTENSION
+   ======================================== */
 @theme inline {
+  /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+
+  /* Base Colors (using rgb() format for opacity modifier support) */
+  --color-base: rgb(255, 255, 255);
+  --color-primary: rgb(43, 61, 79);
+  --color-secondary: rgb(40, 175, 96);
+  --color-tertiary: rgb(107, 117, 132);
+
+  /* Primary */
+  --color-primary-50: rgb(244, 246, 247);
+  --color-primary-100: rgb(226, 231, 235);
+  --color-primary-200: rgb(200, 209, 217);
+  --color-primary-300: rgb(161, 176, 190);
+  --color-primary-400: rgb(115, 136, 153);
+  --color-primary-500: rgb(88, 109, 127);
+  --color-primary-600: rgb(75, 92, 107);
+  --color-primary-700: rgb(65, 78, 90);
+  --color-primary-800: rgb(58, 68, 77);
+  --color-primary-900: rgb(43, 61, 79);
+  --color-primary-950: rgb(31, 41, 54);
+
+  /* Secondary */
+  --color-secondary-50: rgb(238, 251, 243);
+  --color-secondary-100: rgb(214, 245, 225);
+  --color-secondary-200: rgb(176, 234, 200);
+  --color-secondary-300: rgb(124, 217, 167);
+  --color-secondary-400: rgb(69, 193, 130);
+  --color-secondary-500: rgb(40, 175, 96);
+  --color-secondary-600: rgb(24, 133, 80);
+  --color-secondary-700: rgb(19, 106, 66);
+  --color-secondary-800: rgb(18, 84, 54);
+  --color-secondary-900: rgb(16, 69, 46);
+  --color-secondary-950: rgb(8, 39, 26);
+
+  /* Tertiary */
+  --color-tertiary-50: rgb(246, 247, 248);
+  --color-tertiary-100: rgb(235, 237, 239);
+  --color-tertiary-200: rgb(211, 215, 220);
+  --color-tertiary-300: rgb(173, 181, 190);
+  --color-tertiary-400: rgb(129, 140, 153);
+  --color-tertiary-500: rgb(107, 117, 132);
+  --color-tertiary-600: rgb(85, 93, 106);
+  --color-tertiary-700: rgb(70, 76, 86);
+  --color-tertiary-800: rgb(61, 66, 74);
+  --color-tertiary-900: rgb(54, 58, 64);
+  --color-tertiary-950: rgb(36, 38, 42);
+
+  /* Typography */
+  --font-sans: 'Avenir', var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono);
+  --font-avenir: 'Avenir', system-ui, -apple-system, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ========================================
+   BASE STYLES
+   ======================================== */
 body {
-  background: var(--background);
+  background: #FFFFFF;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-avenir);
+}
+
+/* ========================================
+   UTILITY CLASSES - TYPOGRAPHY
+   ======================================== */
+.font-avenir {
+  font-family: 'Avenir', system-ui, -apple-system, sans-serif;
+}
+
+.font-avenir-light {
+  font-family: 'Avenir', system-ui, -apple-system, sans-serif;
+  font-weight: 300;
+}
+
+.font-avenir-regular {
+  font-family: 'Avenir', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+}
+
+.font-avenir-medium {
+  font-family: 'Avenir', system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+}
+
+.font-avenir-bold {
+  font-family: 'Avenir', system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+}
+
+.font-avenir-black {
+  font-family: 'Avenir', system-ui, -apple-system, sans-serif;
+  font-weight: 900;
+}
+
+/* ========================================
+   UTILITY CLASSES - COLORS
+   Note: bg-*, text-*, border-* for primary, secondary, tertiary
+   are now handled by Tailwind directly via @theme inline.
+   This allows opacity modifiers like bg-primary/50 to work.
+   ======================================== */
+
+/* ========================================
+   HIDE DEFAULT SCROLLBAR (Humane-style)
+   ======================================== */
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+html {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Ensure smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }

@@ -1,19 +1,21 @@
 import React from 'react'
-import './styles.css'
+import Navbar from '@/components/layout/Navbar/Navbar'
+import Footer from '@/components/layout/Footer/Footer'
 
 export const metadata = {
-  description: 'A blank template using Payload in a Next.js app.',
-  title: 'Payload Blank Template',
+  description: 'Website Puskesmas Batu Licin - Melayani Kesehatan Masyarakat',
+  title: 'Puskesmas Batu Licin',
 }
 
-export default async function RootLayout(props: { children: React.ReactNode }) {
+export default async function FrontendLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
-    <html lang="en">
-      <body>
-        <main>{children}</main>
-      </body>
-    </html>
+    <div className="min-h-screen bg-white">
+      <Navbar />
+      <main>{children}</main>
+      <Footer />
+    </div>
   )
 }
+
