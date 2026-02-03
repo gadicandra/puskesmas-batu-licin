@@ -6,6 +6,7 @@ import Section from "@/components/common/Section";
 import ScrollIndicator from "@/components/common/ScrollProgress";
 import { SectionProvider } from "@/context/SectionContext";
 import { Heart, Clock, Users, Phone, MapPin, Calendar } from "lucide-react";
+import Berita from "@/components/berita/page";
 
 const sectionLabels: Record<string, string> = {
     hero: "Beranda",
@@ -107,7 +108,14 @@ export default function Home() {
                     </Container>
                 </Section>
 
-                {/* Info Section */}
+                <Section id="makan" isLast>
+                    <Container color="base" >
+                        <Berita />
+                    </Container>
+                        
+                </Section>
+
+                {/* Info Section 
                 <Section id="info" isLast>
                     <Container color="secondary" className="py-16">
                         <div className="flex flex-col items-center gap-8 text-center text-base md:flex-row md:text-left">
@@ -153,6 +161,7 @@ export default function Home() {
                         </div>
                     </Container>
                 </Section>
+                */}
             </div>
         </SectionProvider>
     );

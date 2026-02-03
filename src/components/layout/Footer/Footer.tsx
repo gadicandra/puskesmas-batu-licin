@@ -35,11 +35,11 @@ const Footer = () => {
                     className="object-cover object-center"
                     priority
                 />
-                <div className="absolute inset-0 bg-[#2B3D4F] opacity-85"></div>
+                <div className="absolute inset-0 bg-[#243117] opacity-85"></div>
             </div>
 
             {/* Content Container */}
-            <div className="relative z-10 container mx-auto px-8 lg:pg-0 py-5 pt-10 pb-2 lg:pt-9 lg:pb-2 ">
+            <div className="relative z-10 mx-auto px-8 lg:px-16 py-5 pt-10 pb-2 lg:pt-9 lg:pb-2 ">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 ">
 
                     {/* Column 1: Brand Info */}
@@ -61,7 +61,7 @@ const Footer = () => {
                             </div>
                         </div>
 
-                        <p className="text-sm leading-relaxed text-gray-200">
+                        <p className="text-sm text-center md:text-left leading-relaxed text-gray-200">
                             Melayani Kesehatan Masyarakat dengan sepenuh hati. Kami berkomitmen memberikan pelayanan kesehatan dasar yang berkualitas dan mudah diakses.
                         </p>
 
