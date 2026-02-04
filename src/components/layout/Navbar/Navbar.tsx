@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronDown, DoorOpen, ArrowUpRight, BookOpen } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { AiOutlineAlert } from "react-icons/ai";
 import Link from "next/link";
 import ImageAction from "@/components/elements/ImageAction";
@@ -74,7 +74,7 @@ export default function Navbar() {
         className={cn(
           `w-full bg-[#243117] transition-all duration-300 ${mobileMenuOpen ? "rounded-b-[20px]" : ""}`,
           isScrolled &&
-          `mx-0 w-full bg-[#243117]/60 shadow-[0_4px_30px_rgba(0,0,0,0.5)] md:backdrop-blur-xl md:mx-8 md:rounded-2xl ${mobileMenuOpen ? "bg-[#243117]" : ""}`
+          `mx-0 w-full bg-primary md:bg-primary/60 shadow-[0_4px_30px_rgba(0,0,0,0.5)] md:backdrop-blur-xl md:mx-8 md:rounded-2xl ${mobileMenuOpen ? "bg-primary" : ""}`
         )}
       >
         <div
@@ -88,8 +88,8 @@ export default function Navbar() {
               className="w-[36px]transition-transform duration-500 hover:scale-[1.05]"
             />
             <div className="flex flex-col">
-              <p className="font-avenir text-[20px] font-black text-white leading-none"> UPTD Puskesmas</p>
-              <p className="font-avenir text-[20px] font-black text-white leading-none">Batulicin</p>
+              <p className="font-avenir sm:text-[20px] text-[16px] font-black text-white leading-none"> UPTD Puskesmas</p>
+              <p className="font-avenir sm:text-[20px] text-[16px] font-black text-white leading-none">Batulicin</p>
             </div>
           </Link>
           <>

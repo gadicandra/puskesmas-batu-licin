@@ -26,7 +26,7 @@ const config: Config = {
                 black: "900",
             },
             colors: {
-                base: "#FFFFFF",
+                base: "#EFF1EB",
                 primary: {
                     DEFAULT: "#233115",
                     50: "#f4f6f7",
