@@ -5,7 +5,7 @@ export default function Hero() {
     return (
         <section className="relative w-full max-h-screen flex flex-col overflow-hidden font-sans">
             {/* Background Image */}
-            
+
 
             {/* Overlay - Gradient from left */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent -z-10" />
@@ -26,7 +26,7 @@ export default function Hero() {
                     {/* Heading */}
                     <h1 className="text-5xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
                         Selamat Datang di <br />
-                        <span className="text-[#67943B] font-bold">UPTD Puskesmas Batulicin</span>
+                        <span className="text-secondary font-bold">UPTD Puskesmas Batulicin</span>
                     </h1>
 
                     {/* Description */}
@@ -36,7 +36,7 @@ export default function Hero() {
 
                     {/* Buttons */}
                     <div className="flex flex-row sm:flex-row gap-4 w-full sm:w-auto pt-2">
-                        <Link 
+                        <Link
                             href="/layanan"
                             className="text-sm px-3 md:px-8 py-2 md:py-3.5 rounded-lg border-2 border-white/80 bg-white/10 backdrop-blur-sm text-white font-semibold hover:bg-white hover:text-slate-900 transition-all flex items-center justify-center gap-2 group"
                         >
@@ -47,7 +47,7 @@ export default function Hero() {
                         </Link>
                         <Link
                             href="/kontak"
-                            className="px-3 md:px-8 py-2 md:py-3.5 rounded-lg bg-[#687643] text-white font-bold shadow-sm shadow-[#687643] hover:bg-[#67943B] hover:shadow-sm hover:shadow-[#67943B] transition-all flex items-center justify-center gap-2"
+                            className="px-3 md:px-8 py-2 md:py-3.5 rounded-lg bg-secondary text-white font-bold shadow-sm shadow-secondary hover:bg-secondary hover:shadow-sm hover:shadow-secondary transition-all flex items-center justify-center gap-2"
                         >
                             <svg className="w-10 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -59,7 +59,7 @@ export default function Hero() {
 
                 {/* Right Section: Akses Cepat Card */}
                 <div className="w-full lg:w-auto lg:ml-auto flex flex-col items-stretch lg:items-end">
-                    <div className="relative w-auto lg:w-[650px]  bg-[#243117] backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-slate-700/50">
+                    <div className="relative w-auto lg:w-[650px]  bg-primary backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-slate-700/50">
                         {/* Header Card */}
                         <div className="mb-5">
                             <h2 className="text-xl font-bold text-white">Akses Cepat</h2>

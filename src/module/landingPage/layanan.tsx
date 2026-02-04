@@ -152,7 +152,7 @@ export default function Layanan({ items = DEFAULT_ITEMS, moreHref = "/layanan" }
 					<div className="absolute bottom-4 left-0 right-0 text-center z-10 pointer-events-none">
 						<Link
 							href={moreHref}
-							className="inline-flex text-md items-center gap-2 text-[#67943B] font-semibold text-sm hover:text-[#687643] transition-colors pointer-events-auto"
+							className="inline-flex text-md items-center gap-2 text-secondary font-semibold text-sm hover:text-secondary transition-colors pointer-events-auto"
 						>
 							Selengkapnya
 							<ChevronDown className="w-4 h-4" />
@@ -214,7 +214,7 @@ export default function Layanan({ items = DEFAULT_ITEMS, moreHref = "/layanan" }
 					{/* Arrow button on the right - positioned to overlap last card */}
 					<button
 						onClick={scrollNext}
-						className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center bg-[#67943B] hover:bg-[#687643] text-white rounded-full shadow-lg transition-all duration-300 hover:scale-110 z-10"
+						className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center bg-secondary hover:bg-secondary text-white rounded-full shadow-lg transition-all duration-300 hover:scale-110 z-10"
 						aria-label="Lihat lebih banyak layanan"
 					>
 						<ChevronRight className="w-6 h-6" />
