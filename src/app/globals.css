@@ -51,8 +51,8 @@
 :root {
   /* Base Colors */
   --color-base: #FFFFFF;
-  --color-primary: #2B3D4F;
-  --color-secondary: #28AF60;
+  --color-primary: #233115;
+  --color-secondary: #697644;
   --color-tertiary: #6B7584;
 
   /* Primary Color Shades */
@@ -65,7 +65,7 @@
   --color-primary-600: #4b5c6b;
   --color-primary-700: #414e5a;
   --color-primary-800: #3a444d;
-  --color-primary-900: #2B3D4F;
+  --color-primary-900: #233115;
   --color-primary-950: #1f2936;
 
   /* Secondary Color Shades (Green) */
@@ -74,7 +74,7 @@
   --color-secondary-200: #b0eac8;
   --color-secondary-300: #7cd9a7;
   --color-secondary-400: #45c182;
-  --color-secondary-500: #28AF60;
+  --color-secondary-500: #697644;
   --color-secondary-600: #188550;
   --color-secondary-700: #136a42;
   --color-secondary-800: #125436;
@@ -109,8 +109,8 @@
 
   /* Base Colors (using rgb() format for opacity modifier support) */
   --color-base: rgb(255, 255, 255);
-  --color-primary: rgb(43, 61, 79);
-  --color-secondary: rgb(40, 175, 96);
+  --color-primary: rgb(35, 49, 21);
+  --color-secondary: rgb(105, 118, 68);
   --color-tertiary: rgb(107, 117, 132);
 
   /* Primary */
@@ -123,7 +123,7 @@
   --color-primary-600: rgb(75, 92, 107);
   --color-primary-700: rgb(65, 78, 90);
   --color-primary-800: rgb(58, 68, 77);
-  --color-primary-900: rgb(43, 61, 79);
+  --color-primary-900: rgb(35, 49, 21);
   --color-primary-950: rgb(31, 41, 54);
 
   /* Secondary */
@@ -132,7 +132,7 @@
   --color-secondary-200: rgb(176, 234, 200);
   --color-secondary-300: rgb(124, 217, 167);
   --color-secondary-400: rgb(69, 193, 130);
-  --color-secondary-500: rgb(40, 175, 96);
+  --color-secondary-500: rgb(105, 118, 68);
   --color-secondary-600: rgb(24, 133, 80);
   --color-secondary-700: rgb(19, 106, 66);
   --color-secondary-800: rgb(18, 84, 54);

@@ -74,7 +74,7 @@ export default function Navbar() {
         className={cn(
           `w-full bg-[#243117] transition-all duration-300 ${mobileMenuOpen ? "rounded-b-[20px]" : ""}`,
           isScrolled &&
-          `mx-0 w-full shadow-[0_4px_30px_rgba(0,0,0,0.5)] md:bg-[#243117] md:backdrop-blur-xl md:mx-8 md:rounded-2xl ${mobileMenuOpen ? "bg-[#243117]" : ""}`
+          `mx-0 w-full bg-[#243117]/60 shadow-[0_4px_30px_rgba(0,0,0,0.5)] md:backdrop-blur-xl md:mx-8 md:rounded-2xl ${mobileMenuOpen ? "bg-[#243117]" : ""}`
         )}
       >
         <div
@@ -88,7 +88,7 @@ export default function Navbar() {
               className="w-[36px]transition-transform duration-500 hover:scale-[1.05]"
             />
             <div className="flex flex-col">
-              <p className="font-avenir text-[20px] font-black text-white leading-none">Puskesmas</p>
+              <p className="font-avenir text-[20px] font-black text-white leading-none"> UPTD Puskesmas</p>
               <p className="font-avenir text-[20px] font-black text-white leading-none">Batulicin</p>
             </div>
           </Link>

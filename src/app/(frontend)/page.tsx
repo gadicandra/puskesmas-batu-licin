@@ -28,8 +28,8 @@ export default function Home() {
 
                 {/* Hero Section */}
                 <Section id="hero" isFirst>
-                    
-                    
+
+
                     <Container color="primary" className="py-16 md:py-22">
                         <div className="absolute inset-0 h-7/7 md:h-7/7">
                             <Image
@@ -41,46 +41,46 @@ export default function Home() {
                             />
                         </div>
                         {/*<div className="absolute inset-0 bg-gradient-to-r from-[#687643] via-black/50 to-transparent " />*/}
-                        <div className="absolute inset-0 bg-[#243117] opacity-65 md:h-7/7"></div>
-                        
+                        <div className="absolute inset-0 bg-primary opacity-65 md:h-7/7"></div>
+
                         <Hero />
-                        
-                        
+
+
                     </Container>
                     <div className="hidden lg:block relative z-10 w-full bg-white py-8 md:py-10 rounded-b-[5rem] md:rounded-b-[5rem] mt-auto shadow-2xl ">
-                            <div className="container mx-auto px-4 ">
-                                <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16 lg:gap-24">
-                                    
-                                    <div className="text-center group">
-                                        <h3 className="text-4xl lg:text-5xl font-black text-[#67943B] group-hover:scale-110 transition-transform">
-                                            24/7
-                                        </h3>
-                                        <p className="text-slate-600 font-semibold text-sm mt-2">UGD Siaga</p>
-                                    </div>
+                        <div className="container mx-auto px-4 ">
+                            <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16 lg:gap-24">
+
+                                <div className="text-center group">
+                                    <h3 className="text-4xl lg:text-5xl font-black text-secondary group-hover:scale-110 transition-transform">
+                                        24/7
+                                    </h3>
+                                    <p className="text-slate-600 font-semibold text-sm mt-2">UGD Siaga</p>
+                                </div>
 
 
-                                    <div className="hidden md:block w-px h-14 bg-slate-200" />
-
-                                    
-                                    <div className="text-center group">
-                                        <h3 className="text-4xl lg:text-5xl font-black text-[#67943B] group-hover:scale-110 transition-transform">
-                                            15+
-                                        </h3>
-                                        <p className="text-slate-600 font-semibold text-sm mt-2">Layanan Kesehatan</p>
-                                    </div>
+                                <div className="hidden md:block w-px h-14 bg-slate-200" />
 
 
-                                    <div className="hidden md:block w-px h-14 bg-slate-200" />
+                                <div className="text-center group">
+                                    <h3 className="text-4xl lg:text-5xl font-black text-secondary group-hover:scale-110 transition-transform">
+                                        15+
+                                    </h3>
+                                    <p className="text-slate-600 font-semibold text-sm mt-2">Layanan Kesehatan</p>
+                                </div>
 
-                                    
-                                    <div className="text-center group">
-                                        <h3 className="text-4xl lg:text-5xl font-black text-[#67943B] group-hover:scale-110 transition-transform">
-                                            10k+
-                                        </h3>
-                                        <p className="text-slate-600 font-semibold text-sm mt-2">Pasien Terlayani</p>
-                                    </div>
+
+                                <div className="hidden md:block w-px h-14 bg-slate-200" />
+
+
+                                <div className="text-center group">
+                                    <h3 className="text-4xl lg:text-5xl font-black text-secondary group-hover:scale-110 transition-transform">
+                                        10k+
+                                    </h3>
+                                    <p className="text-slate-600 font-semibold text-sm mt-2">Pasien Terlayani</p>
                                 </div>
                             </div>
+                        </div>
                     </div>
                 </Section>
 
@@ -93,7 +93,7 @@ export default function Home() {
                 {/* Layanan Section */}
                 <Section id="waktulayanan">
                     <Container color="base" className="">
-                        <WaktuPelayanan/>
+                        <WaktuPelayanan />
                     </Container>
                 </Section>
 
@@ -109,7 +109,7 @@ export default function Home() {
                     <Container color="base" >
                         <Berita />
                     </Container>
-                        
+
                 </Section>
             </div>
         </SectionProvider>
