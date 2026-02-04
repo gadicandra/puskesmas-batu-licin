@@ -10,7 +10,7 @@ interface PageHeaderProps {
 
 const PageHeader: React.FC<PageHeaderProps> = ({ image, title, subtitle }) => {
     return (
-        <Container color="primary" className="py-16 md:py-22 h-[400px]">
+        <Container color="primary" className="py-16 md:py-22 h-[200px] md:h-[300px] lg:h-[400px]">
             <div className="absolute inset-0">
                 <Image
                     src={image}
@@ -22,9 +22,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ image, title, subtitle }) => {
             </div>
             <div className="absolute inset-0 bg-gradient-to-r from-primary/90 from-20% to-primary/10 to-80%"></div>
             <div className="relative z-30 flex flex-col h-full justify-center mt-10">
-                <p className="text-white font-bold text-[64px] md:text-[96px] leading-none">{title}</p>
+                <p className="text-white font-bold text-[40px] md:text-[60px] lg:text-[96px] leading-none">{title}</p>
                 {subtitle && (
-                    <p className="text-white font-semibold text-[32px] md:text-[48px]">{subtitle}</p>
+                    <p className="text-white font-semibold text-[16px] md:text-[32px] lg:text-[48px]">{subtitle}</p>
                 )}
             </div>
         </Container>

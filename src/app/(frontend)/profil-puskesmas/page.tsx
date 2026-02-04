@@ -1,9 +1,10 @@
 import PageHeader from "@/components/common/PageHeader";
 import Breadcrumb from "@/components/common/Breadcrumb";
+import ProfilLayout from "@/components/profil/ProfilLayout";
 
 export default function profil() {
   return (
-    <>
+    <div className="bg-base min-h-screen">
       <PageHeader
         image="/batulicin.webp"
         title="Profil Puskesmas"
@@ -15,6 +16,7 @@ export default function profil() {
           { label: "Profil Puskesmas", href: "/profil-puskesmas" },
         ]}
       />
-    </>
+      <ProfilLayout />
+    </div>
   )
 }
