@@ -15,7 +15,7 @@ interface BreadcrumbProps {
 const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
     return (
         <section className="bg-white w-full border-b border-gray-100">
-            <Container className="py-4 md:py-4">
+            <Container sectionClassName="py-4 md:py-4">
                 <nav className="flex items-center text-sm font-medium text-slate-600">
                     <ol className="flex items-center space-x-2">
                         {items.map((item, index) => {
