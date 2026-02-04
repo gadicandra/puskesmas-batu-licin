@@ -114,9 +114,9 @@ export default function Navbar() {
                             className="flex h-auto w- flex-col"
                           >
                             <div className="flex w-full flex-col">
-                              <ListItem href="/about/us" title="Profil Puskesmas" />
-                              <ListItem href="/about/services" title="Struktur Organisasi" />
-                              <ListItem href="/about/services" title="Lokasi Puskesmas" />
+                              <ListItem href="/profil-puskesmas" title="Profil Puskesmas" />
+                              <ListItem href="/struktur-organisasi" title="Struktur Organisasi" />
+                              <ListItem href="/lokasi-puskesmas" title="Lokasi Puskesmas" />
                             </div>
                           </motion.div>
                         </NavigationMenuContent>
