@@ -72,9 +72,9 @@ export default function Navbar() {
     >
       <div
         className={cn(
-          `w-full bg-primary transition-all duration-300 ${mobileMenuOpen ? "rounded-b-[20px]" : ""}`,
+          `w-full bg-[#243117] transition-all duration-300 ${mobileMenuOpen ? "rounded-b-[20px]" : ""}`,
           isScrolled &&
-          `mx-0 w-full shadow-[0_4px_30px_rgba(0,0,0,0.5)] md:bg-primary/70 md:backdrop-blur-xl md:mx-8 md:rounded-2xl ${mobileMenuOpen ? "bg-primary" : ""}`
+          `mx-0 w-full shadow-[0_4px_30px_rgba(0,0,0,0.5)] md:bg-[#243117] md:backdrop-blur-xl md:mx-8 md:rounded-2xl ${mobileMenuOpen ? "bg-[#243117]" : ""}`
         )}
       >
         <div
