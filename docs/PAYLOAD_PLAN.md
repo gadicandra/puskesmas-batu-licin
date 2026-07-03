@@ -16,174 +16,130 @@ sesi (mis. jika limit habis).
 
 ## Konteks & keputusan yang sudah diambil
 
-- **Stack DB:** Postgres lokal via Docker untuk dev (bukan Supabase). Ganti hanya `DATABASE_URL`.
-- **Migrasi:** pakai sistem migrasi bawaan Payload (Drizzle), **bukan Prisma**. Dev = `push: true`
+- **Stack DB:** Postgres lokal via Docker untuk dev (`docker-compose.yml`, host port **5434**). Ganti hanya `DATABASE_URL`.
+- **Migrasi:** sistem migrasi bawaan Payload (Drizzle), **bukan Prisma**. Dev = `push: true`
   (auto-sync). Prod = `push: false` + `payload migrate`. Prisma boleh coexist hanya untuk
-  tabel non-Payload atau read-only introspection — tidak boleh memigrasi tabel Payload.
-- **Desain admin:** Opsi A (brand admin Payload di tempat) — logo + `custom.scss` hijau +
-  custom Dashboard view untuk statistik. `src/app/(payload)/custom.scss` sudah ter-wire (masih kosong).
-- **Analitik pengunjung:** Payload tidak punya analytics bawaan. Keputusan: **self-log** ke
-  collection `PageViews` lalu agregasi (lihat Fase 5). Timezone acuan **WITA (UTC+8)**.
-- **Sumber fakta domain** (jam layanan, jenis pelayanan): SK No. B/445.61/003/PKM.Btl-Adm/I/2023
-  di `public/SK JENIS PELAYANAN PKM BTL.pdf` — ringkasannya ada di `CLAUDE.md`.
-- **Branch:** pekerjaan Payload/artikel di `feat/artikel.adi`. Halaman `informasi-layanan-mutu`
-  ada di branch `feat/informasi-layanan-mutu.adi` (sudah di-push, page-only).
+  tabel non-Payload / read-only introspection.
+- **Desain admin:** Opsi A (brand in-place) — Logo/Icon + `custom.scss` hijau + custom Dashboard (`beforeDashboard`).
+- **Analitik pengunjung:** self-log ke `PageViews` + agregasi WITA (UTC+8). Terpasang.
+- **Sumber fakta domain:** SK B/445.61/003/PKM.Btl-Adm/I/2023 (`public/SK JENIS PELAYANAN PKM BTL.pdf`); ringkas di `CLAUDE.md`.
+- **Branch:** backend/artikel di `feat/artikel.adi`. Halaman `informasi-layanan-mutu` di `feat/informasi-layanan-mutu.adi` (pushed).
 
-### Bug/temuan yang sudah diperbaiki
-- `payload.config.ts`: `Users` belum terdaftar di array `collections` → `admin.user` invalid.
-  Sudah ditambahkan `Users` ke `collections`. (Perlu commit.)
-- Koneksi DB gagal saat `/admin` (Supabase project paused / ref salah) — **belum tuntas**,
-  akan digantikan Postgres lokal di Fase 0.
-
----
-
-## Model data (target akhir)
-
+### Model data (terimplementasi)
 - **Globals:** `OperationalHours`, `SiteSettings`
-- **Collections:** `Users` (+`role`, +`unit`), `Doctors`, `MedicalStaff`, `Vaccines`,
-  `Certificates`, `Articles` (drafts/versions), `Media` (sudah ada), `PageViews`
-- **Roles:** `superadmin` (Puskesmas, akses penuh) · `admin_unit` (unit, akses terbatas ke unit-nya)
+- **Collections:** `Users`(+role,+unit), `Doctors`, `MedicalStaff`, `Vaccines`, `Certificates`, `Articles`(drafts), `Media`, `PageViews`
+- **Roles:** `superadmin` (penuh) · `admin_unit` (dibatasi unitnya via `unitScoped` + `enforceUnit`)
 
 ---
 
-## Fase 0 — Fondasi & Infra DB lokal
+## Fase 0 — Fondasi & Infra DB lokal  ✅
 
-**Tujuan:** `/admin` bisa dibuka, buat first user, DB lokal jalan.
-
-- [x] Buat `docker-compose.yml` Postgres lokal (`postgres:16-alpine`, volume, **host port 5434**)
-- [x] Set `DATABASE_URL` di `.env` ke DB lokal (`...@localhost:5434/puskesmas`) — user; backup di `.env.bak`
-- [x] Commit fix `payload.config.ts` (registrasi `Users`) — commit `590a914`
-- [x] Tambah script `payload` di `package.json` + instal `cross-env@10`
-- [x] `pnpm dev` → `/admin` → layar "Create first user" TERVERIFIKASI (HTTP 200, tabel ter-push)
-- [ ] Buat 1 user superadmin manual — **MANUAL (user, via browser)**
+- [x] `docker-compose.yml` Postgres (`postgres:16-alpine`, host port **5434**)
+- [x] Set `DATABASE_URL` lokal di `.env` (backup `.env.bak`)
+- [x] Fix `payload.config.ts` registrasi `Users` — commit `590a914`
+- [x] Script `payload` + `cross-env@10`
+- [x] `/admin` HTTP 200, create-first-user render, tabel ter-push
+- [ ] Buat 1 user superadmin — **MANUAL (user, via browser `http://localhost:3000/admin`)**
 
 ### Log Fase 0
-- [2026-07-03] `docker-compose.yml` dibuat; port host 5432 & 5433 bentrok → dipakai **5434**.
-  Container `puskesmas-db` up & healthy (`postgres:16-alpine`, db `puskesmas`, user/pass postgres/postgres).
-- [2026-07-03] Script `"payload"` ditambah ke `package.json`; `cross-env@10.1.0` terpasang (devDep).
-- [2026-07-03] Fix registrasi `Users` di `payload.config.ts` di-commit (`590a914`).
-- [2026-07-03] `.env` di-set user. Sempat error `SASL: client password must be a string` karena
-  baris `DATABASE_URL` ter-tempel ke baris tanpa newline → `.env` ditulis ulang bersih (backup `.env.bak`).
-- [2026-07-03] Koneksi DB lokal BERHASIL: `/admin` HTTP 200, `/admin/create-first-user` merender,
-  9 tabel Payload ter-push ke DB `puskesmas` (users, users_sessions, media, payload_migrations, dst).
-- [2026-07-03] SISA: user buat akun superadmin pertama via browser (`http://localhost:3000/admin`).
+- [2026-07-03] Container `puskesmas-db` up/healthy (port host 5432/5433 bentrok → 5434).
+- [2026-07-03] `.env` sempat rusak (baris ke-tempel) → ditulis ulang bersih; koneksi DB OK, 9 tabel awal ter-push.
 
 ---
 
-## Fase 1 — Auth & Roles (Access Control)
+## Fase 1 — Auth & Roles (Access Control)  ✅
 
-**Tujuan:** fondasi role sebelum bikin collection lain, supaya access control langsung dipasang.
-
-- [ ] Tambah field `role` di `Users` (`select`: `superadmin` | `admin_unit`, default `admin_unit`)
-- [ ] Tambah field `unit` di `Users` (untuk scoping admin unit — `select`/relationship)
-- [ ] Buat helper access control (mis. `isSuperAdmin`, `isSuperAdminOrSelfUnit`) di `src/access/`
-- [ ] Pasang access di `Users` (hanya superadmin boleh kelola user)
-- [ ] Uji: login admin_unit tidak bisa akses hal di luar unitnya
+- [x] `role` (superadmin/admin_unit) + `unit` di `Users`, `saveToJWT`
+- [x] Helper access `src/access/index.ts` (isSuperAdmin, superAdminOrSelf, unitScoped, publicReadUnitScoped, field access)
+- [x] `enforceUnit` hook + `unitField` (admin unit terkunci ke unitnya)
+- [x] Access `Users` (superadmin kelola user; user baca dirinya)
 
 ### Log Fase 1
--
+- [2026-07-03] `src/access`, `src/lib/units.ts`, `src/fields/unit.ts`, `src/hooks/enforceUnit.ts`; Users diperbarui. Kolom `role`/`unit` (enum) ter-push. Commit `23e1ea7`.
 
 ---
 
-## Fase 2 — Global: Jam Operasional & Site Settings
+## Fase 2 — Global: Jam Operasional & Site Settings  ✅ (public wiring ditunda)
 
-**Tujuan:** admin bisa ubah jam operasional (poin 3); public baca dari DB, bukan hardcode.
-
-- [ ] Buat global `OperationalHours` (Sen–Kam, Jum, Sab + catatan UGD 24 jam)
-- [ ] Isi nilai awal sesuai SK (Sen–Kam 08.00–11.00, Jum 07.30–10.30, Sab 08.00–11.00)
-- [ ] Ganti array `jadwal` hardcoded di
-      `src/components/informasi-layanan/content/StandarPelayananContent.tsx`
-      agar baca `OperationalHours` via Local API
-      **(catatan: file ini ada di branch `feat/informasi-layanan-mutu.adi` — koordinasikan merge)**
-- [ ] (Opsional) Global `SiteSettings` (alamat, kontak, sosmed)
+- [x] Global `OperationalHours` (default sesuai SK)
+- [x] Global `SiteSettings`
+- [ ] Ganti `jadwal` hardcoded di `StandarPelayananContent.tsx` → baca `OperationalHours`
+      **DITUNDA**: file ada di branch `feat/informasi-layanan-mutu.adi`. Kerjakan saat merge/di branch itu.
 
 ### Log Fase 2
--
+- [2026-07-03] `src/globals/OperationalHours.ts` (jadwal array default SK) & `SiteSettings.ts` dibuat & didaftarkan. Commit `23e1ea7`.
+- [2026-07-03] CATATAN: wiring publik jam operasional ditunda karena halaman-nya di branch lain.
 
 ---
 
-## Fase 3 — Collection Konten Inti
+## Fase 3 — Collection Konten Inti  ✅
 
-**Tujuan:** poin 2, 5, 6, 7 — dokter, sertifikat, vaksin, tenaga medis.
-
-- [ ] `Doctors` (nama, spesialisasi, foto→Media, jadwal, unit, aktif)
-- [ ] `MedicalStaff` (nama, jabatan, unit, foto) — putuskan merge dengan Doctors atau pisah
-- [ ] `Vaccines` (nama, jenis, `stock:number`, satuan, updatedAt)
-- [ ] `Certificates` (judul, file→upload, tanggal, penerbit)
-- [ ] Pasang access control per role di tiap collection
-- [ ] Render ke public side (halaman terkait) via Local API
+- [x] `Doctors` (nama, spesialisasi, foto, jadwal, unit, aktif)
+- [x] `MedicalStaff` (nama, jabatan, unit, foto, aktif)
+- [x] `Vaccines` (nama, jenis, stok, satuan, unit)
+- [x] `Certificates` (judul, penerbit, tanggal, berkas upload — Media izinkan PDF)
+- [x] Access per role (unit-scoped) + render publik via Local API (dipakai di Fase 4/nanti)
 
 ### Log Fase 3
--
+- [2026-07-03] 4 koleksi dibuat, unit-scoped + `enforceUnit`. `Media` mimeTypes +PDF, `staticDir` diperbaiki ke `<project>/media`. Tabel `doctors/medical_staff/vaccines/certificates` ter-push. Commit `23e1ea7`.
 
 ---
 
-## Fase 4 — Artikel
+## Fase 4 — Artikel  ✅
 
-**Tujuan:** poin 8 — CMS artikel + tampil di web.
-
-- [ ] `Articles` (title, slug, cover→Media, excerpt, content→Lexical, author→Users,
-      category, `versions.drafts: true` untuk publish workflow)
-- [ ] Hook auto-generate `slug` dari title
-- [ ] Halaman publik: list artikel + detail (`/artikel`, `/artikel/[slug]`)
-- [ ] Arahkan menu "Artikel" di Navbar ke halaman ini
-- [ ] Access: admin_unit boleh tulis draft, publish diatur sesuai kebijakan
+- [x] `Articles` (title, slug auto, cover, excerpt, content Lexical, category, author, publishedDate, drafts)
+- [x] Hook slug otomatis (`src/fields/slug.ts`)
+- [x] Publik: `/artikel` (list) + `/artikel/[slug]` (detail, render Lexical)
+- [x] Menu "Artikel" (desktop+mobile) → `/artikel`
 
 ### Log Fase 4
--
+- [2026-07-03] `Articles` + `_articles_v` (drafts) ter-push. Halaman publik dibuat, `/artikel` HTTP 200 (empty state). Render via `@payloadcms/richtext-lexical/react`. Commit `da79c36`.
 
 ---
 
-## Fase 5 — Analitik Pengunjung + Statistik Dashboard
+## Fase 5 — Analitik Pengunjung + Statistik Dashboard  ✅
 
-**Tujuan:** poin 1 — kunjungan mingguan/bulanan/tahunan, histogram harian, jam peak.
-
-- [ ] `PageViews` (timestamp, path, userAgent/hash, referrer) — tulis-only dari publik
-- [ ] Mekanisme logging kunjungan (route handler / middleware) + filter bot dasar
-- [ ] Query agregasi (raw SQL via `payload.db.drizzle`, timezone WITA):
-      - [ ] akumulasi 7 hari (per hari), 30 hari, 12 bulan
-      - [ ] histogram per hari
-      - [ ] jam peak (GROUP BY jam)
-- [ ] Custom dashboard: `admin.components.beforeDashboard` atau
-      `admin.components.views.dashboard.Component` — kartu stat + histogram
-- [ ] (Pertimbangkan alternatif Umami/Plausible bila traffic besar)
+- [x] `PageViews` (path, referrer, uaHash, timestamps)
+- [x] `/api/track` (filter bot UA) + `PageViewTracker` beacon di frontend layout
+- [x] Agregasi WITA: 7h/30h/1th, histogram harian, jam peak
+- [x] `DashboardStats` via `beforeDashboard`
 
 ### Log Fase 5
--
+- [2026-07-03] Pipeline TERVERIFIKASI end-to-end: POST browser-UA → row masuk `page_views`; UA bot (curl) di-skip. `DashboardStats` render di dashboard admin. Commit `23e1ea7`.
 
 ---
 
-## Fase 6 — Branding Admin (Opsi A)
+## Fase 6 — Branding Admin (Opsi A)  ✅
 
-**Tujuan:** admin terlihat ber-brand Puskesmas, palet hijau.
-
-- [ ] `graphics.Logo` & `graphics.Icon` (logo puskesmas)
-- [ ] `src/app/(payload)/custom.scss`: override CSS var tema → palet hijau
-      (`--color-base/primary/secondary`, elevation, dsb)
-- [ ] Polish login page & nav
+- [x] `graphics.Logo` & `graphics.Icon` (logo puskesmas)
+- [x] `custom.scss` palet hijau (tombol primary, aksen; best-effort selector Payload)
 
 ### Log Fase 6
--
+- [2026-07-03] Logo/Icon + custom.scss didaftarkan; importMap diregenerate. Commit `23e1ea7`.
+  CATATAN: sebagian selector internal Payload bisa berubah antar versi — verifikasi visual di browser, sesuaikan bila perlu.
 
 ---
 
-## Fase 7 — Migrasi & Persiapan Deploy
+## Fase 7 — Migrasi & Persiapan Deploy  ◐ (scaffold; finalisasi saat deploy)
 
-**Tujuan:** siap produksi.
-
-- [ ] Set `push: false` untuk produksi, buat migrasi: `pnpm payload migrate:create`
-- [ ] Script CI: `payload migrate && pnpm build`
-- [ ] Dockerfile untuk app (Docker "di akhir" sesuai rencana)
-- [ ] Env produksi + secret
+- [x] `Dockerfile` (multi-stage) + `.dockerignore`
+- [ ] `pnpm payload migrate:create initial` + set `push: false` untuk prod — **saat deploy** (jangan jalankan migrasi ke DB dev yang pakai push)
+- [ ] Service app di compose / env produksi + secret
 
 ### Log Fase 7
--
+- [2026-07-03] `Dockerfile` (node:22-alpine, `payload migrate && start`) + `.dockerignore` dibuat. Belum di-build/di-test (deploy-time). Commit menyusul.
 
 ---
 
-## Progress Log (ringkasan per fase / milestone besar)
+## Progress Log (ringkasan milestone)
 
-- [2026-07-03] Rencana ini dibuat (`docs/PAYLOAD_PLAN.md`).
-- [2026-07-03] (Pra-plan) Fix `payload.config.ts` registrasi `Users` — belum commit.
-- [2026-07-03] (Pra-plan) 404: Navbar+Footer ditambahkan & background putih
-  (`src/app/not-found.tsx`, `src/components/page/404-page.tsx`) — belum commit.
+- [2026-07-03] Rencana dibuat (`docs/PAYLOAD_PLAN.md`).
+- [2026-07-03] **Fase 0 selesai** (kecuali buat superadmin di browser): Postgres lokal Docker :5434, `.env` lokal, `/admin` 200.
+- [2026-07-03] **Fase 1 selesai**: roles + access control (`23e1ea7`).
+- [2026-07-03] **Fase 2 selesai** (globals): OperationalHours + SiteSettings; wiring publik jam ditunda ke branch informasi.
+- [2026-07-03] **Fase 3 selesai**: Doctors, MedicalStaff, Vaccines, Certificates (unit-scoped).
+- [2026-07-03] **Fase 4 selesai**: Articles + halaman publik `/artikel` (`da79c36`).
+- [2026-07-03] **Fase 5 selesai**: analitik PageViews + dashboard stats (pipeline terverifikasi).
+- [2026-07-03] **Fase 6 selesai**: branding admin (logo + custom.scss hijau).
+- [2026-07-03] **Fase 7 scaffold**: Dockerfile + .dockerignore; migrasi prod & finalisasi deploy = nanti.
+- [2026-07-03] SISA MANUAL: user buat akun superadmin pertama via browser; wiring publik jam operasional saat merge branch.
