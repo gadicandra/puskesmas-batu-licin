@@ -27,8 +27,11 @@ sesi (mis. jika limit habis).
 
 ### Model data (terimplementasi)
 - **Globals:** `OperationalHours`, `SiteSettings`
-- **Collections:** `Users`(+role,+unit), `Doctors`, `MedicalStaff`, `Vaccines`, `Certificates`, `Articles`(drafts), `Media`, `PageViews`
-- **Roles:** `superadmin` (penuh) · `admin_unit` (dibatasi unitnya via `unitScoped` + `enforceUnit`)
+- **Collections:** `Users`(+role,+lokasi), `Doctors`, `MedicalStaff`, `Vaccines`, `Certificates`, `Articles`(drafts), `Media`, `PageViews`
+- **Roles (REVISI):** `superadmin` (Puskesmas — akses penuh, kelola akun & tetapkan role) ·
+  `admin` (unit/jejaring tersebar di beberapa lokasi, BUKAN poli internal — **hanya kelola artikel**,
+  edit miliknya sendiri). Akun **pertama otomatis superadmin** (hook di Users). Field data collection
+  pakai `poli` (kategorisasi), bukan unit-scoping. `lokasi` (text) = nama unit untuk akun admin.
 
 ---
 
@@ -142,4 +145,9 @@ sesi (mis. jika limit habis).
 - [2026-07-03] **Fase 5 selesai**: analitik PageViews + dashboard stats (pipeline terverifikasi).
 - [2026-07-03] **Fase 6 selesai**: branding admin (logo + custom.scss hijau).
 - [2026-07-03] **Fase 7 scaffold**: Dockerfile + .dockerignore; migrasi prod & finalisasi deploy = nanti.
-- [2026-07-03] SISA MANUAL: user buat akun superadmin pertama via browser; wiring publik jam operasional saat merge branch.
+- [2026-07-03] **Revisi role model** (permintaan user): `admin_unit`→`admin`; admin hanya kelola
+  artikel; superadmin kelola akun+role; akun pertama otomatis superadmin; unit-scoping data diganti
+  `poli`; `unit`→`lokasi` di Users. Schema dev di-reset (0 data) & push ulang. Commit `0ed4a3a`.
+- [2026-07-03] Fix admin panel ramah light/dark mode via `custom.scss` (commit `56af320`).
+- [2026-07-03] SISA MANUAL: **restart dev server-mu** lalu buat akun pertama (otomatis superadmin);
+  wiring publik jam operasional saat merge branch.
