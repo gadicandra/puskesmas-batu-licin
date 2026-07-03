@@ -51,21 +51,22 @@ sesi (mis. jika limit habis).
 **Tujuan:** `/admin` bisa dibuka, buat first user, DB lokal jalan.
 
 - [x] Buat `docker-compose.yml` Postgres lokal (`postgres:16-alpine`, volume, **host port 5434**)
-- [ ] Set `DATABASE_URL` di `.env` ke DB lokal — **MANUAL (user)**: sandbox blokir tulis `.env`.
-      Nilai: `DATABASE_URL=postgres://postgres:postgres@localhost:5434/puskesmas`
-      (comment dulu baris Supabase lama; pastikan `PAYLOAD_SECRET` terisi)
+- [x] Set `DATABASE_URL` di `.env` ke DB lokal (`...@localhost:5434/puskesmas`) — user; backup di `.env.bak`
 - [x] Commit fix `payload.config.ts` (registrasi `Users`) — commit `590a914`
 - [x] Tambah script `payload` di `package.json` + instal `cross-env@10`
-- [ ] `pnpm dev` → buka `/admin` → verifikasi layar "Create first user" — **MANUAL (user)**
-- [ ] Buat 1 user superadmin manual — **MANUAL (user)**
+- [x] `pnpm dev` → `/admin` → layar "Create first user" TERVERIFIKASI (HTTP 200, tabel ter-push)
+- [ ] Buat 1 user superadmin manual — **MANUAL (user, via browser)**
 
 ### Log Fase 0
 - [2026-07-03] `docker-compose.yml` dibuat; port host 5432 & 5433 bentrok → dipakai **5434**.
   Container `puskesmas-db` up & healthy (`postgres:16-alpine`, db `puskesmas`, user/pass postgres/postgres).
 - [2026-07-03] Script `"payload"` ditambah ke `package.json`; `cross-env@10.1.0` terpasang (devDep).
 - [2026-07-03] Fix registrasi `Users` di `payload.config.ts` di-commit (`590a914`).
-- [2026-07-03] TERTUNDA (butuh aksi user): edit `.env` (DATABASE_URL lokal) → `pnpm dev` → buka
-  `/admin` → buat first user. Sandbox tidak mengizinkan menulis `.env`.
+- [2026-07-03] `.env` di-set user. Sempat error `SASL: client password must be a string` karena
+  baris `DATABASE_URL` ter-tempel ke baris tanpa newline → `.env` ditulis ulang bersih (backup `.env.bak`).
+- [2026-07-03] Koneksi DB lokal BERHASIL: `/admin` HTTP 200, `/admin/create-first-user` merender,
+  9 tabel Payload ter-push ke DB `puskesmas` (users, users_sessions, media, payload_migrations, dst).
+- [2026-07-03] SISA: user buat akun superadmin pertama via browser (`http://localhost:3000/admin`).
 
 ---
 
