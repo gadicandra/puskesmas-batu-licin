@@ -36,6 +36,9 @@ export default buildConfig({
     Users,
     {
       slug: 'media',
+      access: {
+        read: () => true, // file (gambar/PDF) harus bisa dibaca publik untuk tampil di web
+      },
       upload: {
         staticDir: path.resolve(dirname, '../media'), // Lokal disk (<project>/media)
         mimeTypes: ['image/*', 'application/pdf'],

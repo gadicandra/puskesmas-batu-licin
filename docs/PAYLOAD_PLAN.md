@@ -151,5 +151,48 @@ sesi (mis. jika limit habis).
   artikel; superadmin kelola akun+role; akun pertama otomatis superadmin; unit-scoping data diganti
   `poli`; `unit`→`lokasi` di Users. Schema dev di-reset (0 data) & push ulang. Commit `0ed4a3a`.
 - [2026-07-03] Fix admin panel ramah light/dark mode via `custom.scss` (commit `56af320`).
+- [2026-07-03] Warna admin dikembalikan ke DEFAULT Payload (hapus branding warna), commit `e62bdb7`.
+- [2026-07-03] DashboardStats: warna ikut tema Payload + histogram **bulanan (12 bln)** & **mingguan
+  (4 mgg)** selain harian; commit `a89d5e0`. Jam peak jadi interval 1 jam (`c868859`).
+- [2026-07-03] **BUG FIX**: koleksi `media` tanpa `access` → default Payload butuh auth utk read →
+  gambar publik ter-blokir. Ditambah `read: () => true`. (commit menyusul)
 - [2026-07-03] SISA MANUAL: **restart dev server-mu** lalu buat akun pertama (otomatis superadmin);
-  wiring publik jam operasional saat merge branch.
+  wiring publik jam operasional saat merge branch; hapus cache `.next` bila error ENOENT route.
+
+---
+
+## Review Menyeluruh — Celah, Edge Case, & Peningkatan (2026-07-03)
+
+Status: `[x]` sudah ditangani · `[ ]` rekomendasi (belum).
+
+### Prioritas TINGGI
+- [x] **Media read butuh auth** → gambar (cover artikel, foto dokter, sertifikat) tak tampil untuk
+  pengunjung publik. Fix: `media.access.read = () => true`.
+- [ ] **Analitik menghitung page-view, bukan PENGUNJUNG unik.** Requirement minta "jumlah orang".
+      Rekomendasi: set cookie visitor-id (mis. per hari), dedup di `/api/track` → metrik "orang"
+      terpisah dari "kunjungan". Saat ini angka = total view.
+- [ ] **`/api/track` + `PageViews.create: () => true` tanpa rate limit** → siapa pun bisa membanjiri
+      DB (DoS/analitik palsu), termasuk via REST `/api/page-views`. Rekomendasi: rate-limit per IP,
+      tutup create REST publik (hanya lewat route + `overrideAccess`), atau token beacon.
+
+### Prioritas SEDANG
+- [ ] **Slug artikel bentrok**: `unique:true` tapi auto-generate dari judul tanpa dedup → dua judul
+      sama = error simpan. Fix: cek keunikan & tambah sufiks (`-2`) di hook slug.
+- [ ] **Brute-force login**: set `auth: { maxLoginAttempts, lockTime }` di `Users` (verifikasi default).
+- [ ] **Admin bisa self-publish artikel** (set `_status=published`). Bila perlu alur review, batasi
+      publish ke superadmin via field access `_status`. (keputusan desain)
+- [ ] **Upload lokal-disk tidak persist di produksi** (container ephemeral). Pakai storage adapter
+      (S3/R2/UploadThing) untuk prod. (Fase 7)
+- [ ] **PDF ke koleksi `media` ber-imageSizes** → sharp coba resize PDF, berpotensi error. Uji; bila
+      perlu, pisahkan koleksi upload dokumen (tanpa imageSizes) untuk sertifikat.
+
+### Prioritas RENDAH
+- [ ] `PageViewTracker` kirim tiap ganti route tanpa debounce/dedup → over-count saat navigasi cepat.
+- [ ] Bot filter hanya regex UA → headless ber-UA palsu lolos.
+- [ ] `/artikel` tanpa paginasi (limit 30) — masalah skala.
+- [ ] `DashboardStats` fetch s/d 20k baris + 12 count → berat bila traffic besar; pertimbangkan
+      agregasi SQL (`date_trunc`) atau tabel ringkasan harian.
+- [ ] CORS/CSRF Payload belum dikonfigurasi (`cors`, `csrf`) — perlu bila frontend beda domain.
+- [ ] `path` di `/api/track` diterima apa adanya (truncate 512) → validasi path internal.
+- [ ] Artikel `author` bisa dangling bila user dihapus.
+- [ ] Reset password / verifikasi email auth belum diaktifkan (untuk prod).
