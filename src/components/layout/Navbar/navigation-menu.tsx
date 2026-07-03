@@ -64,7 +64,7 @@ const NavigationMenuTrigger = React.forwardRef<
   >
     {children}
     <ChevronDown
-      className="relative top-px ml-1 h-3 w-3 transition-transform duration-300 ease-out group-data-[state=open]:rotate-180"
+      className="relative top-px ml-1 h-3 w-3 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-data-[state=open]:rotate-180"
       aria-hidden="true"
     />
   </NavigationMenuPrimitive.Trigger>
@@ -78,7 +78,7 @@ const NavigationMenuContent = React.forwardRef<
   <NavigationMenuPrimitive.Content
     ref={ref}
     className={cn(
-      "data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-10 data-[motion=from-start]:slide-in-from-left-10 data-[motion=to-end]:slide-out-to-right-10 data-[motion=to-start]:slide-out-to-left-10 text-white left-0 h-fit w-full rounded-xl bg-primary/95 backdrop-blur-lg p-1 transition-all duration-300 ease-out md:absolute md:w-auto lg:mt-4 lg:border lg:border-white/20 lg:p-4 lg:shadow-xl",
+      "navmenu-content text-white left-0 h-fit w-full rounded-xl bg-primary/95 backdrop-blur-lg p-1 md:absolute md:w-auto lg:mt-4 lg:border lg:border-white/20 lg:p-4 lg:shadow-xl",
       className
     )}
     {...props}

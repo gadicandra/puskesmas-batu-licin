@@ -105,32 +105,25 @@ export default function Navbar() {
                       <NavigationMenuItem>
                         <NavigationMenuTrigger>Profil</NavigationMenuTrigger>
                         <NavigationMenuContent>
-                          <motion.div
-                            key="about-accordion"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="flex h-auto w- flex-col"
-                          >
-                            <div className="flex w-full flex-col">
-                              <ListItem href="/profil-puskesmas" title="Profil Puskesmas" />
-                              <ListItem href="/struktur-organisasi" title="Struktur Organisasi" />
-                              <ListItem href="/lokasi-puskesmas" title="Lokasi Puskesmas" />
-                            </div>
-                          </motion.div>
+                          <div className="flex w-full flex-col">
+                            <ListItem href="/profil-puskesmas" title="Profil Puskesmas" />
+                            <ListItem href="/struktur-organisasi" title="Struktur Organisasi" />
+                            <ListItem href="/lokasi-puskesmas" title="Lokasi Puskesmas" />
+                          </div>
                         </NavigationMenuContent>
                       </NavigationMenuItem>
                       <NavigationMenuItem>
-                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                          <Link
-                            href="/article/telescope"
-                            className={`cursor-pointer hover:text-white transition-all duration-300 ease-out hover:bg-white/20 hover:scale-105 hover:shadow-md active:scale-95 ${pathname === "/article/telescope" ? "text-white bg-white/20 scale-105" : ""
-                              }`}
-                          >
-                            <p className="text-base">Layanan</p>
-                          </Link>
-                        </NavigationMenuLink>
+                        <NavigationMenuTrigger>Layanan</NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                          <div className="flex w-full flex-col">
+                            <ListItem
+                              href="/informasi-layanan-mutu"
+                              title="Informasi Layanan dan Mutu"
+                            >
+                              Standar, tarif, hak pasien &amp; mutu
+                            </ListItem>
+                          </div>
+                        </NavigationMenuContent>
                       </NavigationMenuItem>
                       <NavigationMenuItem>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
@@ -231,7 +224,7 @@ export default function Navbar() {
                   <span>Profil</span>
                   <motion.span
                     animate={{ rotate: activeAccordion === "profil" ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                   >
                     <ChevronDown size={24} />
                   </motion.span>
@@ -241,9 +234,9 @@ export default function Navbar() {
                   {activeAccordion === "profil" && (
                     <motion.div
                       key="profil-accordion"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.3 }}
                       className="z-101 ml-3 flex w-fit flex-col gap-3 border-l border-white/20 py-1 pl-3"
                     >
@@ -267,16 +260,43 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-              {/* Layanan */}
-              <div key="layanan-wrapper">
-                <Link href="/layanan" onClick={closeMobileMenu}>
-                  <div
-                    className={`font-avenir-regular w-full p-2 hover:text-secondary transition-colors ${pathname === "/layanan" ? "font-semibold text-secondary" : ""
-                      }`}
+              {/* Layanan - Accordion */}
+              <div
+                key="layanan-wrapper"
+                className="font-avenir-regular relative flex w-full flex-col items-start"
+              >
+                <div
+                  className={`flex w-full cursor-pointer items-center justify-between p-2 ${pathname.startsWith("/informasi-layanan") ? "font-semibold text-secondary" : ""
+                    }`}
+                  onClick={() => toggleAccordion("layanan")}
+                >
+                  <span>Layanan</span>
+                  <motion.span
+                    animate={{ rotate: activeAccordion === "layanan" ? 180 : 0 }}
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    Layanan
-                  </div>
-                </Link>
+                    <ChevronDown size={24} />
+                  </motion.span>
+                </div>
+
+                <AnimatePresence>
+                  {activeAccordion === "layanan" && (
+                    <motion.div
+                      key="layanan-accordion"
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.3 }}
+                      className="z-101 ml-3 flex w-fit flex-col gap-3 border-l border-white/20 py-1 pl-3"
+                    >
+                      <Link href="/informasi-layanan-mutu" onClick={closeMobileMenu}>
+                        <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
+                          <span className="font-avenir font-medium">Informasi Layanan dan Mutu</span>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Fasilitas */}

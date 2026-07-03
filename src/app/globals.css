@@ -255,6 +255,40 @@ body {
   animation: scroll-hint 2s ease-in-out 1s;
 }
 
+/* Navbar dropdown: rise from below + fade in on open, sink down + fade out on close.
+   Keyed to Radix data-state so the exit animation plays before unmount. */
+@keyframes navDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes navDropdownOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.navmenu-content[data-state="open"] {
+  animation: navDropdownIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.navmenu-content[data-state="closed"] {
+  animation: navDropdownOut 0.28s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
 html {
   scroll-behavior: smooth;
 }
