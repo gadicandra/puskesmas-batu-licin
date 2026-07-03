@@ -1,19 +1,17 @@
 import type { Access, FieldAccess } from 'payload'
 
-// Catatan: field `role`/`unit` di-`saveToJWT`, jadi tersedia di `req.user` tanpa query.
-// Type payload-types belum tentu ter-regenerate saat helper ini ditulis, sehingga
-// akses properti custom di-cast longgar agar tetap compile.
-type AuthUser = { id: string | number; role?: string; unit?: string } | null | undefined
-
+// Field `role` di-`saveToJWT`, jadi tersedia di `req.user` tanpa query.
+// Cast longgar karena payload-types bisa belum ter-regenerate saat helper ditulis.
+type AuthUser = { id: string | number; role?: string } | null | undefined
 const asUser = (u: unknown): AuthUser => u as AuthUser
 
 /** Hanya user terautentikasi. */
 export const isLoggedIn: Access = ({ req: { user } }) => Boolean(user)
 
-/** Hanya superadmin (akses penuh Puskesmas). */
+/** Hanya superadmin (Puskesmas) — akses penuh. */
 export const isSuperAdmin: Access = ({ req: { user } }) => asUser(user)?.role === 'superadmin'
 
-/** Superadmin penuh; selain itu hanya dokumen dirinya sendiri. */
+/** Superadmin penuh; selain itu hanya dokumen dirinya sendiri (untuk koleksi Users). */
 export const superAdminOrSelf: Access = ({ req: { user } }) => {
     const u = asUser(user)
     if (!u) return false
@@ -21,30 +19,14 @@ export const superAdminOrSelf: Access = ({ req: { user } }) => {
     return { id: { equals: u.id } }
 }
 
-/**
- * Superadmin melihat/ubah semua; admin unit dibatasi hanya dokumen unit-nya
- * (koleksi wajib punya field `unit`).
- */
-export const unitScoped: Access = ({ req: { user } }) => {
+/** Superadmin boleh semua; admin biasa hanya dokumen yang ia tulis (field `author`). */
+export const superAdminOrAuthor: Access = ({ req: { user } }) => {
     const u = asUser(user)
     if (!u) return false
     if (u.role === 'superadmin') return true
-    if (u.unit) return { unit: { equals: u.unit } }
-    return false
+    return { author: { equals: u.id } }
 }
 
-/**
- * Publik boleh baca semua (untuk public side web), tetapi di dalam admin panel
- * admin unit hanya melihat dokumen unit-nya; superadmin melihat semua.
- */
-export const publicReadUnitScoped: Access = ({ req: { user } }) => {
-    const u = asUser(user)
-    if (!u) return true
-    if (u.role === 'superadmin') return true
-    if (u.unit) return { unit: { equals: u.unit } }
-    return true
-}
-
-/** Field access: hanya superadmin boleh mengubah nilai field ini. */
+/** Field access: hanya superadmin boleh mengubah nilai field ini (mis. `role`). */
 export const superAdminFieldAccess: FieldAccess = ({ req: { user } }) =>
     asUser(user)?.role === 'superadmin'

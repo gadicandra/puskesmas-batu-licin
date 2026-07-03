@@ -1,5 +1,5 @@
 import type { GlobalConfig } from 'payload'
-import { isLoggedIn } from '../access'
+import { isSuperAdmin } from '../access'
 
 /** Pengaturan situs umum yang tampil di public side (footer, kontak). */
 export const SiteSettings: GlobalConfig = {
@@ -8,7 +8,7 @@ export const SiteSettings: GlobalConfig = {
     admin: { group: 'Pengaturan' },
     access: {
         read: () => true,
-        update: isLoggedIn,
+        update: isSuperAdmin,
     },
     fields: [
         { name: 'namaInstansi', type: 'text', defaultValue: 'UPTD Puskesmas Batulicin' },

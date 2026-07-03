@@ -1,20 +1,32 @@
 import type { CollectionConfig } from 'payload'
 import { isSuperAdmin, superAdminOrSelf, superAdminFieldAccess } from '../access'
-import { unitOptions } from '../lib/units'
 
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
-    defaultColumns: ['name', 'email', 'role', 'unit'],
+    defaultColumns: ['name', 'email', 'role', 'lokasi'],
     group: 'Sistem',
   },
   auth: true,
   access: {
+    // Hanya superadmin yang mengelola akun. User biasa hanya melihat dirinya.
     read: superAdminOrSelf,
     create: isSuperAdmin,
     update: superAdminOrSelf,
     delete: isSuperAdmin,
+  },
+  hooks: {
+    beforeChange: [
+      // Akun PERTAMA yang dibuat otomatis jadi superadmin (Puskesmas).
+      async ({ req, operation, data }) => {
+        if (operation === 'create') {
+          const { totalDocs } = await req.payload.count({ collection: 'users' })
+          if (totalDocs === 0) return { ...data, role: 'superadmin' }
+        }
+        return data
+      },
+    ],
   },
   fields: [
     {
@@ -25,25 +37,27 @@ export const Users: CollectionConfig = {
       name: 'role',
       type: 'select',
       required: true,
-      defaultValue: 'admin_unit',
+      defaultValue: 'admin',
       saveToJWT: true,
       options: [
         { label: 'Super Admin (Puskesmas)', value: 'superadmin' },
-        { label: 'Admin Unit', value: 'admin_unit' },
+        { label: 'Admin (Unit/Jejaring)', value: 'admin' },
       ],
+      admin: {
+        description: 'Superadmin: akses penuh. Admin: hanya kelola artikel.',
+      },
       access: {
-        // Hanya superadmin yang boleh menaikkan/menurunkan role.
+        // Hanya superadmin yang boleh menetapkan/menaikkan role (termasuk jadi superadmin).
         update: superAdminFieldAccess,
       },
     },
     {
-      name: 'unit',
-      type: 'select',
+      name: 'lokasi',
+      type: 'text',
       saveToJWT: true,
-      options: [...unitOptions],
       admin: {
-        description: 'Unit yang dikelola. Wajib untuk Admin Unit.',
-        condition: (data) => data?.role === 'admin_unit',
+        description: 'Nama unit/lokasi layanan (untuk akun Admin). Kosongkan untuk Superadmin.',
+        condition: (data) => data?.role === 'admin',
       },
       access: {
         update: superAdminFieldAccess,

@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isLoggedIn } from '../access'
+import { isSuperAdmin } from '../access'
 
 export const Certificates: CollectionConfig = {
     slug: 'certificates',
@@ -11,9 +11,9 @@ export const Certificates: CollectionConfig = {
     },
     access: {
         read: () => true, // tampil di public side
-        create: isLoggedIn,
-        update: isLoggedIn,
-        delete: isLoggedIn,
+        create: isSuperAdmin,
+        update: isSuperAdmin,
+        delete: isSuperAdmin,
     },
     fields: [
         { name: 'judul', type: 'text', required: true },

@@ -1,5 +1,5 @@
 import type { GlobalConfig } from 'payload'
-import { isLoggedIn } from '../access'
+import { isSuperAdmin } from '../access'
 
 /** Jam operasional Puskesmas — dikelola admin, ditampilkan di public side.
  *  Nilai default mengikuti SK B/445.61/003/PKM.Btl-Adm/I/2023. */
@@ -9,7 +9,7 @@ export const OperationalHours: GlobalConfig = {
     admin: { group: 'Pengaturan' },
     access: {
         read: () => true, // publik
-        update: isLoggedIn,
+        update: isSuperAdmin,
     },
     fields: [
         {

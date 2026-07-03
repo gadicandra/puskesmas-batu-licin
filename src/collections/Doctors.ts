@@ -1,29 +1,27 @@
 import type { CollectionConfig } from 'payload'
-import { isLoggedIn, unitScoped, publicReadUnitScoped } from '../access'
-import { unitField } from '../fields/unit'
-import { enforceUnit } from '../hooks/enforceUnit'
+import { isSuperAdmin } from '../access'
+import { poliField } from '../fields/poli'
 
 export const Doctors: CollectionConfig = {
     slug: 'doctors',
     labels: { singular: 'Dokter', plural: 'Dokter' },
     admin: {
         useAsTitle: 'nama',
-        defaultColumns: ['nama', 'spesialisasi', 'unit', 'aktif'],
+        defaultColumns: ['nama', 'spesialisasi', 'poli', 'aktif'],
         group: 'Layanan',
     },
     access: {
-        read: publicReadUnitScoped,
-        create: isLoggedIn,
-        update: unitScoped,
-        delete: unitScoped,
+        read: () => true, // tampil di public side
+        create: isSuperAdmin,
+        update: isSuperAdmin,
+        delete: isSuperAdmin,
     },
-    hooks: { beforeChange: [enforceUnit] },
     fields: [
         { name: 'nama', type: 'text', required: true },
         { name: 'spesialisasi', type: 'text', required: true },
         { name: 'foto', type: 'upload', relationTo: 'media' },
         { name: 'jadwalPraktik', type: 'text', admin: { description: 'mis. Senin–Jumat, 08.00–11.00' } },
         { name: 'aktif', type: 'checkbox', defaultValue: true },
-        unitField,
+        poliField,
     ],
 }

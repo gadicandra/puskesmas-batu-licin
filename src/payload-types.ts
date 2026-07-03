@@ -141,28 +141,14 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name?: string | null;
-  role: 'superadmin' | 'admin_unit';
   /**
-   * Unit yang dikelola. Wajib untuk Admin Unit.
+   * Superadmin: akses penuh. Admin: hanya kelola artikel.
    */
-  unit?:
-    | (
-        | 'umum'
-        | 'gigi'
-        | 'kia-kb'
-        | 'lansia'
-        | 'gizi'
-        | 'sanitasi'
-        | 'mtbs'
-        | 'lab'
-        | 'farmasi'
-        | 'iva'
-        | 'promkes'
-        | 'ugd'
-        | 'tata-usaha'
-        | 'keuangan'
-      )
-    | null;
+  role: 'superadmin' | 'admin';
+  /**
+   * Nama unit/lokasi layanan (untuk akun Admin). Kosongkan untuk Superadmin.
+   */
+  lokasi?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -233,23 +219,26 @@ export interface Doctor {
   jadwalPraktik?: string | null;
   aktif?: boolean | null;
   /**
-   * Unit pemilik data.
+   * Poli/unit layanan terkait.
    */
-  unit:
-    | 'umum'
-    | 'gigi'
-    | 'kia-kb'
-    | 'lansia'
-    | 'gizi'
-    | 'sanitasi'
-    | 'mtbs'
-    | 'lab'
-    | 'farmasi'
-    | 'iva'
-    | 'promkes'
-    | 'ugd'
-    | 'tata-usaha'
-    | 'keuangan';
+  poli?:
+    | (
+        | 'umum'
+        | 'gigi'
+        | 'kia-kb'
+        | 'lansia'
+        | 'gizi'
+        | 'sanitasi'
+        | 'mtbs'
+        | 'lab'
+        | 'farmasi'
+        | 'iva'
+        | 'promkes'
+        | 'ugd'
+        | 'tata-usaha'
+        | 'keuangan'
+      )
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -264,23 +253,26 @@ export interface MedicalStaff {
   foto?: (number | null) | Media;
   aktif?: boolean | null;
   /**
-   * Unit pemilik data.
+   * Poli/unit layanan terkait.
    */
-  unit:
-    | 'umum'
-    | 'gigi'
-    | 'kia-kb'
-    | 'lansia'
-    | 'gizi'
-    | 'sanitasi'
-    | 'mtbs'
-    | 'lab'
-    | 'farmasi'
-    | 'iva'
-    | 'promkes'
-    | 'ugd'
-    | 'tata-usaha'
-    | 'keuangan';
+  poli?:
+    | (
+        | 'umum'
+        | 'gigi'
+        | 'kia-kb'
+        | 'lansia'
+        | 'gizi'
+        | 'sanitasi'
+        | 'mtbs'
+        | 'lab'
+        | 'farmasi'
+        | 'iva'
+        | 'promkes'
+        | 'ugd'
+        | 'tata-usaha'
+        | 'keuangan'
+      )
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -302,23 +294,26 @@ export interface Vaccine {
   satuan?: string | null;
   keterangan?: string | null;
   /**
-   * Unit pemilik data.
+   * Poli/unit layanan terkait.
    */
-  unit:
-    | 'umum'
-    | 'gigi'
-    | 'kia-kb'
-    | 'lansia'
-    | 'gizi'
-    | 'sanitasi'
-    | 'mtbs'
-    | 'lab'
-    | 'farmasi'
-    | 'iva'
-    | 'promkes'
-    | 'ugd'
-    | 'tata-usaha'
-    | 'keuangan';
+  poli?:
+    | (
+        | 'umum'
+        | 'gigi'
+        | 'kia-kb'
+        | 'lansia'
+        | 'gizi'
+        | 'sanitasi'
+        | 'mtbs'
+        | 'lab'
+        | 'farmasi'
+        | 'iva'
+        | 'promkes'
+        | 'ugd'
+        | 'tata-usaha'
+        | 'keuangan'
+      )
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -494,7 +489,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   role?: T;
-  unit?: T;
+  lokasi?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -564,7 +559,7 @@ export interface DoctorsSelect<T extends boolean = true> {
   foto?: T;
   jadwalPraktik?: T;
   aktif?: T;
-  unit?: T;
+  poli?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -577,7 +572,7 @@ export interface MedicalStaffSelect<T extends boolean = true> {
   jabatan?: T;
   foto?: T;
   aktif?: T;
-  unit?: T;
+  poli?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -591,7 +586,7 @@ export interface VaccinesSelect<T extends boolean = true> {
   stok?: T;
   satuan?: T;
   keterangan?: T;
-  unit?: T;
+  poli?: T;
   updatedAt?: T;
   createdAt?: T;
 }

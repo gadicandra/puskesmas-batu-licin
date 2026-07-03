@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isLoggedIn } from '../access'
+import { isLoggedIn, superAdminOrAuthor } from '../access'
 import { slugField } from '../fields/slug'
 
 export const Articles: CollectionConfig = {
@@ -19,9 +19,19 @@ export const Articles: CollectionConfig = {
             if (user) return true
             return { _status: { equals: 'published' } }
         },
-        create: isLoggedIn,
-        update: isLoggedIn,
-        delete: isLoggedIn,
+        create: isLoggedIn, // superadmin & admin boleh menambah artikel
+        update: superAdminOrAuthor, // admin hanya boleh mengubah artikelnya sendiri
+        delete: superAdminOrAuthor,
+    },
+    hooks: {
+        beforeChange: [
+            // Admin non-super: paksa author = dirinya (tak bisa mengklaim artikel orang lain).
+            ({ req, data }) => {
+                const u = req.user as { id?: string | number; role?: string } | undefined
+                if (u && u.role !== 'superadmin') return { ...data, author: u.id }
+                return data
+            },
+        ],
     },
     fields: [
         { name: 'title', type: 'text', required: true },

@@ -1,23 +1,21 @@
 import type { CollectionConfig } from 'payload'
-import { isLoggedIn, unitScoped, publicReadUnitScoped } from '../access'
-import { unitField } from '../fields/unit'
-import { enforceUnit } from '../hooks/enforceUnit'
+import { isSuperAdmin } from '../access'
+import { poliField } from '../fields/poli'
 
 export const MedicalStaff: CollectionConfig = {
     slug: 'medical-staff',
     labels: { singular: 'Tenaga Medis', plural: 'Tenaga Medis' },
     admin: {
         useAsTitle: 'nama',
-        defaultColumns: ['nama', 'jabatan', 'unit', 'aktif'],
+        defaultColumns: ['nama', 'jabatan', 'poli', 'aktif'],
         group: 'Layanan',
     },
     access: {
-        read: publicReadUnitScoped,
-        create: isLoggedIn,
-        update: unitScoped,
-        delete: unitScoped,
+        read: () => true,
+        create: isSuperAdmin,
+        update: isSuperAdmin,
+        delete: isSuperAdmin,
     },
-    hooks: { beforeChange: [enforceUnit] },
     fields: [
         { name: 'nama', type: 'text', required: true },
         {
@@ -38,6 +36,6 @@ export const MedicalStaff: CollectionConfig = {
         },
         { name: 'foto', type: 'upload', relationTo: 'media' },
         { name: 'aktif', type: 'checkbox', defaultValue: true },
-        unitField,
+        poliField,
     ],
 }
