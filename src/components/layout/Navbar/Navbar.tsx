@@ -150,8 +150,8 @@ export default function Navbar() {
                       <NavigationMenuItem>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                           <Link
-                            href="/article/telescope"
-                            className={`cursor-pointer hover:text-white transition-all duration-300 ease-out hover:bg-white/20 hover:scale-105 hover:shadow-md active:scale-95 ${pathname === "/article/telescope" ? "text-white bg-white/20 scale-105" : ""
+                            href="/artikel"
+                            className={`cursor-pointer hover:text-white transition-all duration-300 ease-out hover:bg-white/20 hover:scale-105 hover:shadow-md active:scale-95 ${pathname.startsWith("/artikel") ? "text-white bg-white/20 scale-105" : ""
                               }`}
                           >
                             <p className="text-base">Artikel</p>
