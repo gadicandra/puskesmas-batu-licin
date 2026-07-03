@@ -69,6 +69,12 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    doctors: Doctor;
+    'medical-staff': MedicalStaff;
+    vaccines: Vaccine;
+    certificates: Certificate;
+    articles: Article;
+    'page-views': PageView;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +84,12 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    doctors: DoctorsSelect<false> | DoctorsSelect<true>;
+    'medical-staff': MedicalStaffSelect<false> | MedicalStaffSelect<true>;
+    vaccines: VaccinesSelect<false> | VaccinesSelect<true>;
+    certificates: CertificatesSelect<false> | CertificatesSelect<true>;
+    articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    'page-views': PageViewsSelect<false> | PageViewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -87,8 +99,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'operational-hours': OperationalHour;
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    'operational-hours': OperationalHoursSelect<false> | OperationalHoursSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
@@ -122,6 +140,29 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  name?: string | null;
+  role: 'superadmin' | 'admin_unit';
+  /**
+   * Unit yang dikelola. Wajib untuk Admin Unit.
+   */
+  unit?:
+    | (
+        | 'umum'
+        | 'gigi'
+        | 'kia-kb'
+        | 'lansia'
+        | 'gizi'
+        | 'sanitasi'
+        | 'mtbs'
+        | 'lab'
+        | 'farmasi'
+        | 'iva'
+        | 'promkes'
+        | 'ugd'
+        | 'tata-usaha'
+        | 'keuangan'
+      )
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -158,6 +199,195 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "doctors".
+ */
+export interface Doctor {
+  id: number;
+  nama: string;
+  spesialisasi: string;
+  foto?: (number | null) | Media;
+  /**
+   * mis. Senin–Jumat, 08.00–11.00
+   */
+  jadwalPraktik?: string | null;
+  aktif?: boolean | null;
+  /**
+   * Unit pemilik data.
+   */
+  unit:
+    | 'umum'
+    | 'gigi'
+    | 'kia-kb'
+    | 'lansia'
+    | 'gizi'
+    | 'sanitasi'
+    | 'mtbs'
+    | 'lab'
+    | 'farmasi'
+    | 'iva'
+    | 'promkes'
+    | 'ugd'
+    | 'tata-usaha'
+    | 'keuangan';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medical-staff".
+ */
+export interface MedicalStaff {
+  id: number;
+  nama: string;
+  jabatan: 'dokter' | 'perawat' | 'bidan' | 'apoteker' | 'analis' | 'gizi' | 'sanitarian' | 'administrasi' | 'lainnya';
+  foto?: (number | null) | Media;
+  aktif?: boolean | null;
+  /**
+   * Unit pemilik data.
+   */
+  unit:
+    | 'umum'
+    | 'gigi'
+    | 'kia-kb'
+    | 'lansia'
+    | 'gizi'
+    | 'sanitasi'
+    | 'mtbs'
+    | 'lab'
+    | 'farmasi'
+    | 'iva'
+    | 'promkes'
+    | 'ugd'
+    | 'tata-usaha'
+    | 'keuangan';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vaccines".
+ */
+export interface Vaccine {
+  id: number;
+  nama: string;
+  /**
+   * mis. Campak, Polio, DPT-HB-Hib
+   */
+  jenis?: string | null;
+  /**
+   * Jumlah dosis tersedia.
+   */
+  stok: number;
+  satuan?: string | null;
+  keterangan?: string | null;
+  /**
+   * Unit pemilik data.
+   */
+  unit:
+    | 'umum'
+    | 'gigi'
+    | 'kia-kb'
+    | 'lansia'
+    | 'gizi'
+    | 'sanitasi'
+    | 'mtbs'
+    | 'lab'
+    | 'farmasi'
+    | 'iva'
+    | 'promkes'
+    | 'ugd'
+    | 'tata-usaha'
+    | 'keuangan';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certificates".
+ */
+export interface Certificate {
+  id: number;
+  judul: string;
+  penerbit?: string | null;
+  tanggal?: string | null;
+  /**
+   * Scan/berkas sertifikat (gambar atau PDF).
+   */
+  berkas: number | Media;
+  keterangan?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles".
+ */
+export interface Article {
+  id: number;
+  title: string;
+  /**
+   * Dikosongkan = dibuat otomatis dari judul.
+   */
+  slug?: string | null;
+  cover?: (number | null) | Media;
+  /**
+   * Ringkasan singkat untuk daftar & preview.
+   */
+  excerpt?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  category?: ('berita' | 'pengumuman' | 'kegiatan' | 'kesehatan') | null;
+  author?: (number | null) | User;
+  publishedDate?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-views".
+ */
+export interface PageView {
+  id: number;
+  path: string;
+  referrer?: string | null;
+  uaHash?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -190,6 +420,30 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'doctors';
+        value: number | Doctor;
+      } | null)
+    | ({
+        relationTo: 'medical-staff';
+        value: number | MedicalStaff;
+      } | null)
+    | ({
+        relationTo: 'vaccines';
+        value: number | Vaccine;
+      } | null)
+    | ({
+        relationTo: 'certificates';
+        value: number | Certificate;
+      } | null)
+    | ({
+        relationTo: 'articles';
+        value: number | Article;
+      } | null)
+    | ({
+        relationTo: 'page-views';
+        value: number | PageView;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -238,6 +492,9 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  unit?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -272,6 +529,112 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "doctors_select".
+ */
+export interface DoctorsSelect<T extends boolean = true> {
+  nama?: T;
+  spesialisasi?: T;
+  foto?: T;
+  jadwalPraktik?: T;
+  aktif?: T;
+  unit?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medical-staff_select".
+ */
+export interface MedicalStaffSelect<T extends boolean = true> {
+  nama?: T;
+  jabatan?: T;
+  foto?: T;
+  aktif?: T;
+  unit?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vaccines_select".
+ */
+export interface VaccinesSelect<T extends boolean = true> {
+  nama?: T;
+  jenis?: T;
+  stok?: T;
+  satuan?: T;
+  keterangan?: T;
+  unit?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certificates_select".
+ */
+export interface CertificatesSelect<T extends boolean = true> {
+  judul?: T;
+  penerbit?: T;
+  tanggal?: T;
+  berkas?: T;
+  keterangan?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles_select".
+ */
+export interface ArticlesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  cover?: T;
+  excerpt?: T;
+  content?: T;
+  category?: T;
+  author?: T;
+  publishedDate?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-views_select".
+ */
+export interface PageViewsSelect<T extends boolean = true> {
+  path?: T;
+  referrer?: T;
+  uaHash?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -312,6 +675,78 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "operational-hours".
+ */
+export interface OperationalHour {
+  id: number;
+  jadwal: {
+    hari: string;
+    jam: string;
+    id?: string | null;
+  }[];
+  catatan?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  namaInstansi?: string | null;
+  alamat?: string | null;
+  telepon?: string | null;
+  email?: string | null;
+  sosialMedia?:
+    | {
+        platform: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "operational-hours_select".
+ */
+export interface OperationalHoursSelect<T extends boolean = true> {
+  jadwal?:
+    | T
+    | {
+        hari?: T;
+        jam?: T;
+        id?: T;
+      };
+  catatan?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  namaInstansi?: T;
+  alamat?: T;
+  telepon?: T;
+  email?: T;
+  sosialMedia?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

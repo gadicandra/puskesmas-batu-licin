@@ -6,7 +6,14 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
-import { Media } from './collections/Media'
+import { Doctors } from './collections/Doctors'
+import { MedicalStaff } from './collections/MedicalStaff'
+import { Vaccines } from './collections/Vaccines'
+import { Certificates } from './collections/Certificates'
+import { Articles } from './collections/Articles'
+import { PageViews } from './collections/PageViews'
+import { OperationalHours } from './globals/OperationalHours'
+import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -17,14 +24,21 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      beforeDashboard: ['/components/admin/DashboardStats'],
+      graphics: {
+        Logo: '/components/admin/Logo',
+        Icon: '/components/admin/Icon',
+      },
+    },
   },
   collections: [
     Users,
     {
       slug: 'media',
       upload: {
-        staticDir: path.resolve(__dirname, '../../media'), // Lokal disk
-        mimeTypes: ['image/*'],
+        staticDir: path.resolve(dirname, '../media'), // Lokal disk (<project>/media)
+        mimeTypes: ['image/*', 'application/pdf'],
         imageSizes: [
           {
             name: 'thumbnail',
@@ -48,7 +62,14 @@ export default buildConfig({
         },
       ],
     },
+    Doctors,
+    MedicalStaff,
+    Vaccines,
+    Certificates,
+    Articles,
+    PageViews,
   ],
+  globals: [OperationalHours, SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

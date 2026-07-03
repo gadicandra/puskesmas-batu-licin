@@ -1,0 +1,35 @@
+/* ============================================================
+   Branding admin Puskesmas Batulicin — palet hijau.
+   Sentuhan aman: tombol utama & aksen sukses jadi hijau brand.
+   Jika suatu selector tidak cocok di versi Payload, ia tak berefek
+   (tidak merusak tampilan default).
+   ============================================================ */
+
+:root {
+  --color-success-500: #697644;
+  --theme-success-500: #697644;
+}
+
+/* Tombol aksi utama (Save, Create, dsb.) */
+.btn--style-primary {
+  background-color: #233115;
+  border-color: #233115;
+
+  &:hover,
+  &:focus {
+    background-color: #2f4420;
+    border-color: #2f4420;
+  }
+}
+
+/* Item navigasi aktif */
+.nav__link--active,
+.nav-group__toggle:hover {
+  color: #697644;
+}
+
+/* Highlight fokus field mengikuti brand */
+.field-type input:focus,
+.field-type textarea:focus {
+  border-color: #697644;
+}
