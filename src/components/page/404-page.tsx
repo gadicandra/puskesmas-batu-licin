@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function Custom404Page() {
   return (
-    <section className="min-h-screen bg-base py-10 font-avenir overflow-hidden flex items-center justify-center">
+    <section className="min-h-screen bg-white py-10 font-avenir overflow-hidden flex items-center justify-center">
       <div className="container mx-auto px-4">
         <div className="flex justify-center">
           <div className="w-full max-w-3xl">

@@ -19,6 +19,7 @@ export default buildConfig({
     },
   },
   collections: [
+    Users,
     {
       slug: 'media',
       upload: {
