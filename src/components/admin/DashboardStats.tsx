@@ -134,11 +134,17 @@ export default async function DashboardStats() {
     const peakHour = hourBuckets.reduce((best, c, h) => (c > hourBuckets[best] ? h : best), 0)
     const peakCount = hourBuckets[peakHour]
 
+    const pad = (n: number) => String(n).padStart(2, '0')
     const summary = [
         { label: '7 Hari', value: String(week) },
         { label: '30 Hari', value: String(month) },
         { label: '1 Tahun', value: String(year) },
-        { label: 'Jam Peak (WITA)', value: `${String(peakHour).padStart(2, '0')}.00`, sub: `${peakCount} kunjungan` },
+        {
+            label: 'Jam Peak (WITA)',
+            value: `${pad(peakHour)}.00–${pad((peakHour + 1) % 24)}.00`,
+            sub: `${peakCount} kunjungan`,
+            valueSize: 22,
+        },
     ]
 
     return (
@@ -153,7 +159,7 @@ export default async function DashboardStats() {
                         <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: C.muted }}>
                             {c.label}
                         </div>
-                        <div style={{ fontSize: 30, fontWeight: 900, color: C.strong, lineHeight: 1.1, marginTop: 6 }}>{c.value}</div>
+                        <div style={{ fontSize: 'valueSize' in c ? c.valueSize : 30, fontWeight: 900, color: C.strong, lineHeight: 1.1, marginTop: 6 }}>{c.value}</div>
                         {'sub' in c && c.sub ? <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{c.sub}</div> : null}
                     </div>
                 ))}
