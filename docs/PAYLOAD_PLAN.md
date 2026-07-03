@@ -50,16 +50,22 @@ sesi (mis. jika limit habis).
 
 **Tujuan:** `/admin` bisa dibuka, buat first user, DB lokal jalan.
 
-- [ ] Buat `docker-compose.yml` Postgres lokal (mis. `postgres:16`, volume, port 5432)
-- [ ] Set `DATABASE_URL` di `.env` ke DB lokal
-- [ ] Commit fix `payload.config.ts` (registrasi `Users`)
-- [ ] Tambah script `"payload": "cross-env NODE_OPTIONS=--no-deprecation payload"` di `package.json`
-      (butuh `cross-env` — cek/instal)
-- [ ] `pnpm dev` → buka `/admin` → verifikasi layar "Create first user"
-- [ ] Buat 1 user superadmin manual
+- [x] Buat `docker-compose.yml` Postgres lokal (`postgres:16-alpine`, volume, **host port 5434**)
+- [ ] Set `DATABASE_URL` di `.env` ke DB lokal — **MANUAL (user)**: sandbox blokir tulis `.env`.
+      Nilai: `DATABASE_URL=postgres://postgres:postgres@localhost:5434/puskesmas`
+      (comment dulu baris Supabase lama; pastikan `PAYLOAD_SECRET` terisi)
+- [x] Commit fix `payload.config.ts` (registrasi `Users`) — commit `590a914`
+- [x] Tambah script `payload` di `package.json` + instal `cross-env@10`
+- [ ] `pnpm dev` → buka `/admin` → verifikasi layar "Create first user" — **MANUAL (user)**
+- [ ] Buat 1 user superadmin manual — **MANUAL (user)**
 
 ### Log Fase 0
--
+- [2026-07-03] `docker-compose.yml` dibuat; port host 5432 & 5433 bentrok → dipakai **5434**.
+  Container `puskesmas-db` up & healthy (`postgres:16-alpine`, db `puskesmas`, user/pass postgres/postgres).
+- [2026-07-03] Script `"payload"` ditambah ke `package.json`; `cross-env@10.1.0` terpasang (devDep).
+- [2026-07-03] Fix registrasi `Users` di `payload.config.ts` di-commit (`590a914`).
+- [2026-07-03] TERTUNDA (butuh aksi user): edit `.env` (DATABASE_URL lokal) → `pnpm dev` → buka
+  `/admin` → buat first user. Sandbox tidak mengizinkan menulis `.env`.
 
 ---
 
