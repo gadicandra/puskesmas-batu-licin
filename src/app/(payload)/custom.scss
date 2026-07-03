@@ -1,46 +1,11 @@
-/* ============================================================
-   Branding admin Puskesmas Batulicin — palet hijau.
-   Sentuhan aman: tombol utama & aksen sukses jadi hijau brand.
-   Jika suatu selector tidak cocok di versi Payload, ia tak berefek
-   (tidak merusak tampilan default).
-   ============================================================ */
-
-/* PENTING — isolasi dari globals.css frontend.
-   Root layout meng-share <body> dengan aturan `background:#EFF1EB` + font Avenir
-   yang bocor ke admin (latar terang + teks tema gelap = pucat/tak terbaca).
-   Paksa latar, teks, dan font admin mengikuti tema Payload → benar di light & dark mode. */
+/* Admin dibiarkan memakai WARNA DEFAULT Payload.
+   Satu-satunya aturan di sini bukan kustomisasi warna, melainkan isolasi:
+   root layout meng-share <body> dengan `globals.css` frontend yang memaksa
+   `background:#EFF1EB` + font Avenir sehingga bocor ke admin. Kita kembalikan
+   latar & teks ke variabel tema bawaan Payload (--theme-bg / --theme-text),
+   jadi admin tampil sesuai default-nya (light maupun dark mode). */
 html[data-theme],
 body {
   background: var(--theme-bg) !important;
   color: var(--theme-text) !important;
-  font-family: var(--font-body, system-ui, -apple-system, "Segoe UI", sans-serif) !important;
-}
-
-:root {
-  --color-success-500: #697644;
-  --theme-success-500: #697644;
-}
-
-/* Tombol aksi utama (Save, Create, dsb.) */
-.btn--style-primary {
-  background-color: #233115;
-  border-color: #233115;
-
-  &:hover,
-  &:focus {
-    background-color: #2f4420;
-    border-color: #2f4420;
-  }
-}
-
-/* Item navigasi aktif */
-.nav__link--active,
-.nav-group__toggle:hover {
-  color: #697644;
-}
-
-/* Highlight fokus field mengikuti brand */
-.field-type input:focus,
-.field-type textarea:focus {
-  border-color: #697644;
 }

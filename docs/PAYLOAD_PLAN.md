@@ -119,7 +119,9 @@ sesi (mis. jika limit habis).
 
 ### Log Fase 6
 - [2026-07-03] Logo/Icon + custom.scss didaftarkan; importMap diregenerate. Commit `23e1ea7`.
-  CATATAN: sebagian selector internal Payload bisa berubah antar versi — verifikasi visual di browser, sesuaikan bila perlu.
+- [2026-07-03] Atas permintaan user: **warna admin dikembalikan ke DEFAULT Payload** — branding warna
+  (tombol/nav hijau) dihapus dari custom.scss; hanya sisakan isolasi latar/teks ke `--theme-bg/--theme-text`
+  agar tidak kebocoran globals.css. Logo/Icon puskesmas tetap.
 
 ---
 
