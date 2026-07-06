@@ -1,65 +1,27 @@
 import React from "react";
-import MottoCard from "../MottoCard";
-import { Heart, Shield, Users, Lightbulb, Target, Mail } from "lucide-react";
+import { HeartHandshake, Sparkles } from "lucide-react";
 
 const MottoContent = () => {
     return (
         <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:mt-20 mb-10">
-                <MottoCard
-                    letter="C"
-                    title="Compassionate"
-                    subtitle="Cepat"
-                    description="Memberikan pelayanan yang cepat dan tanggap kepada setiap pasien."
-                    icon={<Heart className="w-6 h-6 text-pink-500" />}
-                    color="bg-pink-50"
-                    textColor="text-pink-600"
-                />
-                <MottoCard
-                    letter="E"
-                    title="Empathy"
-                    subtitle="Efektif"
-                    description="Memberikan pelayanan yang efektif dan efisien sesuai standar."
-                    icon={<Shield className="w-6 h-6 text-blue-500" />}
-                    color="bg-blue-50"
-                    textColor="text-blue-600"
-                />
-                <MottoCard
-                    letter="R"
-                    title="Respect"
-                    subtitle="Ramah"
-                    description="Melayani dengan ramah, sopan, dan santun kepada semua pengunjung."
-                    icon={<Users className="w-6 h-6 text-green-500" />}
-                    color="bg-green-50"
-                    textColor="text-green-600"
-                />
-                <MottoCard
-                    letter="D"
-                    title="Dedication"
-                    subtitle="Disiplin"
-                    description="Disiplin dalam waktu dan prosedur pelayanan kesehatan."
-                    icon={<Lightbulb className="w-6 h-6 text-amber-500" />}
-                    color="bg-amber-50"
-                    textColor="text-amber-600"
-                />
-                <MottoCard
-                    letter="A"
-                    title="Accountable"
-                    subtitle="Akuntabel"
-                    description="Dapat dipertanggungjawabkan sesuai dengan peraturan yang berlaku."
-                    icon={<Target className="w-6 h-6 text-purple-500" />}
-                    color="bg-purple-50"
-                    textColor="text-purple-600"
-                />
-                <MottoCard
-                    letter="S"
-                    title="Smile"
-                    subtitle="Senyum"
-                    description="Selalu memberikan senyuman dalam setiap pelayanan."
-                    icon={<Mail className="w-6 h-6 text-cyan-500" />}
-                    color="bg-cyan-50"
-                    textColor="text-cyan-600"
-                />
+            <div className="lg:mt-20 mb-10">
+                <div className="relative overflow-hidden rounded-2xl border border-secondary/20 bg-white p-6 md:p-10 shadow-sm">
+                    <div className="absolute right-0 top-0 h-32 w-32 rounded-bl-full bg-secondary/10" />
+                    <div className="relative z-10 flex flex-col gap-8 md:flex-row md:items-center">
+                        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-secondary text-white">
+                            <HeartHandshake className="h-10 w-10" />
+                        </div>
+                        <div>
+                            <p className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-secondary">
+                                <Sparkles className="h-4 w-4" />
+                                Motto Pelayanan
+                            </p>
+                            <p className="text-2xl font-bold leading-relaxed text-slate-800 md:text-4xl">
+                                &quot;Ramah dan profesional dalam pelayanan kesehatan, dan kepuasan Anda adalah harapan kami.&quot;
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
