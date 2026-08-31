@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 /** Pesan validasi ditulis dalam bahasa sehari-hari dan selalu memberi tahu
  *  cara memperbaiki — bukan sekadar menyatakan ada yang salah.
- *  Lihat CUSTOM_DASHBOARD_PLAN §2 prinsip 5. */
+ *  Lihat docs/DASHBOARD.md §2 prinsip 5. */
 
 export const skemaArtikel = z.object({
     title: z.string().trim().min(1, 'Judul belum diisi. Isi judul artikel lalu simpan lagi.'),

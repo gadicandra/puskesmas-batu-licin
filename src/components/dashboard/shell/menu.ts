@@ -24,7 +24,7 @@ export type MenuItem = {
 }
 
 /** Menu sidebar. Label sengaja memakai bahasa sehari-hari, bukan istilah teknis
- *  ("Galeri Gambar", bukan "Media"). Lihat CUSTOM_DASHBOARD_PLAN §2. */
+ *  ("Galeri Gambar", bukan "Media"). Lihat docs/DASHBOARD.md §2. */
 export const MENU: MenuItem[] = [
     { label: 'Beranda', href: '/dashboard', ikon: LayoutDashboard, grup: 'utama' },
     { label: 'Artikel', href: '/dashboard/artikel', ikon: Newspaper, grup: 'utama' },

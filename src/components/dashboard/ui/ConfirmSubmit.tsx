@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import Button, { type ButtonProps } from './Button'
 
 /** Tombol submit yang meminta konfirmasi dulu. Pesannya WAJIB menyebut nama
- *  data yang akan dihapus — bukan "Anda yakin?" (lihat CUSTOM_DASHBOARD_PLAN §2). */
+ *  data yang akan dihapus — bukan "Anda yakin?" (lihat docs/DASHBOARD.md §2). */
 export default function ConfirmSubmit({
     pesan,
     children,

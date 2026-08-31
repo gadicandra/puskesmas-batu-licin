@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 import MediaPicker from '@/components/dashboard/media/MediaPicker'
 
 /** Tombol toolbar. Sengaja hanya yang benar-benar dibutuhkan — setiap tombol
- *  tambahan adalah beban bagi pengguna awam (CUSTOM_DASHBOARD_PLAN §8). */
+ *  tambahan adalah beban bagi pengguna awam (docs/DASHBOARD.md §3). */
 function TombolToolbar({
     aktif = false,
     label,
