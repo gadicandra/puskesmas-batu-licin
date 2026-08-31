@@ -1,9 +1,8 @@
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { notFound } from "next/navigation";
-import { RichText } from "@payloadcms/richtext-lexical/react";
-import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 import Breadcrumb from "@/components/common/Breadcrumb";
+import { bersihkanHtml, waktuBaca } from "@/lib/dashboard/html";
 import Container from "@/components/layout/Container/Container";
 
 export const dynamic = "force-dynamic";
@@ -57,6 +56,14 @@ export default async function ArtikelDetailPage({ params }: { params: Promise<{ 
                         <span className="font-medium normal-case text-tertiary">
                             {formatTanggal(a.publishedDate)}
                         </span>
+                        {a.content && (
+                            <>
+                                <span className="text-tertiary/50">•</span>
+                                <span className="font-medium normal-case text-tertiary">
+                                    {waktuBaca(a.content)} menit baca
+                                </span>
+                            </>
+                        )}
                     </div>
                     <h1 className="mt-3 text-3xl md:text-4xl font-black leading-tight text-primary">
                         {a.title}
@@ -73,9 +80,13 @@ export default async function ArtikelDetailPage({ params }: { params: Promise<{ 
                     )}
 
                     {a.content && (
-                        <div className="prose prose-lg mt-8 max-w-none text-primary/90">
-                            <RichText data={a.content as SerializedEditorState} />
-                        </div>
+                        // Isi artikel disanitasi lagi saat render — HTML dari editor
+                        // tidak pernah dianggap tepercaya, sekalipun sudah dibersihkan
+                        // waktu disimpan.
+                        <div
+                            className="prose-artikel mt-8"
+                            dangerouslySetInnerHTML={{ __html: bersihkanHtml(a.content) }}
+                        />
                     )}
                 </article>
             </Container>

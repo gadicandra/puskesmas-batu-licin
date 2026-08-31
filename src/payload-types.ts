@@ -353,21 +353,7 @@ export interface Article {
    * Ringkasan singkat untuk daftar & preview.
    */
   excerpt?: string | null;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  content?: string | null;
   category?: ('berita' | 'pengumuman' | 'kegiatan' | 'kesehatan') | null;
   author?: (number | null) | User;
   publishedDate?: string | null;

@@ -42,7 +42,13 @@ export const Articles: CollectionConfig = {
             type: 'textarea',
             admin: { description: 'Ringkasan singkat untuk daftar & preview.' },
         },
-        { name: 'content', type: 'richText' },
+        {
+            // Disimpan sebagai HTML dari editor WYSIWYG dashboard (Tiptap), bukan
+            // Lexical. Selalu disanitasi di server sebelum simpan & saat render.
+            name: 'content',
+            type: 'textarea',
+            label: 'Isi artikel (HTML)',
+        },
         {
             name: 'category',
             type: 'select',
