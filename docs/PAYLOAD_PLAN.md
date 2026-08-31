@@ -156,22 +156,32 @@ control, versioning, upload, Local API). Spesifikasi lengkap: `docs/CUSTOM_DASHB
 - [x] `PageViews.create` ditutup dari publik — penulisan hanya lewat `/api/track`.
 - [x] `slugField` menjamin slug unik dengan sufiks angka (`judul-sama-2`).
 
-### Belum — dikerjakan saat dashboard custom siap (M3, lihat PROJECT_PLAN)
-- [ ] Halaman `/setup` untuk membuat superadmin pertama — **WAJIB ada sebelum `/admin`
-      dihapus.** Layar "create first user" Payload ikut hilang bersama `/admin`; tanpa
-      `/setup`, deploy ke database kosong tidak bisa dimasuki sama sekali.
-- [ ] Hapus `admin.components` (`beforeDashboard`, `graphics.Logo/Icon`) dari `payload.config.ts`
-- [ ] Hapus `src/components/admin/*` setelah logikanya diporting ke Beranda dashboard
-- [ ] Hapus route group `(payload)/admin` + `importMap.js`
-- [ ] Hapus `src/app/(payload)/custom.scss` beserta import-nya di `layout.tsx`
-      (konsekuensi baik: masalah `sass` yang tidak ter-resolve dari root ikut hilang)
-- [ ] **JANGAN hapus `(payload)/api`** — REST melayani berkas media publik yang dipakai situs
-- [ ] Verifikasi `pnpm build` & `payload migrate` setelah pembersihan
+### Tahap 2 — Penghapusan `/admin` ✅ SELESAI 2026-08-31 (commit `ec5c495`)
+- [x] Halaman `/dashboard/setup` untuk membuat superadmin pertama — dibuat **sebelum**
+      penghapusan. Dijaga di server (`payload.count({collection:'users'}) === 0`), bukan
+      hanya di UI. Menggantikan layar "create first user" Payload yang ikut hilang.
+- [x] Hapus `admin.components` dari `payload.config.ts`; ditambah `admin.disable: true`
+- [x] Hapus `src/components/admin/*` (logika statistik diporting ke `src/lib/dashboard/statistik.ts`)
+- [x] Hapus route group `(payload)/admin` + `importMap.js`
+- [x] Hapus `src/app/(payload)/custom.scss` dan `(payload)/layout.tsx`
+      → masalah `sass` yang tidak ter-resolve dari root ikut hilang, `sass` tidak perlu dipasang
+- [x] **`(payload)/api` DIPERTAHANKAN** — REST melayani berkas media publik
+- [x] Verifikasi `pnpm build` berhasil; `/admin` → 404; `/api/users` → 403 (REST hidup)
+- [ ] Verifikasi `payload migrate` di produksi — saat deploy (M4)
+
+### Yang tersisa dari Payload setelah penghapusan
+Schema & migrasi (Drizzle) · auth (hash password, JWT, cookie `payload-token`) ·
+access control `src/access` · Local API · drafts/versions `articles` · upload + sharp ·
+REST `/api/*` · `payload-types.ts`. **Yang hilang hanya UI-nya.**
 
 ### Log Fase 8
-- [2026-08-31] Pembersihan tahap pertama selesai (lihat daftar di atas). `/admin` sengaja
-  **belum** dihapus karena dashboard custom belum ada — menghapusnya sekarang berarti tidak
-  ada cara mengelola konten sama sekali selama masa pembangunan.
+- [2026-08-31] Pembersihan tahap pertama selesai (importMap basi, koleksi `media` disatukan).
+- [2026-08-31] Field `content` pada `Articles` diubah dari `richText` (Lexical) ke `textarea`
+  berisi HTML. **Database diperiksa dulu: 0 artikel**, jadi tanpa risiko dan tanpa script
+  konversi. Konsekuensi: `@payloadcms/richtext-lexical` masih terpasang sebagai editor
+  default di config, tapi tidak ada field yang memakainya lagi — bisa dilepas nanti.
+- [2026-08-31] **Tahap 2 selesai: `/admin` dihapus** setelah dashboard custom di `/dashboard`
+  bisa dipakai penuh dan halaman `/dashboard/setup` tersedia. Diverifikasi di server dev.
 
 ---
 
@@ -202,6 +212,9 @@ control, versioning, upload, Local API). Spesifikasi lengkap: `docs/CUSTOM_DASHB
 - [2026-08-31] **Fase 8 tahap 1 selesai**: importMap basi dihapus (akar penyebab build gagal),
   koleksi `media` disatukan ke `src/collections/Media.ts`, kunci login, slug unik, `page-views`
   ditutup dari publik. Commit `8e44f45`, PR #8.
+- [2026-08-31] **Fase 8 tahap 2 selesai**: `/admin` dihapus total, digantikan dashboard custom
+  di `/dashboard` (14 halaman). Pembuatan superadmin pertama pindah ke `/dashboard/setup`.
+  Commit `ec5c495`. Rincian per fase ada di `docs/CUSTOM_DASHBOARD_PLAN.md`.
 
 ---
 

@@ -570,50 +570,77 @@ library chart (grafik ditulis dengan SVG) · library form (`useActionState` Reac
 - [2026-08-31] Sisa komponen sengaja dibuat belakangan saat modul yang memakainya dikerjakan,
   supaya tidak membangun komponen yang ternyata tidak terpakai.
 
-### Fase 3 — Pola CRUD generik
-- [ ] `validation.ts` (zod diturunkan dari `payload-types.ts`)
-- [ ] Helper action generik (create/update/delete) — selalu `overrideAccess: false`
-- [ ] Pemetaan error Payload → pesan Bahasa Indonesia (§2 prinsip 5)
-- [ ] Helper list (page/limit/sort/search/filter)
-- [ ] `revalidatePath` termasuk path publik yang terpengaruh
+### Fase 3 — Pola CRUD generik ✅
+- [x] `src/lib/dashboard/validation.ts` (zod, pesan Bahasa Indonesia)
+- [x] `src/lib/dashboard/crud.ts` — pabrik server action create/update/delete
+- [x] `src/lib/dashboard/errors.ts` — pemetaan error Payload → pesan yang bisa ditindaklanjuti
+- [x] Filter/paginasi ditangani di tiap halaman daftar
+- [x] `revalidatePath` termasuk path publik (`/artikel`, `/`)
 
-**Log Fase 3:** _(kosong)_
+**Log Fase 3:**
+- [2026-08-31] `buatAksiCrud()` memangkas pengulangan untuk 4 koleksi sederhana. Helper ini
+  **tidak** menggantikan access control — setiap operasi tetap `overrideAccess: false` + `user`.
+- [2026-08-31] Checkbox HTML tidak terkirim saat tidak dicentang; ditangani lewat penanda
+  `_checkbox_aktif` supaya nilai `false` benar-benar tersimpan, bukan diabaikan.
 
-### Fase 4 — Artikel + editor (§6.4, §8) — **paling berat**
-- [ ] Ubah field `content` → HTML + sanitasi (`src/lib/dashboard/html.ts`)
-- [ ] Script migrasi Lexical → HTML + verifikasi manual (backup DB dulu)
-- [ ] `ArticleEditor` Tiptap + toolbar + dialog tautan/gambar + pembersih paste
-- [ ] Halaman daftar artikel (search, filter, paginasi, scoping role)
-- [ ] Halaman tulis/ubah + SaveBar + draf lokal + peringatan keluar halaman
-- [ ] Perbaikan dedup slug (`-2`) + pratinjau alamat halaman
-- [ ] Sesuaikan render `/artikel/[slug]` untuk HTML tersanitasi
+### Fase 4 — Artikel + editor (§6.4, §8) ✅
+- [x] Field `content` → `textarea` berisi HTML + sanitasi (`src/lib/dashboard/html.ts`)
+- [x] Migrasi Lexical → HTML **tidak diperlukan**: database diperiksa, 0 artikel
+- [x] `ArticleEditor` Tiptap + toolbar 9 tombol + dialog tautan + pemilih gambar
+- [x] Halaman daftar (search, filter kategori & status, paginasi, tabel/kartu)
+- [x] Halaman tulis/ubah + bilah aksi menempel + peringatan keluar halaman
+- [x] Dedup slug sudah dikerjakan di baseline M0; pratinjau alamat halaman ada di form
+- [x] `/artikel/[slug]` merender HTML tersanitasi + waktu baca
+- [ ] Simpan otomatis ke draf lokal (browser) — **belum**, lihat sisa pekerjaan §15
 
-**Log Fase 4:** _(kosong)_
+**Log Fase 4:**
+- [2026-08-31] **Cek database sebelum migrasi: 0 artikel.** Perubahan tipe field jadi tanpa
+  risiko dan tanpa script konversi. Inilah alasan memindahkannya sekarang, bukan nanti.
+- [2026-08-31] Sanitasi dilakukan DUA KALI (simpan + render). Whitelist ketat, skema hanya
+  http/https/mailto/tel sehingga `javascript:` dan `data:` diblokir; tautan keluar otomatis
+  `rel="noopener noreferrer"`.
+- [2026-08-31] Tipografi `.prose-artikel` / `.prose-dashboard` di `globals.css` dipakai
+  halaman publik **dan** di dalam editor, supaya tampilan saat menulis mirip hasil akhir.
 
-### Fase 5 — Galeri Gambar (§6.5)
-- [ ] Grid galeri + pencarian + paginasi
-- [ ] Unggah drag & drop + validasi client + progress + `alt` wajib
-- [ ] Panel detail (salin tautan, ubah alt, hapus)
-- [ ] Cek relasi sebelum hapus
-- [ ] `ImagePicker` (dipakai Fase 4 & 6)
-- [ ] Uji PDF vs `imageSizes`
+### Fase 5 — Galeri Gambar (§6.5) ◐
+- [x] Grid galeri + pencarian + paginasi
+- [x] Unggah + validasi ukuran/tipe di browser **dan** server + `alt` wajib
+- [x] Panel detail (salin tautan, hapus)
+- [x] Cek relasi sebelum hapus (artikel, dokter, tenaga medis, sertifikat)
+- [x] `MediaPicker` dipakai editor artikel, sampul artikel, dan modul data
+- [ ] Ubah `alt` dari panel detail — **belum**
+- [ ] Unggah drag & drop dan bar progres per berkas — **belum** (sekarang pilih berkas biasa)
+- [ ] Uji PDF vs `imageSizes` — **belum diuji**
 
-**Log Fase 5:** _(kosong)_
+**Log Fase 5:**
+- [2026-08-31] Validasi ukuran dijalankan dua kali: di browser supaya pengguna tidak menunggu
+  unggahan yang pasti gagal, dan di server sebagai pengaman sebenarnya.
 
-### Fase 6 — Dokter · Tenaga Medis · Vaksin · Sertifikat (§6.6–6.9)
-- [ ] Dokter · [ ] Tenaga Medis · [ ] Vaksin (+ ubah stok cepat) · [ ] Sertifikat
-- [ ] Toggle aktif langsung dari tabel
+### Fase 6 — Dokter · Tenaga Medis · Vaksin · Sertifikat (§6.6–6.9) ◐
+- [x] Dokter · [x] Tenaga Medis · [x] Vaksin · [x] Sertifikat
+- [ ] Ubah stok vaksin cepat dari tabel — **belum** (masih lewat form)
+- [ ] Toggle aktif langsung dari tabel — **belum** (masih lewat form)
+- [ ] Modul **Pengaduan** — belum dibangun (koleksi `complaints` belum ada, lihat PROJECT_PLAN M1)
 
-**Log Fase 6:** _(kosong)_
+**Log Fase 6:**
+- [2026-08-31] Keempatnya memakai satu komponen generik `KoleksiSederhana` yang digerakkan
+  spesifikasi field, sehingga menambah koleksi baru cukup menulis daftar field + satu file action.
 
-### Fase 7 — Pengaturan & Pengguna (§6.11–6.14)
-- [ ] Jam Operasional (array editor + tombol kembalikan ke SK)
-- [ ] **Wiring jam operasional ke Footer, `waktuPelayanan.tsx`, `Hero.tsx`**
-- [ ] Pengaturan Situs
-- [ ] Pengguna (CRUD + reset kata sandi + pengaman superadmin terakhir + pemindahan artikel)
-- [ ] Akun Saya
+### Fase 7 — Pengaturan & Pengguna (§6.11–6.14) ◐
+- [x] Jam Operasional (editor baris + tombol "Kembalikan ke Jadwal Resmi SK")
+- [ ] **Wiring jam operasional ke Footer, `waktuPelayanan.tsx`, `Hero.tsx` — BELUM.**
+      Nilainya sudah benar (dikoreksi di baseline M0) tapi masih hardcode. Selama belum
+      disambungkan, mengubah jam di dashboard **tidak berpengaruh di situs** — ini jebakan
+      untuk pengguna awam dan harus diselesaikan sebelum staf dilatih.
+- [x] Pengaturan Situs (kontak + media sosial)
+- [x] Pengguna (CRUD + ganti kata sandi + pengaman superadmin terakhir)
+- [ ] Pemindahan artikel saat pengguna dihapus — **belum** (baru diberi peringatan jumlahnya)
+- [x] Akun Saya (ubah nama + ganti kata sandi dengan verifikasi sandi lama)
 
-**Log Fase 7:** _(kosong)_
+**Log Fase 7:**
+- [2026-08-31] Dua pengaman anti-terkunci di modul Pengguna: superadmin terakhir tidak bisa
+  dihapus maupun diturunkan rolenya, dan tidak ada yang bisa menghapus akunnya sendiri.
+  Tanpa `/admin`, kehilangan superadmin terakhir berarti sistem terkunci permanen.
 
 ### Fase 8 — Beranda & analitik (§6.3, §6.10, §9) ◐
 - [x] Porting `DashboardStats` → Beranda Tailwind (`src/lib/dashboard/statistik.ts`)
@@ -629,27 +656,38 @@ library chart (grafik ditulis dengan SVG) · library form (`useActionState` Reac
 - [2026-08-31] Sisa Fase 8 (halaman Statistik mendalam, pengunjung unik, rate limit, agregasi SQL)
   belum dikerjakan.
 
-### Fase 9 — Hardening & QA
-- [ ] `auth: { maxLoginAttempts, lockTime }` di `Users`
-- [ ] Konfigurasi `cors` & `csrf`
-- [ ] **Audit manual: tidak ada `overrideAccess: true`** kecuali `/api/track`
-- [ ] Uji lintas role (login sebagai `admin`, coba akses URL & action terlarang)
-- [ ] Uji upload (>5MB, mimetype terlarang, PDF, nama file unicode)
-- [ ] Uji XSS pada konten artikel (paste `<script>`, atribut `onerror`)
-- [ ] Aksesibilitas & responsif penuh di ponsel
-- [ ] Uji semua keadaan kosong
-- [ ] Reset password & verifikasi email untuk produksi
+### Fase 9 — Hardening & QA ◐
+- [x] `auth: { maxLoginAttempts, lockTime }` di `Users` (baseline M0)
+- [ ] Konfigurasi `cors` & `csrf` — **belum**
+- [x] Audit `overrideAccess: true` — hanya di `/api/track` (beacon publik) dan
+      `/dashboard/setup` (belum ada user yang bisa jadi aktor). Keduanya disengaja.
+- [x] Uji lintas role: admin unit dialihkan ke `/dashboard/tanpa-akses` di 5 halaman
+      khusus superadmin, dan ditolak Payload saat mencoba membuat data dokter
+- [ ] Uji upload (>5MB, mimetype terlarang, PDF, nama file unicode) — **belum**
+- [ ] Uji XSS nyata di peramban — **belum** (whitelist sanitasi sudah dipasang)
+- [ ] Aksesibilitas & responsif diuji di perangkat asli — **belum**
+- [ ] Reset password & verifikasi email untuk produksi — **belum**
 
-**Log Fase 9:** _(kosong)_
+**Log Fase 9:**
+- [2026-08-31] Verifikasi runtime dijalankan di server dev, bukan hanya `pnpm build`:
+  12 halaman dashboard HTTP 200 sebagai superadmin; 5 halaman ditolak untuk admin unit;
+  `/admin` 404; `/api/users` 403 (REST hidup, access control jalan).
 
-### Fase 10 — Hapus `/admin` & dokumentasi (§10)
-- [ ] Halaman `/setup` (user pertama) — **sebelum** penghapusan
-- [ ] Pembersihan sesuai checklist §10
-- [ ] Update `CLAUDE.md` (struktur `(dashboard)`, aturan `overrideAccess: false`, editor HTML)
-- [ ] Panduan singkat bergambar untuk staf Puskesmas
-- [ ] Verifikasi build produksi + `payload migrate`
+### Fase 10 — Hapus `/admin` & dokumentasi (§10) ◐
+- [x] Halaman `/dashboard/setup` dibuat **sebelum** penghapusan
+- [x] `src/app/(payload)/admin`, `custom.scss`, `layout.tsx` dihapus
+- [x] `src/components/admin/*` dihapus
+- [x] `payload.config.ts`: `admin.components` dibuang, `admin.disable: true`
+- [x] `(payload)/api` dipertahankan (melayani berkas media publik)
+- [x] `sass` tidak diperlukan lagi — masalahnya hilang bersama `custom.scss`
+- [x] Update `CLAUDE.md`
+- [ ] Panduan bergambar untuk staf Puskesmas — **belum**
+- [ ] Verifikasi `payload migrate` di produksi — **belum** (saat deploy, M4)
 
-**Log Fase 10:** _(kosong)_
+**Log Fase 10:**
+- [2026-08-31] `/setup` dijaga di **server** (`payload.count` = 0), bukan hanya di UI.
+  Diverifikasi: dengan 1 akun di database, `/dashboard/setup` dialihkan ke halaman login.
+- [2026-08-31] `/admin` kini 404, `/api/*` tetap hidup.
 
 ---
 
@@ -683,7 +721,32 @@ Perlu persetujuan user — kalau salah satu ternyata penting, estimasi berubah.
 
 ---
 
+## 15. Sisa pekerjaan dashboard (belum selesai)
+
+Dicatat eksplisit supaya sesi berikutnya bisa langsung melanjutkan.
+
+| Sisa | Fase | Catatan |
+| --- | --- | --- |
+| **Wiring jam operasional ke Footer/Hero/waktuPelayanan** | 7 | Paling penting. Sekarang mengubah jam di dashboard tidak berpengaruh di situs |
+| Modul Pengaduan + koleksi `complaints` | 6 | Halaman publik `/pengaduan` juga belum ada |
+| Simpan otomatis draf artikel di browser | 4 | Perlindungan bagi penulis awam |
+| Ubah `alt` dari panel galeri | 5 | |
+| Unggah drag & drop + bar progres | 5 | |
+| Ubah stok vaksin & toggle aktif langsung dari tabel | 6 | Pekerjaan harian, sebaiknya tidak lewat form penuh |
+| Pemindahan artikel saat pengguna dihapus | 7 | Sekarang baru diberi peringatan |
+| Pengunjung unik + agregasi SQL | 8 | K6, belum dikerjakan |
+| CORS/CSRF, reset password, verifikasi email | 9 | Untuk produksi |
+| Uji upload, XSS nyata, aksesibilitas di perangkat asli | 9 | |
+| Panduan bergambar untuk staf | 10 | |
+
+---
+
 ## Progress Log
 - [2026-08-31] Rencana awal dibuat, menunggu keputusan K1–K6.
 - [2026-08-31] K1–K6 dijawab; dokumen ditulis ulang jadi spesifikasi fitur per halaman.
   Keputusan: editor WYSIWYG Tiptap (pengguna awam), `/admin` dihapus total, analitik ikut diperbaiki.
+- [2026-08-31] **Fase 1–2 selesai**: auth, shell, design system, beranda. Commit `dfdc124`.
+- [2026-08-31] **Fase 3–4 selesai**: pola CRUD, editor Tiptap, modul Artikel. Commit `6cd33b1`.
+- [2026-08-31] **Fase 5–10 selesai sebagian**: Galeri, 4 modul data, Pengaturan, Pengguna,
+  Akun, Statistik, `/dashboard/setup`, dan **`/admin` dihapus**. Commit `ec5c495`.
+  Dashboard sudah bisa dipakai penuh; sisa pekerjaan didaftar di §15.

@@ -73,7 +73,7 @@ commit langsung ke `main`, sertakan tangkapan layar desktop + ponsel untuk perub
 | 5 | Layanan Kesehatan | ⬜ | P2 | M1 |
 | 6 | Artikel (publik) | 🟡 | P3 | M2 |
 | 7 | Informasi Layanan & Mutu | ✅ **sudah di-merge** | — | — |
-| 8 | Dashboard custom | ⬜ | P1 | M1–M3 |
+| 8 | Dashboard custom | ✅ **inti selesai** (`/admin` dihapus) | P1 | M1 |
 
 ---
 
@@ -121,7 +121,7 @@ Semua orang mulai dari titik yang sama. Rincian perbaikan di §6.
 
 | Owner | Section | Keluaran |
 | --- | --- | --- |
-| **P1** | **Dashboard bagian 1** — fondasi | Login `/dashboard/login`, guard auth, shell (sidebar+topbar+drawer ponsel), design system dashboard (Button, Field, Table, Modal, Toast, dll). `CUSTOM_DASHBOARD_PLAN.md` Fase 1–2 |
+| **P1** | ~~Dashboard bagian 1~~ ✅ **SELESAI 31 Ags — seluruh dashboard, bukan hanya fondasi.** 14 halaman, editor WYSIWYG, `/dashboard/setup`, dan `/admin` sudah dihapus. Sisa pekerjaan di `CUSTOM_DASHBOARD_PLAN.md` §15 | Beralih ke: wiring jam operasional ke situs, lalu koleksi `complaints` untuk P3 |
 | **P2** | **Layanan Kesehatan** | `/layanan-kesehatan`: 14 layanan dalam gedung, detail Laboratorium, layanan luar gedung, UGD 24 jam, jadwal dokter dari koleksi `doctors`, alur pendaftaran |
 | **P3** | **Pengaduan** | Koleksi `complaints` (bersama P1), route `POST /api/pengaduan` + rate limit + honeypot, halaman `/pengaduan` dengan form ramah awam, nomor tiket, kanal alternatif (telepon/WA) |
 | **P4** | — | Kejar C1, C2, C3 |
@@ -132,7 +132,7 @@ Semua orang mulai dari titik yang sama. Rincian perbaikan di §6.
 
 | Owner | Section | Keluaran |
 | --- | --- | --- |
-| **P1** | **Dashboard bagian 2** — konten | Pola CRUD generik + validasi zod, modul Artikel lengkap, **editor WYSIWYG Tiptap**, migrasi konten Lexical→HTML, Galeri Gambar. Fase 3–5 |
+| **P1** | **Sisa dashboard + dukungan modul publik** | Wiring jam operasional (Footer/Hero/waktuPelayanan), modul Pengaduan di dashboard, simpan otomatis draf artikel, ubah stok vaksin cepat. Lihat `CUSTOM_DASHBOARD_PLAN.md` §15 |
 | **P2** | **Akreditasi & Penghargaan**, lalu **Home** | `/akreditasi` dari koleksi `certificates`; Home: sambungkan jam & berita ke CMS, blok darurat, blok kontak, SEO + Open Graph |
 | **P3** | **Artikel publik** + QA | Filter kategori & pencarian, perbaikan halaman detail (penulis, waktu baca, bagikan WhatsApp, artikel terkait), penyesuaian render HTML; QA hasil M1 |
 | **P4** | — | Kejar C4–C9 |
@@ -230,6 +230,19 @@ Audit codebase 31 Agustus 2026, seluruhnya sudah diperbaiki dan masuk PR ke `mai
 - Login dibatasi 5 percobaan, kunci 10 menit (anti brute-force)
 - `/artikel` diberi paginasi (sebelumnya `limit: 30` tanpa paginasi)
 
+**Dashboard custom (31 Agustus, commit `dfdc124`, `6cd33b1`, `ec5c495`):**
+- 14 halaman di `/dashboard`: Beranda, Artikel (daftar + tulis/ubah), Galeri Gambar,
+  Statistik, Dokter, Tenaga Medis, Vaksin, Sertifikat, Pengaturan, Pengguna, Akun Saya,
+  Login, Setup, Tanpa Akses
+- Editor artikel WYSIWYG (Tiptap) dengan toolbar 9 tombol; konten disimpan sebagai HTML
+  yang disanitasi dua kali. Database diperiksa lebih dulu: **0 artikel**, jadi migrasi dari
+  Lexical tanpa risiko
+- `/dashboard/setup` untuk membuat Super Admin pertama, dijaga di server
+- **`/admin` Payload dihapus total.** `(payload)/api` dipertahankan karena melayani berkas
+  media publik
+- Diverifikasi di server dev: 12 halaman HTTP 200 sebagai superadmin, 5 halaman ditolak
+  untuk admin unit, `/admin` 404, cookie sesi round-trip dengan `payload.auth()`
+
 **Bersih-bersih Payload:**
 - `src/app/(payload)/admin/importMap.ts` dihapus — sisa versi Payload lain yang tidak diimpor
   siapa pun (layout memakai `importMap.js`). **Inilah akar penyebab build gagal**, sehingga
@@ -248,7 +261,9 @@ Audit codebase 31 Agustus 2026, seluruhnya sudah diperbaiki dan masuk PR ke `mai
 | `author` artikel bisa dangling bila user dihapus | M3 |
 | Ikon media sosial footer masih `href="#"` | menunggu C9 |
 | Peringatan lint sisa (`<img>` vs `next/image`, exhaustive-deps) | M3, saat optimasi |
-| `/admin` Payload belum dihapus (dashboard belum ada) + halaman `/setup` belum dibuat | M3 |
+| ~~`/admin` belum dihapus + `/setup` belum dibuat~~ — **SELESAI 31 Ags** | — |
+| **Jam operasional belum tersambung ke situs** — mengubahnya di dashboard belum berpengaruh | M2 |
+| Modul Pengaduan (dashboard + halaman publik) | M1 |
 | CORS/CSRF Payload belum dikonfigurasi | M3 |
 | Reset password & verifikasi email untuk produksi | M4/M5 |
 
@@ -297,6 +312,9 @@ Permintaan baru di tengah jalan masuk daftar ini dulu, dibahas Jumat, baru diput
   diperbaiki, 6 data salah dikoreksi, build yang tadinya gagal kini berhasil, lint 0 error.
 - [2026-08-31] Bersih-bersih Payload: importMap basi dihapus (akar penyebab build gagal),
   koleksi `media` disatukan ke `src/collections/Media.ts`. Detail di `PAYLOAD_PLAN.md` Fase 8.
+- [2026-08-31] **Dashboard custom selesai & `/admin` dihapus.** 14 halaman, editor WYSIWYG,
+  `/dashboard/setup`. Diverifikasi di server dev (bukan hanya build). Sisa pekerjaan
+  didaftar di `CUSTOM_DASHBOARD_PLAN.md` §15 — terpenting: wiring jam operasional ke situs.
 - [2026-08-31] **PR #8** dibuka ke `main`
   (https://github.com/gadicandra/puskesmas-batu-licin/pull/8) — 58 file, +3825/-819.
   **Langkah berikutnya: review & merge, lalu semua orang membuat branch baru dari `main`.**
