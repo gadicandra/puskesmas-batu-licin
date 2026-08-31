@@ -534,24 +534,41 @@ library chart (grafik ditulis dengan SVG) · library form (`useActionState` Reac
 
 ## 12. Fase kerja
 
-### Fase 1 — Fondasi auth & shell
-- [ ] `src/lib/dashboard/auth.ts` (`getCurrentUser`, `requireUser`, `requireSuperAdmin`)
-- [ ] `(dashboard)/dashboard/layout.tsx` — guard + shell
-- [ ] Halaman login + server action + penanganan error (§6.1)
-- [ ] Server action logout
-- [ ] Sidebar terfilter role + Topbar + drawer ponsel (§6.2)
-- [ ] Halaman 403 & 404 dashboard
-- [ ] `PageViewTracker` skip `/dashboard`
+### Fase 1 — Fondasi auth & shell ✅
+- [x] `src/lib/dashboard/auth.ts` (`getCurrentUser`, `requireUser`, `requireSuperAdmin`, `isSuperAdmin`)
+- [x] `src/app/dashboard/(app)/layout.tsx` — guard + shell
+- [x] Halaman login `/dashboard/login` + server action + penanganan error (§6.1)
+- [x] Server action logout
+- [x] Sidebar terfilter role + Topbar + drawer ponsel (§6.2)
+- [x] Halaman 403 (`/dashboard/tanpa-akses`)
+- [x] `PageViewTracker` skip `/dashboard` (sudah dikerjakan di baseline M0)
 
-**Log Fase 1:** _(kosong)_
+**Log Fase 1:**
+- [2026-08-31] Struktur rute: `src/app/dashboard/login/` (publik) + `src/app/dashboard/(app)/`
+  (dijaga guard). Route group `(app)` dipakai supaya layout ber-guard tidak ikut membungkus
+  halaman login. Root layout `src/app/layout.tsx` sudah menyediakan html/body + Tailwind,
+  jadi tidak perlu layout baru.
+- [2026-08-31] Login memakai `payload.login()` lalu memasang cookie sesi dengan
+  `generatePayloadCookie` dari `payload/shared` (**diverifikasi ke tipe paket terpasang**,
+  bukan asumsi: `{ collectionAuthConfig, cookiePrefix, token, returnCookieAsObject }`).
+  Logout memakai `generateExpiredPayloadCookie`. Dengan begitu cookie-nya sama persis
+  dengan yang dibaca `payload.auth()`.
+- [2026-08-31] Pesan error login tidak membedakan email vs kata sandi salah; akun terkunci
+  diberi pesan khusus beserta lama tunggu.
+- [2026-08-31] **BELUM diuji manual di peramban** — baru lolos `pnpm build`.
 
-### Fase 2 — Design system (§7)
-- [ ] Token & utilitas · Button · Field + input primitives
-- [ ] Card · Badge · DataTable (+ mode kartu ponsel) · Pagination
-- [ ] Modal · ConfirmDialog · Toast · EmptyState · Skeleton · FileDrop · SaveBar
-- [ ] Audit aksesibilitas dasar
+### Fase 2 — Design system (§7) ◐
+- [x] Button (4 varian, state loading) · Field · Input/Textarea/Select
+- [x] Card · Badge · EmptyState · PageHeader · StatTile · BarChart · ConfirmSubmit
+- [ ] DataTable (+ mode kartu ponsel) · Pagination — dibuat saat modul Artikel
+- [ ] Modal · Toast · Skeleton · FileDrop · SaveBar — dibuat saat dibutuhkan modulnya
+- [x] Target sentuh ≥44px, focus ring, `text-base` di isian (mencegah zoom iOS)
 
-**Log Fase 2:** _(kosong)_
+**Log Fase 2:**
+- [2026-08-31] Primitif dasar dibuat di `src/components/dashboard/ui/`. Memakai token warna
+  yang sudah ada di `globals.css` (primary/secondary/tertiary/base) — tidak menambah token baru.
+- [2026-08-31] Sisa komponen sengaja dibuat belakangan saat modul yang memakainya dikerjakan,
+  supaya tidak membangun komponen yang ternyata tidak terpakai.
 
 ### Fase 3 — Pola CRUD generik
 - [ ] `validation.ts` (zod diturunkan dari `payload-types.ts`)
@@ -598,13 +615,19 @@ library chart (grafik ditulis dengan SVG) · library form (`useActionState` Reac
 
 **Log Fase 7:** _(kosong)_
 
-### Fase 8 — Beranda & analitik (§6.3, §6.10, §9)
-- [ ] Porting `DashboardStats` → Beranda Tailwind
+### Fase 8 — Beranda & analitik (§6.3, §6.10, §9) ◐
+- [x] Porting `DashboardStats` → Beranda Tailwind (`src/lib/dashboard/statistik.ts`)
 - [ ] StatTile + BarChart + Sparkline (SVG)
 - [ ] Halaman Statistik mendalam
 - [ ] Pengunjung unik + rate limit + agregasi SQL + debounce tracker
 
-**Log Fase 8:** _(kosong)_
+**Log Fase 8:**
+- [2026-08-31] Beranda dashboard selesai lebih awal (bersamaan Fase 1) karena logika agregasinya
+  tinggal diporting dari `DashboardStats`. Isi: 4 kartu angka, histogram 7 hari, jam ramai WITA,
+  artikel terakhir diubah, panel stok vaksin menipis (superadmin saja). Admin unit hanya melihat
+  artikel miliknya sendiri.
+- [2026-08-31] Sisa Fase 8 (halaman Statistik mendalam, pengunjung unik, rate limit, agregasi SQL)
+  belum dikerjakan.
 
 ### Fase 9 — Hardening & QA
 - [ ] `auth: { maxLoginAttempts, lockTime }` di `Users`
