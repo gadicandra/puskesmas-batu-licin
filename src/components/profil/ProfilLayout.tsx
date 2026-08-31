@@ -28,7 +28,7 @@ const ProfilLayout = () => {
             component: <BudayaKerjaContent />
         },
         'MOTTO PELAYANAN': {
-            title: <span>Motto <span className="text-secondary">CERDAS</span></span>,
+            title: "Motto Pelayanan",
             component: <MottoContent />
         },
         'MAKLUMAT PELAYANAN': {

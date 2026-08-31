@@ -26,62 +26,70 @@ type OrgData = {
 
 const orgData: OrgData = {
     kepala: {
-        name: "drg. Rian Prasetya Munaji",
+        name: "dr. Laurensius L., MH",
         role: "Kepala Puskesmas",
-        image: "/kpl.webp",
+        image: "/logo_puskesmas.webp",
     },
     clusters: [
         {
-            name: "drg. Rian Prasetya Munaji",
-            role: "Klaster 1: Manajemen",
-            image: "/placeholder_avatar.webp",
+            name: "Isman S., S.Kep., Ns., M.M",
+            role: "Manajemen",
+            image: "/logo_puskesmas.webp",
             pjs: [
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Manajemen SDM" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Manajemen Data" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Manajemen Keuangan" },
+                { name: "Isman S., S.Kep., Ns., M.M", role: "Manajemen Inti" },
+                { name: "Syaiful Fahrin, S.Kep., Ns", role: "Sarpras" },
+                { name: "dr. Mardalena", role: "Mutu" },
+                { name: "dr. Andri Wijanarko", role: "Jejaring" },
+                { name: "Debora Silitonga, S.Ak", role: "Keuangan" },
+                { name: "Hijratul Riskhi, A.Md.Kes", role: "Sistem Info. Digital" },
+                { name: "Nani Rohayah, SKM", role: "Pemberdayaan Masyarakat" },
+                { name: "Dita Noviyanti", role: "Arsip & SDM" },
             ]
         },
         {
-            name: "drg. Rian Prasetya Munaji",
-            role: "Klaster 2: UKM Esensial",
-            image: "/placeholder_avatar.webp",
+            name: "dr. Mardalena",
+            role: "Ibu & Anak",
+            image: "/logo_puskesmas.webp",
             pjs: [
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Promosi Kesehatan" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Kesehatan Lingkungan" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ KIA & KB" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Gizi" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Pencegahan Penyakit" },
+                { name: "Ratna Nur S., A.Md.Keb", role: "Kesehatan Ibu" },
+                { name: "Rina Jun Fitri, A.Md.Keb", role: "Kes. Bayi & Anak" },
+                { name: "Dyah K.A., S.Kep., Ns", role: "Kes. Usia Sekolah" },
+                { name: "Fera H., S.Kep., Ns", role: "Kesehatan Remaja" },
+                { name: "Rina Jun Fitri, A.Md.Keb", role: "Kes. Anak Pra Sekolah" },
             ]
         },
         {
-            name: "drg. Rian Prasetya Munaji",
-            role: "Klaster 3: UKM Pengembangan",
-            image: "/placeholder_avatar.webp",
+            name: "dr. Andri Wijanarko",
+            role: "Dewasa & Lansia",
+            image: "/logo_puskesmas.webp",
             pjs: [
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Kesehatan Jiwa" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Kesehatan Gigi" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Kesehatan Tradisional" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Kesehatan Olahraga" },
+                { name: "Mahpuzatul, J., S.Kep., Ns", role: "Usia Dewasa" },
+                { name: "Siti Aisyah, S.Kep., Ns", role: "Usia Lansia" },
+                { name: "Hj. Badariah, A.Md.Keb", role: "Kes. Reproduksi" },
             ]
         },
         {
-            name: "drg. Rian Prasetya Munaji",
-            role: "Klaster 4: UKP",
-            image: "/placeholder_avatar.webp",
+            name: "dr. Dyni Iswatinisia",
+            role: "P2M & Kesling",
+            image: "/logo_puskesmas.webp",
             pjs: [
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Pendaftaran" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Pemeriksaan Umum" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Farmasi" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Laboratorium" },
+                { name: "Harno, SKM", role: "Surveilance" },
+                { name: "Indri Delliyana, SKM", role: "Promkes" },
+                { name: "Mey Lida S.L., A.Md.Kes", role: "Kesling" },
             ]
         },
         {
-            name: "drg. Rian Prasetya Munaji",
-            role: "Klaster 5: Jejaring & Jaringan",
-            image: "/placeholder_avatar.webp",
+            name: "dr. Nidhya Dwie M",
+            role: "Lintas Kluster",
+            image: "/logo_puskesmas.webp",
             pjs: [
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Pustu" },
-                { name: "drg. Rian Prasetya Munaji", role: "PJ Poskesdes" },
+                { name: "Ade Susan I., A.Md.AK", role: "Laboratorium" },
+                { name: "Rahmayani M., S.Farm., Apt", role: "Farmasi" },
+                { name: "drg. Lukman Noor Hakim", role: "Gigi & Mulut" },
+                { name: "Darmiaty, S.Kep., Ns", role: "UGD & Tindakan" },
+                { name: "Sri Norliani, A.Md.Gz", role: "Gizi" },
+                { name: "dr. Mardalena", role: "Krisis Kesehatan" },
+                { name: "Siti Nur Halizah, A.Md.Kes", role: "Rehab Medik" },
             ]
         },
     ]
