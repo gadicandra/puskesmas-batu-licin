@@ -21,6 +21,12 @@ import {
   navigationMenuTriggerStyle,
 } from "./navigation-menu";
 
+/** Rute di bawah dropdown "Profil" — dipakai untuk menandai menu aktif. */
+const PROFIL_PATHS = ["/profil-puskesmas", "/struktur-organisasi", "/lokasi-puskesmas"];
+
+/** Nomor darurat PSC 119 (sumber: data/puskesmas.md). */
+const EMERGENCY_TEL = "tel:085249312786";
+
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -53,11 +59,6 @@ export default function Navbar() {
         setMobileMenuOpen(false);
       }
     };
-
-    // Tutup mobile menu saat scroll hanya di desktop
-    if (window.innerWidth >= 1024) {
-      setMobileMenuOpen(false);
-    }
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -128,28 +129,6 @@ export default function Navbar() {
                       <NavigationMenuItem>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                           <Link
-                            href="/article/telescope"
-                            className={`cursor-pointer hover:text-white transition-all duration-300 ease-out hover:bg-white/20 hover:scale-105 hover:shadow-md active:scale-95 ${pathname === "/article/telescope" ? "text-white bg-white/20 scale-105" : ""
-                              }`}
-                          >
-                            <p className="text-base">Fasilitas</p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </NavigationMenuItem>
-                      <NavigationMenuItem>
-                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                          <Link
-                            href="/article/telescope"
-                            className={`cursor-pointer hover:text-white transition-all duration-300 ease-out hover:bg-white/20 hover:scale-105 hover:shadow-md active:scale-95 ${pathname === "/article/telescope" ? "text-white bg-white/20 scale-105" : ""
-                              }`}
-                          >
-                            <p className="text-base">Dokter</p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </NavigationMenuItem>
-                      <NavigationMenuItem>
-                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                          <Link
                             href="/artikel"
                             className={`cursor-pointer hover:text-white transition-all duration-300 ease-out hover:bg-white/20 hover:scale-105 hover:shadow-md active:scale-95 ${pathname.startsWith("/artikel") ? "text-white bg-white/20 scale-105" : ""
                               }`}
@@ -158,38 +137,27 @@ export default function Navbar() {
                           </Link>
                         </NavigationMenuLink>
                       </NavigationMenuItem>
-                      <NavigationMenuItem>
-                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                          <Link
-                            href="/article/telescope"
-                            className={`cursor-pointer hover:text-white transition-all duration-300 ease-out hover:bg-white/20 hover:scale-105 hover:shadow-md active:scale-95 ${pathname === "/article/telescope" ? "text-white bg-white/20 scale-105" : ""
-                              }`}
-                          >
-                            <p className="text-base">Pengaduan</p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </NavigationMenuItem>
                     </NavigationMenuList>
                   </AnimatePresence>
                 </div>
               </NavigationMenu>
               <div className="hidden items-center gap-5 lg:flex">
-                <Link href="/apply">
+                <a href={EMERGENCY_TEL} aria-label="Telepon darurat PSC 119">
                   <Button
                     text="Emergency Call"
                     leftIcon={<AiOutlineAlert size={18} />}
                     className="cursor-pointer border-0 bg-secondary text-white hover:bg-secondary/80 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-300 ease-out"
                   />
-                </Link>
+                </a>
               </div>
             </div>
 
             {/* Mobile Menu Toggle */}
             <div className="flex items-center gap-3 lg:hidden">
               {/* Emergency Call - Icon only on mobile */}
-              <Link href="/emergency" className="flex items-center justify-center rounded-full bg-secondary p-2 text-white transition-all duration-300 hover:bg-secondary/80 hover:scale-105 active:scale-95">
+              <a href={EMERGENCY_TEL} aria-label="Telepon darurat PSC 119" className="flex items-center justify-center rounded-full bg-secondary p-2 text-white transition-all duration-300 hover:bg-secondary/80 hover:scale-105 active:scale-95">
                 <AiOutlineAlert size={24} />
-              </Link>
+              </a>
               <div
                 onClick={toggleMobileMenu}
                 className={cn(
@@ -217,7 +185,7 @@ export default function Navbar() {
                 className="font-avenir-regular relative flex w-full flex-col items-start"
               >
                 <div
-                  className={`flex w-full cursor-pointer items-center justify-between p-2 ${pathname.startsWith("/about") ? "font-semibold text-secondary" : ""
+                  className={`flex w-full cursor-pointer items-center justify-between p-2 ${PROFIL_PATHS.some((path) => pathname.startsWith(path)) ? "font-semibold text-secondary" : ""
                     }`}
                   onClick={() => toggleAccordion("profil")}
                 >
@@ -240,17 +208,17 @@ export default function Navbar() {
                       transition={{ duration: 0.3 }}
                       className="z-101 ml-3 flex w-fit flex-col gap-3 border-l border-white/20 py-1 pl-3"
                     >
-                      <Link href="/about/us" onClick={closeMobileMenu}>
+                      <Link href="/profil-puskesmas" onClick={closeMobileMenu}>
                         <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
                           <span className="font-avenir font-medium">Profil Puskesmas</span>
                         </div>
                       </Link>
-                      <Link href="/about/struktur" onClick={closeMobileMenu}>
+                      <Link href="/struktur-organisasi" onClick={closeMobileMenu}>
                         <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
                           <span className="font-avenir font-medium">Struktur Organisasi</span>
                         </div>
                       </Link>
-                      <Link href="/about/lokasi" onClick={closeMobileMenu}>
+                      <Link href="/lokasi-puskesmas" onClick={closeMobileMenu}>
                         <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
                           <span className="font-avenir font-medium">Lokasi Puskesmas</span>
                         </div>
@@ -299,30 +267,6 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-              {/* Fasilitas */}
-              <div key="fasilitas-wrapper">
-                <Link href="/fasilitas" onClick={closeMobileMenu}>
-                  <div
-                    className={`font-avenir-regular w-full p-2 hover:text-secondary transition-colors ${pathname === "/fasilitas" ? "font-semibold text-secondary" : ""
-                      }`}
-                  >
-                    Fasilitas
-                  </div>
-                </Link>
-              </div>
-
-              {/* Dokter */}
-              <div key="dokter-wrapper">
-                <Link href="/dokter" onClick={closeMobileMenu}>
-                  <div
-                    className={`font-avenir-regular w-full p-2 hover:text-secondary transition-colors ${pathname === "/dokter" ? "font-semibold text-secondary" : ""
-                      }`}
-                  >
-                    Dokter
-                  </div>
-                </Link>
-              </div>
-
               {/* Artikel */}
               <div key="artikel-wrapper">
                 <Link href="/artikel" onClick={closeMobileMenu}>
@@ -334,29 +278,17 @@ export default function Navbar() {
                   </div>
                 </Link>
               </div>
-
-              {/* Pengaduan */}
-              <div key="pengaduan-wrapper">
-                <Link href="/pengaduan" onClick={closeMobileMenu}>
-                  <div
-                    className={`font-avenir-regular w-full p-2 hover:text-secondary transition-colors ${pathname === "/pengaduan" ? "font-semibold text-secondary" : ""
-                      }`}
-                  >
-                    Pengaduan
-                  </div>
-                </Link>
-              </div>
             </div>
           </AnimatePresence>
           {/* Emergency Call Button in Mobile Menu */}
           <div className="flex w-full flex-col items-center gap-4 pt-4 border-t border-white/20">
-            <Link href="/emergency" className="w-full">
+            <a href={EMERGENCY_TEL} aria-label="Telepon darurat PSC 119" className="w-full">
               <Button
                 text="Emergency Call"
                 leftIcon={<AiOutlineAlert size={20} />}
                 className="w-full border-0 bg-secondary text-white hover:bg-secondary/80"
               />
-            </Link>
+            </a>
           </div>
         </section>
       </div>

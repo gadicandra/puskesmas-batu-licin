@@ -10,37 +10,46 @@ function formatTime(hours: number, minutes = 0) {
 	return `${pad(hours)}:${pad(minutes)}`
 }
 
+/** Jadwal pelayanan dalam gedung sesuai SK Kepala Puskesmas Batulicin
+ *  No. B/445.61/003/PKM.Btl-Adm/I/2023. Kunci = hari (0 Minggu .. 6 Sabtu). */
+const JADWAL: Record<number, { mulai: number; selesai: number } | null> = {
+	0: null, // Minggu: pelayanan dalam gedung tutup (UGD tetap 24 jam)
+	1: { mulai: 8 * 60, selesai: 11 * 60 }, // Senin
+	2: { mulai: 8 * 60, selesai: 11 * 60 }, // Selasa
+	3: { mulai: 8 * 60, selesai: 11 * 60 }, // Rabu
+	4: { mulai: 8 * 60, selesai: 11 * 60 }, // Kamis
+	5: { mulai: 7 * 60 + 30, selesai: 10 * 60 + 30 }, // Jumat
+	6: { mulai: 8 * 60, selesai: 11 * 60 }, // Sabtu
+}
+
+const NAMA_HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
+
+function menitKeJam(menit: number) {
+	return formatTime(Math.floor(menit / 60), menit % 60)
+}
+
 function isOpenBySchedule(date: Date) {
-	const day = date.getDay() // 0 Sun .. 6 Sat
-	const minutes = date.getHours() * 60 + date.getMinutes()
+	const jadwal = JADWAL[date.getDay()]
+	if (!jadwal) return false
+	const menit = date.getHours() * 60 + date.getMinutes()
+	return menit >= jadwal.mulai && menit < jadwal.selesai
+}
 
-	const openStart = 7 * 60 + 30 // 07:30
-
-	if (day >= 1 && day <= 4) {
-		// Monday - Thursday 07:30 - 14:00
-		return minutes >= openStart && minutes < 14 * 60
-	}
-
-	if (day === 5) {
-		// Friday 07:30 - 11:00
-		return minutes >= openStart && minutes < 11 * 60
-	}
-
-	if (day === 6) {
-		// Saturday 07:30 - 12:00
-		return minutes >= openStart && minutes < 12 * 60
-	}
-
-	// Sunday closed
-	return false
+/** Jam tutup hari ini, untuk teks "Sampai ...". */
+function jamTutupHariIni(date: Date) {
+	const jadwal = JADWAL[date.getDay()]
+	return jadwal ? menitKeJam(jadwal.selesai) : null
 }
 
 function nextOpenMessage(date: Date) {
-	const day = date.getDay()
-	// If today is Saturday, next open is Monday 07:30
-	if (day === 6) return `Buka Senin ${formatTime(7, 30)}`
-	// Otherwise open tomorrow 07:30
-	return `Buka Besok ${formatTime(7, 30)}`
+	for (let i = 1; i <= 7; i++) {
+		const hari = (date.getDay() + i) % 7
+		const jadwal = JADWAL[hari]
+		if (!jadwal) continue
+		const label = i === 1 ? 'Besok' : NAMA_HARI[hari]
+		return `Buka ${label} ${menitKeJam(jadwal.mulai)}`
+	}
+	return 'Jadwal belum tersedia'
 }
 
 export default function WaktuPelayanan() {
@@ -52,7 +61,6 @@ export default function WaktuPelayanan() {
 	}, [])
 
 	const open = isOpenBySchedule(now)
-	const statusMessage = open ? `Buka Sekarang` : `Tutup · ${nextOpenMessage(now)}`
 
 	return (
 		<section className="max-w-8xl mx-auto py-12">
@@ -63,7 +71,7 @@ export default function WaktuPelayanan() {
 					<span className={`w-3 h-3 rounded-full ${open ? 'bg-green-500' : 'bg-red-500'}`}></span>
 					<span className={`${open ? 'text-green-700' : 'text-red-600'} font-medium`}>{open ? 'Buka' : 'Tutup'}</span>
 					<span className="text-slate-500">·</span>
-					<span className="text-sm text-slate-600">{open ? `Sampai ${now.getDay() >= 1 && now.getDay() <= 4 ? formatTime(14) : now.getDay() === 5 ? formatTime(11) : formatTime(12)}` : nextOpenMessage(now)}</span>
+					<span className="text-sm text-slate-600">{open ? `Sampai ${jamTutupHariIni(now)}` : nextOpenMessage(now)}</span>
 				</div>
 			</div>
 
@@ -83,9 +91,9 @@ export default function WaktuPelayanan() {
 					</div>
 
 					<ul className="space-y-2 text-sm">
-						<li className="flex items-center justify-between"><span className="text-slate-600">Senin - Kamis</span><span className="text-green-600">07:30 - 14:00</span></li>
-						<li className="flex items-center justify-between"><span className="text-slate-600">Jumat</span><span className="text-green-600">07:30 - 11:00</span></li>
-						<li className="flex items-center justify-between"><span className="text-slate-600">Sabtu</span><span className="text-green-600">07:30 - 12:00</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Senin - Kamis</span><span className="text-green-600">08:00 - 11:00</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Jumat</span><span className="text-green-600">07:30 - 10:30</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Sabtu</span><span className="text-green-600">08:00 - 11:00</span></li>
 						<li className="flex items-center justify-between"><span className="text-slate-600">Minggu</span><span className="text-red-500">Tutup</span></li>
 					</ul>
 				</article>
@@ -104,7 +112,9 @@ export default function WaktuPelayanan() {
 						<span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full">Terjadwal</span>
 					</div>
 					<ul className="space-y-2 text-sm">
-						<li className="flex items-center justify-between"><span className="text-slate-600">Senin - Sabtu</span><span className="text-green-600">07:00 - 13:00</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Senin - Kamis</span><span className="text-green-600">08:00 - 11:00</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Jumat</span><span className="text-green-600">07:30 - 10:30</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Sabtu</span><span className="text-green-600">08:00 - 11:00</span></li>
 						<li className="flex items-center justify-between"><span className="text-slate-600">Minggu</span><span className="text-red-500">Tutup</span></li>
 					</ul>
 				</article>
