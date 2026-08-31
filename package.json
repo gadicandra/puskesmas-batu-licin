@@ -14,6 +14,7 @@
     "@payloadcms/db-postgres": "^3.72.0",
     "@payloadcms/next": "^3.72.0",
     "@payloadcms/richtext-lexical": "^3.72.0",
+    "@payloadcms/ui": "^3.72.0",
     "@radix-ui/react-navigation-menu": "^1.2.14",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

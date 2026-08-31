@@ -126,12 +126,9 @@ export default function BeritaSection() {
     // Index 1: Shows 1,2,3,4 (End) -> Max index = 5 - 4 = 1.
     const maxSlideIndex = Math.max(0, totalItems - itemsPerPage);
 
-    // Reset slide if screen changes and we are out of bounds
-    useEffect(() => {
-        if (currentSlide > maxSlideIndex) {
-            setCurrentSlide(maxSlideIndex);
-        }
-    }, [itemsPerPage, maxSlideIndex, currentSlide]);
+    // Jaga indeks slide tetap dalam batas saat ukuran layar berubah — dihitung
+    // saat render, bukan lewat setState di dalam effect (menghindari render berantai).
+    const safeSlide = Math.min(currentSlide, maxSlideIndex);
 
     // Auto-slide every 6 seconds
     useEffect(() => {
@@ -189,7 +186,7 @@ export default function BeritaSection() {
                         <div
                             className={`flex transition-transform duration-500 ease-in-out ${!enableSlider ? 'grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 md:gap-6 transform-none' : ''}`}
                             style={{
-                                transform: enableSlider ? `translateX(-${currentSlide * (100 / itemsPerPage)}%)` : "none",
+                                transform: enableSlider ? `translateX(-${safeSlide * (100 / itemsPerPage)}%)` : "none",
                                 gap: enableSlider ? "0" : undefined // Gap is handled by grid
                             }}
                         >
@@ -236,7 +233,7 @@ export default function BeritaSection() {
                                 <button
                                     key={index}
                                     onClick={() => goToSlide(index)}
-                                    className={`h-2.5 rounded-full transition-all duration-300 ${currentSlide === index ? "w-8 bg-green-500" : "w-2.5 bg-green-200"
+                                    className={`h-2.5 rounded-full transition-all duration-300 ${safeSlide === index ? "w-8 bg-green-500" : "w-2.5 bg-green-200"
                                         }`}
                                     aria-label={`Go to slide ${index + 1}`}
                                 />

@@ -58,7 +58,9 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
     )
 }
 
-export default async function DashboardStats() {
+/** Ambil & agregasi data statistik kunjungan. Dipisah dari komponen supaya
+ *  pemanggilan fungsi tidak-murni (Date.now) tidak terjadi saat render. */
+async function ambilStatistik() {
     const payload = await getPayload({ config })
     const now = Date.now()
     const since = (days: number) => new Date(now - days * DAY_MS).toISOString()
@@ -146,6 +148,12 @@ export default async function DashboardStats() {
             valueSize: 22,
         },
     ]
+
+    return { summary, monthDefs, weekBuckets, dayBuckets }
+}
+
+export default async function DashboardStats() {
+    const { summary, monthDefs, weekBuckets, dayBuckets } = await ambilStatistik()
 
     return (
         <div style={{ marginBottom: 32, display: 'flex', flexDirection: 'column', gap: 12 }}>
