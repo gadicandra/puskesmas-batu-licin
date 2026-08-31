@@ -173,6 +173,9 @@ export interface User {
  */
 export interface Media {
   id: number;
+  /**
+   * Keterangan gambar untuk pembaca layar (aksesibilitas).
+   */
   alt: string;
   updatedAt: string;
   createdAt: string;

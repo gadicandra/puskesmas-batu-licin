@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
+import { Media } from './collections/Media'
 import { Doctors } from './collections/Doctors'
 import { MedicalStaff } from './collections/MedicalStaff'
 import { Vaccines } from './collections/Vaccines'
@@ -34,37 +35,7 @@ export default buildConfig({
   },
   collections: [
     Users,
-    {
-      slug: 'media',
-      access: {
-        read: () => true, // file (gambar/PDF) harus bisa dibaca publik untuk tampil di web
-      },
-      upload: {
-        staticDir: path.resolve(dirname, '../media'), // Lokal disk (<project>/media)
-        mimeTypes: ['image/*', 'application/pdf'],
-        imageSizes: [
-          {
-            name: 'thumbnail',
-            width: 400,
-            height: 300,
-            position: 'centre',
-          },
-          {
-            name: 'card',
-            width: 768,
-            height: 1024,
-            position: 'centre',
-          },
-        ],
-      },
-      fields: [
-        {
-          name: 'alt',
-          type: 'text',
-          required: true,
-        },
-      ],
-    },
+    Media,
     Doctors,
     MedicalStaff,
     Vaccines,
