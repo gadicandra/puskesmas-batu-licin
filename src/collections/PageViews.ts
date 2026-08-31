@@ -14,7 +14,9 @@ export const PageViews: CollectionConfig = {
     timestamps: true,
     access: {
         read: isLoggedIn,
-        create: () => true, // ditulis dari publik (beacon)
+        // Ditulis HANYA lewat route `/api/track` (memakai Local API/overrideAccess).
+        // REST publik `/api/page-views` sengaja ditutup supaya tidak bisa dibanjiri.
+        create: () => false,
         update: isSuperAdmin,
         delete: isSuperAdmin,
     },

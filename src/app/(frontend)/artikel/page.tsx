@@ -12,20 +12,36 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
+const PER_PAGE = 12;
+
+const KATEGORI_LABEL: Record<string, string> = {
+    berita: "Berita",
+    pengumuman: "Pengumuman",
+    kegiatan: "Kegiatan",
+    kesehatan: "Tips Kesehatan",
+};
+
 const formatTanggal = (iso?: string | null) =>
     iso
         ? new Date(iso).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
         : "";
 
-export default async function ArtikelPage() {
+export default async function ArtikelPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string }>;
+}) {
+    const { page } = await searchParams;
+    const halaman = Math.max(1, Number.parseInt(page ?? "1", 10) || 1);
+
     const payload = await getPayload({ config });
-    const { docs } = await payload.find({
+    const { docs, totalPages, hasPrevPage, hasNextPage } = await payload.find({
         collection: "articles",
         where: { _status: { equals: "published" } },
         sort: "-publishedDate",
         depth: 1,
-        limit: 30,
-        pagination: false,
+        limit: PER_PAGE,
+        page: halaman,
     });
 
     return (
@@ -72,7 +88,7 @@ export default async function ArtikelPage() {
                                     </div>
                                     <div className="flex flex-1 flex-col p-5">
                                         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-secondary">
-                                            <span>{a.category}</span>
+                                            <span>{KATEGORI_LABEL[a.category ?? ""] ?? a.category}</span>
                                             <span className="text-tertiary/50">•</span>
                                             <span className="font-medium normal-case text-tertiary">
                                                 {formatTanggal(a.publishedDate)}
@@ -91,6 +107,43 @@ export default async function ArtikelPage() {
                             );
                         })}
                     </div>
+                )}
+
+                {totalPages > 1 && (
+                    <nav
+                        aria-label="Navigasi halaman artikel"
+                        className="mt-10 flex items-center justify-center gap-3"
+                    >
+                        {hasPrevPage ? (
+                            <Link
+                                href={`/artikel?page=${halaman - 1}`}
+                                className="rounded-full border border-primary/15 bg-white px-5 py-2.5 text-sm font-semibold text-primary transition hover:border-secondary hover:text-secondary"
+                            >
+                                Sebelumnya
+                            </Link>
+                        ) : (
+                            <span className="rounded-full border border-primary/10 px-5 py-2.5 text-sm font-semibold text-tertiary/40">
+                                Sebelumnya
+                            </span>
+                        )}
+
+                        <span className="text-sm font-medium text-tertiary">
+                            Halaman {halaman} dari {totalPages}
+                        </span>
+
+                        {hasNextPage ? (
+                            <Link
+                                href={`/artikel?page=${halaman + 1}`}
+                                className="rounded-full border border-primary/15 bg-white px-5 py-2.5 text-sm font-semibold text-primary transition hover:border-secondary hover:text-secondary"
+                            >
+                                Berikutnya
+                            </Link>
+                        ) : (
+                            <span className="rounded-full border border-primary/10 px-5 py-2.5 text-sm font-semibold text-tertiary/40">
+                                Berikutnya
+                            </span>
+                        )}
+                    </nav>
                 )}
             </Container>
         </div>

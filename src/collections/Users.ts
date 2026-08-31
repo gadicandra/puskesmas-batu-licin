@@ -8,7 +8,11 @@ export const Users: CollectionConfig = {
     defaultColumns: ['name', 'email', 'role', 'lokasi'],
     group: 'Sistem',
   },
-  auth: true,
+  auth: {
+    // Batasi percobaan login untuk menahan serangan brute-force.
+    maxLoginAttempts: 5,
+    lockTime: 10 * 60 * 1000, // 10 menit
+  },
   access: {
     // Hanya superadmin yang mengelola akun. User biasa hanya melihat dirinya.
     read: superAdminOrSelf,
