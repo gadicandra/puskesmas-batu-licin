@@ -20,18 +20,13 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  // UI admin bawaan Payload (/admin) sudah DIHAPUS — digantikan dashboard custom
+  // di /dashboard. Yang tersisa dari Payload adalah schema, auth, access control,
+  // versioning, upload, Local API, dan REST /api (dipakai publik untuk berkas media).
+  // Pembuatan Super Admin pertama kini lewat halaman /dashboard/setup.
   admin: {
     user: Users.slug,
-    importMap: {
-      baseDir: path.resolve(dirname),
-    },
-    components: {
-      beforeDashboard: ['/components/admin/DashboardStats'],
-      graphics: {
-        Logo: '/components/admin/Logo',
-        Icon: '/components/admin/Icon',
-      },
-    },
+    disable: true,
   },
   collections: [
     Users,
