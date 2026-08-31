@@ -13,14 +13,14 @@ import {
     FaMapMarkerAlt,
     FaClock,
 } from "react-icons/fa";
-import { FiSend } from "react-icons/fi";
 
 const Nav = [
     { name: 'Beranda', href: '/' },
-    { name: 'Layanan', href: '/layanan' },
-    { name: 'Dokter', href: '/dokter' },
-    { name: 'Berita', href: '/berita' },
-    { name: 'Pengaduan', href: '/pengaduan' },
+    { name: 'Profil Puskesmas', href: '/profil-puskesmas' },
+    { name: 'Struktur Organisasi', href: '/struktur-organisasi' },
+    { name: 'Informasi Layanan dan Mutu', href: '/informasi-layanan-mutu' },
+    { name: 'Artikel', href: '/artikel' },
+    { name: 'Lokasi Puskesmas', href: '/lokasi-puskesmas' },
 ]
 
 const Footer = () => {
@@ -91,7 +91,8 @@ const Footer = () => {
                             <li className="flex items-start gap-3">
                                 <FaMapMarkerAlt className="mt-1 text-green-400 flex-shrink-0" size={16} />
                                 <span>
-                                    Jl. Raya Batulicin No. 123, Kec. Batulicin, Kab. Tanah Bumbu, Kalimantan Selatan
+                                    Jl. Pemerintahan No.071 RT.005 RW.001, Kel. Batulicin, Kec. Batulicin,
+                                    Kab. Tanah Bumbu, Kalimantan Selatan
                                 </span>
                             </li>
                             <li className="flex items-center gap-3">
@@ -102,11 +103,24 @@ const Footer = () => {
                             </li>
                             <li className="flex items-center gap-3">
                                 <FaPhoneAlt className="text-green-400 flex-shrink-0" size={16} />
-                                <span>(0518) 123-456</span>
+                                <a href="tel:081148812882" className="hover:underline">
+                                    0811 4881 2882 (Telepon / WhatsApp)
+                                </a>
                             </li>
                             <li className="flex items-center gap-3">
-                                <FaClock className="text-green-400 flex-shrink-0" size={16} />
-                                <span>Senin - Sabtu: 08.00 - 16.00</span>
+                                <FaPhoneAlt className="text-green-400 flex-shrink-0" size={16} />
+                                <a href="tel:085249312786" className="hover:underline">
+                                    0852 4931 2786 (Darurat / PSC 119)
+                                </a>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <FaClock className="mt-1 text-green-400 flex-shrink-0" size={16} />
+                                <span>
+                                    Senin&ndash;Kamis: 08.00&ndash;11.00<br />
+                                    Jumat: 07.30&ndash;10.30<br />
+                                    Sabtu: 08.00&ndash;11.00<br />
+                                    <span className="text-green-400">UGD &amp; UGD Kebidanan: 24 jam</span>
+                                </span>
                             </li>
                         </ul>
                     </div>
@@ -127,18 +141,7 @@ const Footer = () => {
 
                     {/* Column 4: Newsletter & Map */}
                     <div className="flex flex-col space-y-6">
-                        <h3 className="text-xl font-bold text-green-400">Let’s Stay Connected</h3>
-
-                        <div className="relative">
-                            <input
-                                type="email"
-                                placeholder="Enter your email to subscribe"
-                                className="w-full pl-4 pr-12 py-3 rounded-md text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                            />
-                            <button className="absolute right-1 top-1 bottom-1 bg-green-500 hover:bg-green-600 text-white px-4 rounded transition">
-                                <FiSend size={18} />
-                            </button>
-                        </div>
+                        <h3 className="text-xl font-bold text-green-400">Lokasi Kami</h3>
 
                         {/* Map Integration */}
                         <div className="w-full h-40 bg-gray-300 rounded-xl overflow-hidden relative shadow-lg">
@@ -160,7 +163,7 @@ const Footer = () => {
 
                 {/* Copyright */}
                 <div className="border-t border-gray-500 mt-12 pt-3 text-center text-xs text-gray-400">
-                    <p>&copy; 2024 Puskesmas Batulicin. Hak Cipta Dilindungi.</p>
+                    <p>&copy; 2026 UPTD Puskesmas Batulicin. Hak Cipta Dilindungi.</p>
                 </div>
             </div>
         </footer>

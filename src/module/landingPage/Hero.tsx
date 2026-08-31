@@ -151,7 +151,7 @@ export default function Hero() {
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide">
                                     Jam Operasional
                                 </p>
-                                <p className="text-sm font-bold text-green-600">08.00 - 16.00</p>
+                                <p className="text-sm font-bold text-green-600">08.00 - 11.00</p>
                             </div>
                         </div>
 

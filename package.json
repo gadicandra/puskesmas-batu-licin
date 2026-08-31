@@ -7,13 +7,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.72.0",
     "@payloadcms/next": "^3.72.0",
     "@payloadcms/richtext-lexical": "^3.72.0",
     "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@tiptap/extension-image": "^3.30.6",
+    "@tiptap/extension-link": "^3.30.6",
+    "@tiptap/pm": "^3.30.6",
+    "@tiptap/react": "^3.30.6",
+    "@tiptap/starter-kit": "^3.30.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
@@ -27,14 +33,18 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "sanitize-html": "^2.17.7",
     "sharp": "^0.34.5",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sanitize-html": "^2.16.1",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.2",
     "tailwindcss": "^4",

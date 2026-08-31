@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, ReactNode } from "react";
 import { motion, useScroll, useMotionValueEvent } from "motion/react";
+import type { UseScrollOptions } from "motion/react";
 import { useSectionContext } from "@/context/SectionContext";
 
 interface SectionProps {
@@ -30,7 +31,7 @@ export default function Section({
     }, [id, registerSection, unregisterSection]);
 
     // Determine scroll offsets based on section position
-    const getScrollOffset = (): [string, string] => {
+    const getScrollOffset = (): UseScrollOptions["offset"] => {
         if (isFirst) {
             return ["start start", "end center"];
         } else if (isLast) {
@@ -42,7 +43,7 @@ export default function Section({
 
     const { scrollYProgress } = useScroll({
         target: ref,
-        offset: getScrollOffset() as any,
+        offset: getScrollOffset(),
     });
 
     useMotionValueEvent(scrollYProgress, "change", (progress) => {

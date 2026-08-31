@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function Custom404Page() {
   return (
-    <section className="min-h-screen bg-base py-10 font-avenir overflow-hidden flex items-center justify-center">
+    <section className="min-h-screen bg-white py-10 font-avenir overflow-hidden flex items-center justify-center">
       <div className="container mx-auto px-4">
         <div className="flex justify-center">
           <div className="w-full max-w-3xl">
@@ -26,18 +26,18 @@ export default function Custom404Page() {
               {/* Content Box */}
               <div className="-mt-8">
                 <h3 className="text-2xl md:text-4xl font-bold text-primary mb-4">
-                  Look like you're lost
+                  Sepertinya halaman ini tidak ditemukan
                 </h3>
 
                 <p className="text-tertiary mb-6">
-                  the page you are looking for not available!
+                  Halaman yang Anda cari tidak tersedia atau sudah dipindahkan.
                 </p>
 
                 <Link
                   href="/"
                   className="inline-block px-6 py-3 bg-secondary text-base rounded-lg hover:bg-secondary/80 transition-all duration-300 font-medium"
                 >
-                  Go to Home
+                  Kembali ke Beranda
                 </Link>
               </div>
             </div>

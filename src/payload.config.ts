@@ -7,47 +7,38 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Doctors } from './collections/Doctors'
+import { MedicalStaff } from './collections/MedicalStaff'
+import { Vaccines } from './collections/Vaccines'
+import { Certificates } from './collections/Certificates'
+import { Articles } from './collections/Articles'
+import { PageViews } from './collections/PageViews'
+import { OperationalHours } from './globals/OperationalHours'
+import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  // UI admin bawaan Payload (/admin) sudah DIHAPUS — digantikan dashboard custom
+  // di /dashboard. Yang tersisa dari Payload adalah schema, auth, access control,
+  // versioning, upload, Local API, dan REST /api (dipakai publik untuk berkas media).
+  // Pembuatan Super Admin pertama kini lewat halaman /dashboard/setup.
   admin: {
     user: Users.slug,
-    importMap: {
-      baseDir: path.resolve(dirname),
-    },
+    disable: true,
   },
   collections: [
-    {
-      slug: 'media',
-      upload: {
-        staticDir: path.resolve(__dirname, '../../media'), // Lokal disk
-        mimeTypes: ['image/*'],
-        imageSizes: [
-          {
-            name: 'thumbnail',
-            width: 400,
-            height: 300,
-            position: 'centre',
-          },
-          {
-            name: 'card',
-            width: 768,
-            height: 1024,
-            position: 'centre',
-          },
-        ],
-      },
-      fields: [
-        {
-          name: 'alt',
-          type: 'text',
-          required: true,
-        },
-      ],
-    },
+    Users,
+    Media,
+    Doctors,
+    MedicalStaff,
+    Vaccines,
+    Certificates,
+    Articles,
+    PageViews,
   ],
+  globals: [OperationalHours, SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
