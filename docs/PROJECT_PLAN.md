@@ -22,7 +22,7 @@ Dokumen pendamping:
 
 | Item | Nilai |
 | --- | --- |
-| Baseline bersih (PR ke `main`) | **31 Agustus 2026** ✅ |
+| Baseline bersih | **PR #8 dibuka 31 Agustus 2026** — menunggu review & merge |
 | Minggu kerja fitur | 31 Ags – 18 Sep (3 minggu) |
 | **Deploy + testing dimulai** | **Senin, 21 September 2026** |
 | UAT bersama staf Puskesmas | 21 – 25 September |
@@ -111,7 +111,9 @@ Semua orang mulai dari titik yang sama. Rincian perbaikan di §6.
 - [x] Perbaiki seluruh tautan mati di navbar & footer
 - [x] Perbaiki data yang salah di situs (alamat, telepon, jam pelayanan)
 - [x] `pnpm lint` bersih dari error, `pnpm build` **berhasil** (sebelumnya gagal)
-- [x] PR ke `main`
+- [x] Bersih-bersih Payload: importMap basi dihapus, koleksi `media` disatukan ke `src/collections/`
+- [x] PR **#8** dibuka ke `main`
+- [ ] **Review & merge PR #8** — sebelum ini, jangan ada yang membuat branch fitur baru
 
 ---
 
@@ -228,6 +230,15 @@ Audit codebase 31 Agustus 2026, seluruhnya sudah diperbaiki dan masuk PR ke `mai
 - Login dibatasi 5 percobaan, kunci 10 menit (anti brute-force)
 - `/artikel` diberi paginasi (sebelumnya `limit: 30` tanpa paginasi)
 
+**Bersih-bersih Payload:**
+- `src/app/(payload)/admin/importMap.ts` dihapus — sisa versi Payload lain yang tidak diimpor
+  siapa pun (layout memakai `importMap.js`). **Inilah akar penyebab build gagal**, sehingga
+  dependency `@payloadcms/ui` yang sempat ditambahkan untuk menambalnya dilepas kembali
+- Koleksi `media` dipindah dari definisi inline di `payload.config.ts` ke
+  `src/collections/Media.ts` — file itu sudah ada tapi tidak pernah diimpor (kode mati).
+  Skema tidak berubah, tidak ada migrasi DB
+- `payload-types.ts` & importmap diregenerasi
+
 **Sisa utang yang dijadwalkan, bukan diabaikan:**
 | Utang | Kapan |
 | --- | --- |
@@ -237,6 +248,9 @@ Audit codebase 31 Agustus 2026, seluruhnya sudah diperbaiki dan masuk PR ke `mai
 | `author` artikel bisa dangling bila user dihapus | M3 |
 | Ikon media sosial footer masih `href="#"` | menunggu C9 |
 | Peringatan lint sisa (`<img>` vs `next/image`, exhaustive-deps) | M3, saat optimasi |
+| `/admin` Payload belum dihapus (dashboard belum ada) + halaman `/setup` belum dibuat | M3 |
+| CORS/CSRF Payload belum dikonfigurasi | M3 |
+| Reset password & verifikasi email untuk produksi | M4/M5 |
 
 ---
 
@@ -281,4 +295,8 @@ Permintaan baru di tengah jalan masuk daftar ini dulu, dibahas Jumat, baru diput
 ## Progress Log
 - [2026-08-31] Baseline bersih selesai: Informasi Layanan & Mutu di-merge, 13 tautan mati
   diperbaiki, 6 data salah dikoreksi, build yang tadinya gagal kini berhasil, lint 0 error.
-  PR dibuka ke `main`.
+- [2026-08-31] Bersih-bersih Payload: importMap basi dihapus (akar penyebab build gagal),
+  koleksi `media` disatukan ke `src/collections/Media.ts`. Detail di `PAYLOAD_PLAN.md` Fase 8.
+- [2026-08-31] **PR #8** dibuka ke `main`
+  (https://github.com/gadicandra/puskesmas-batu-licin/pull/8) — 58 file, +3825/-819.
+  **Langkah berikutnya: review & merge, lalu semua orang membuat branch baru dari `main`.**

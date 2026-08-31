@@ -136,6 +136,45 @@ sesi (mis. jika limit habis).
 
 ---
 
+## Fase 8 — Pembersihan & Rencana Pensiun Payload Admin  ◐ (2026-08-31)
+
+Keputusan baru: UI admin Payload (`/admin`) akan **diganti seluruhnya** oleh dashboard
+custom di `/dashboard`. Payload tetap dipakai sebagai backend (schema, auth, access
+control, versioning, upload, Local API). Spesifikasi lengkap: `docs/CUSTOM_DASHBOARD_PLAN.md`.
+
+### Sudah dikerjakan (commit `8e44f45`, PR #8)
+- [x] Hapus `src/app/(payload)/admin/importMap.ts` — sisa versi Payload lain (memetakan
+      `CollectionCards` dari `@payloadcms/ui/rsc`), tidak diimpor siapa pun karena
+      `layout.tsx` memakai `importMap.js`. **Inilah akar penyebab `pnpm build` gagal**
+      selama ini di semua branch.
+- [x] Satukan koleksi `media`: sebelumnya didefinisikan inline di `payload.config.ts`
+      sementara `src/collections/Media.ts` ada tapi tidak pernah diimpor (kode mati).
+      Definisi dipindah ke `Media.ts`, `staticDir` disesuaikan ke `'../../media'`.
+      Skema tidak berubah → **tidak ada migrasi DB**.
+- [x] Regenerasi `payload-types.ts` & importmap — hanya bertambah komentar dokumentasi.
+- [x] `Users.auth`: `maxLoginAttempts: 5` + `lockTime` 10 menit (anti brute-force).
+- [x] `PageViews.create` ditutup dari publik — penulisan hanya lewat `/api/track`.
+- [x] `slugField` menjamin slug unik dengan sufiks angka (`judul-sama-2`).
+
+### Belum — dikerjakan saat dashboard custom siap (M3, lihat PROJECT_PLAN)
+- [ ] Halaman `/setup` untuk membuat superadmin pertama — **WAJIB ada sebelum `/admin`
+      dihapus.** Layar "create first user" Payload ikut hilang bersama `/admin`; tanpa
+      `/setup`, deploy ke database kosong tidak bisa dimasuki sama sekali.
+- [ ] Hapus `admin.components` (`beforeDashboard`, `graphics.Logo/Icon`) dari `payload.config.ts`
+- [ ] Hapus `src/components/admin/*` setelah logikanya diporting ke Beranda dashboard
+- [ ] Hapus route group `(payload)/admin` + `importMap.js`
+- [ ] Hapus `src/app/(payload)/custom.scss` beserta import-nya di `layout.tsx`
+      (konsekuensi baik: masalah `sass` yang tidak ter-resolve dari root ikut hilang)
+- [ ] **JANGAN hapus `(payload)/api`** — REST melayani berkas media publik yang dipakai situs
+- [ ] Verifikasi `pnpm build` & `payload migrate` setelah pembersihan
+
+### Log Fase 8
+- [2026-08-31] Pembersihan tahap pertama selesai (lihat daftar di atas). `/admin` sengaja
+  **belum** dihapus karena dashboard custom belum ada — menghapusnya sekarang berarti tidak
+  ada cara mengelola konten sama sekali selama masa pembangunan.
+
+---
+
 ## Progress Log (ringkasan milestone)
 
 - [2026-07-03] Rencana dibuat (`docs/PAYLOAD_PLAN.md`).
@@ -158,6 +197,11 @@ sesi (mis. jika limit habis).
   gambar publik ter-blokir. Ditambah `read: () => true`. (commit menyusul)
 - [2026-07-03] SISA MANUAL: **restart dev server-mu** lalu buat akun pertama (otomatis superadmin);
   wiring publik jam operasional saat merge branch; hapus cache `.next` bila error ENOENT route.
+- [2026-08-31] **Keputusan besar**: UI admin Payload diganti dashboard custom di `/dashboard`
+  (spesifikasi: `docs/CUSTOM_DASHBOARD_PLAN.md`). Payload tetap jadi backend.
+- [2026-08-31] **Fase 8 tahap 1 selesai**: importMap basi dihapus (akar penyebab build gagal),
+  koleksi `media` disatukan ke `src/collections/Media.ts`, kunci login, slug unik, `page-views`
+  ditutup dari publik. Commit `8e44f45`, PR #8.
 
 ---
 
@@ -168,31 +212,37 @@ Status: `[x]` sudah ditangani · `[ ]` rekomendasi (belum).
 ### Prioritas TINGGI
 - [x] **Media read butuh auth** → gambar (cover artikel, foto dokter, sertifikat) tak tampil untuk
   pengunjung publik. Fix: `media.access.read = () => true`.
-- [ ] **Analitik menghitung page-view, bukan PENGUNJUNG unik.** Requirement minta "jumlah orang".
+- [ ] **Analitik menghitung page-view, bukan PENGUNJUNG unik.** → dijadwalkan **M3** (PROJECT_PLAN) Requirement minta "jumlah orang".
       Rekomendasi: set cookie visitor-id (mis. per hari), dedup di `/api/track` → metrik "orang"
       terpisah dari "kunjungan". Saat ini angka = total view.
-- [ ] **`/api/track` + `PageViews.create: () => true` tanpa rate limit** → siapa pun bisa membanjiri
+- [x] ~~**`/api/track` + `PageViews.create: () => true` tanpa rate limit**~~ — **SELESAI 2026-08-31**
+      (rate limit 30/menit per IP, `create` publik ditutup, validasi path). Sisa: rate limit
+      in-memory hanya cukup untuk satu instance; pindahkan ke Redis bila nanti multi-instance.
+      Catatan asli: → siapa pun bisa membanjiri
       DB (DoS/analitik palsu), termasuk via REST `/api/page-views`. Rekomendasi: rate-limit per IP,
       tutup create REST publik (hanya lewat route + `overrideAccess`), atau token beacon.
 
 ### Prioritas SEDANG
-- [ ] **Slug artikel bentrok**: `unique:true` tapi auto-generate dari judul tanpa dedup → dua judul
+- [x] ~~**Slug artikel bentrok**~~ — **SELESAI 2026-08-31**: sufiks angka otomatis (`judul-sama-2`).
+      Catatan asli:: `unique:true` tapi auto-generate dari judul tanpa dedup → dua judul
       sama = error simpan. Fix: cek keunikan & tambah sufiks (`-2`) di hook slug.
-- [ ] **Brute-force login**: set `auth: { maxLoginAttempts, lockTime }` di `Users` (verifikasi default).
+- [x] ~~**Brute-force login**~~ — **SELESAI 2026-08-31**: `maxLoginAttempts: 5`, `lockTime` 10 menit.
 - [ ] **Admin bisa self-publish artikel** (set `_status=published`). Bila perlu alur review, batasi
       publish ke superadmin via field access `_status`. (keputusan desain)
-- [ ] **Upload lokal-disk tidak persist di produksi** (container ephemeral). Pakai storage adapter
+- [ ] **Upload lokal-disk tidak persist di produksi** → dijadwalkan **M4** (storage S3/R2, PROJECT_PLAN) (container ephemeral). Pakai storage adapter
       (S3/R2/UploadThing) untuk prod. (Fase 7)
 - [ ] **PDF ke koleksi `media` ber-imageSizes** → sharp coba resize PDF, berpotensi error. Uji; bila
       perlu, pisahkan koleksi upload dokumen (tanpa imageSizes) untuk sertifikat.
 
 ### Prioritas RENDAH
-- [ ] `PageViewTracker` kirim tiap ganti route tanpa debounce/dedup → over-count saat navigasi cepat.
+- [x] ~~`PageViewTracker` tanpa debounce/dedup~~ — **SELESAI 2026-08-31**: jeda 800ms + penjagaan
+      path yang sama tidak terkirim dua kali; `/dashboard` & `/api` juga tidak dilacak.
 - [ ] Bot filter hanya regex UA → headless ber-UA palsu lolos.
-- [ ] `/artikel` tanpa paginasi (limit 30) — masalah skala.
-- [ ] `DashboardStats` fetch s/d 20k baris + 12 count → berat bila traffic besar; pertimbangkan
+- [x] ~~`/artikel` tanpa paginasi (limit 30)~~ — **SELESAI 2026-08-31**: paginasi 12 per halaman.
+- [ ] `DashboardStats` fetch s/d 20k baris + 12 count → dijadwalkan **M3** (agregasi SQL saat porting ke dashboard) → berat bila traffic besar; pertimbangkan
       agregasi SQL (`date_trunc`) atau tabel ringkasan harian.
-- [ ] CORS/CSRF Payload belum dikonfigurasi (`cors`, `csrf`) — perlu bila frontend beda domain.
-- [ ] `path` di `/api/track` diterima apa adanya (truncate 512) → validasi path internal.
-- [ ] Artikel `author` bisa dangling bila user dihapus.
-- [ ] Reset password / verifikasi email auth belum diaktifkan (untuk prod).
+- [ ] CORS/CSRF Payload belum dikonfigurasi (`cors`, `csrf`) → dijadwalkan **M3** — perlu bila frontend beda domain.
+- [x] ~~`path` di `/api/track` diterima apa adanya~~ — **SELESAI 2026-08-31**: hanya menerima path
+      internal (diawali `/`, bukan `//`, tanpa `://`), dan path admin/dashboard/api ditolak.
+- [ ] Artikel `author` bisa dangling bila user dihapus. → dijadwalkan **M3** (saat modul Pengguna)
+- [ ] Reset password / verifikasi email auth belum diaktifkan (untuk prod). → dijadwalkan **M4/M5**
