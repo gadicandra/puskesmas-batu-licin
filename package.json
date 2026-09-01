@@ -16,6 +16,7 @@
     "@payloadcms/db-postgres": "^3.72.0",
     "@payloadcms/next": "^3.72.0",
     "@payloadcms/richtext-lexical": "^3.72.0",
+    "@payloadcms/storage-s3": "^3.72.0",
     "@radix-ui/react-navigation-menu": "^1.2.14",
     "@tiptap/extension-image": "^3.30.6",
     "@tiptap/extension-link": "^3.30.6",

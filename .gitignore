@@ -19,6 +19,8 @@
 /.next/
 # direktori build container Docker (lihat NEXT_DIST_DIR di docker-compose.yml)
 /.next-docker/
+# folder unggahan milik container (lihat MEDIA_DIR di docker-compose.yml)
+/media-docker/
 # store pnpm lokal (terbentuk saat install di dalam container)
 /.pnpm-store/
 # cadangan database sebelum migrasi — jangan ikut ter-commit

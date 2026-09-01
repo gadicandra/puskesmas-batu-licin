@@ -48,6 +48,12 @@ services:
       APP_URL: ${APP_URL:-http://localhost:3000}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      # Penyimpanan berkas. Kosong = disk lokal (volume puskesmas_media di
+      # bawah). Terisi = Cloudflare R2, dan volume itu tidak lagi terpakai.
+      R2_BUCKET: ${R2_BUCKET:-}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
       NODE_ENV: development
       NEXT_TELEMETRY_DISABLED: "1"
       # Di dalam container tidak ada TTY, jadi auto-push skema Payload akan
@@ -58,6 +64,7 @@ services:
       # `pnpm build` di komputer dan build di container tidak berebut folder
       # yang sama.
       NEXT_DIST_DIR: .next-docker
+      MEDIA_DIR: media-docker
       # Perubahan berkas dari host tidak selalu terdeteksi di dalam container
       # (terutama Docker Desktop di Windows/macOS). Polling membuat hot-reload
       # tetap jalan di semua sistem operasi.
@@ -73,7 +80,7 @@ services:
       - puskesmas_node_modules:/app/node_modules
       - puskesmas_next:/app/.next-docker
       # Berkas unggahan disimpan di volume agar tidak hilang saat container dibuat ulang.
-      - puskesmas_media:/app/media
+      - puskesmas_media:/app/media-docker
     # `--forceAcceptWarning` pada migrate: Payload menolak jalan tanpa konfirmasi
     # bila database pernah disentuh auto-push (mis. seseorang menjalankan
     # `pnpm dev` di komputernya lebih dulu). Tanpa TTY, pertanyaan itu
@@ -105,10 +112,11 @@ services:
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-puskesmas123}
       NODE_ENV: development
       PAYLOAD_DB_PUSH: "false"
+      MEDIA_DIR: media-docker
     volumes:
       - .:/app
       - puskesmas_node_modules:/app/node_modules
-      - puskesmas_media:/app/media
+      - puskesmas_media:/app/media-docker
     command: >
       sh -c "corepack enable &&
              pnpm install --frozen-lockfile &&

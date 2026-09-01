@@ -31,6 +31,21 @@ APP_URL=
 # Lihat README bagian "Skema database: migrasi vs auto-push".
 PAYLOAD_DB_PUSH=
 
+# --- Penyimpanan berkas: Cloudflare R2 (opsional) ------------------------
+# Kosongkan untuk memakai disk lokal `<project>/media`. Itu sudah benar untuk
+# pengembangan dan untuk produksi di VPS/server sendiri yang disknya permanen.
+#
+# WAJIB diisi bila dideploy ke platform yang disknya sementara (Vercel dan
+# sejenisnya): di sana berkas yang diunggah staf HILANG pada deploy berikutnya,
+# tanpa pesan galat apa pun.
+#
+# Cara memperolehnya ada di README bagian "Penyimpanan berkas".
+# Keempatnya harus terisi; kalau ada satu yang kosong, R2 tidak diaktifkan.
+R2_BUCKET=
+R2_ENDPOINT=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+
 # --- Akun pertama yang dibuat `pnpm seed` --------------------------------
 SEED_ADMIN_EMAIL=admin@puskesmas.local
 SEED_ADMIN_PASSWORD=puskesmas123

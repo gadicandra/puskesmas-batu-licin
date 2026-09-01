@@ -286,6 +286,11 @@ Sidebar juga menampilkan ikon berputar pada menu yang baru diklik lewat
 saat Next masih mengambil kode halaman — yang tanpa penanda terasa seperti klik
 tidak terbaca.
 
+**Penyimpanan berkas:** Galeri Gambar menyimpan ke disk lokal atau Cloudflare
+R2, dipilih otomatis dari variabel `R2_*` di `.env` (lihat README bagian
+"Penyimpanan berkas"). URL-nya tetap `/api/media/<berkas>` di kedua mode, jadi
+gambar yang sudah tertanam di artikel tidak rusak saat berpindah penyimpanan.
+
 **Kursor tombol:** preflight Tailwind v4 menghapus `cursor: pointer` pada
 `<button>` yang dulu ada di v3, sehingga tombol memakai kursor panah dan terasa
 tidak bisa diklik. Diperbaiki sekali di `globals.css` (`@layer base`), bukan

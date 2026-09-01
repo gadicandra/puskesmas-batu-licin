@@ -104,6 +104,75 @@ Dikendalikan lewat `PAYLOAD_DB_PUSH` di `.env`.
 
 ---
 
+## Penyimpanan berkas (gambar & PDF)
+
+Berkas yang diunggah staf lewat Galeri Gambar bisa disimpan di dua tempat.
+Pilihannya otomatis dari isi `.env` — tidak ada saklar di kode.
+
+| Kondisi | Tempat simpan |
+| --- | --- |
+| Variabel `R2_*` kosong | Disk lokal `<project>/media` |
+| Keempat `R2_*` terisi | Cloudflare R2 |
+
+URL publiknya **sama di kedua mode** (`/api/media/<berkas>`), jadi berpindah
+penyimpanan tidak merusak tautan gambar yang sudah tersimpan di artikel.
+
+### Kapan wajib memakai R2
+
+**Deploy di VPS / server Dinas Kesehatan → disk lokal sudah cukup dan gratis.**
+`docker-compose.yml` sudah memasang volume `puskesmas_media`, jadi berkas
+selamat saat container dibuat ulang. Yang perlu ditambahkan hanya backup rutin.
+
+**Deploy di Vercel atau sejenisnya → R2 wajib.** Disk di sana bersifat sementara:
+berkas yang diunggah staf hilang pada deploy berikutnya, **tanpa pesan galat**.
+Gejalanya baru terlihat berminggu-minggu kemudian saat gambar artikel lama
+mendadak kosong.
+
+### Kenapa R2, bukan S3
+
+Gratis 10 GB, dan **biaya keluar (egress) nol**. Situs publik menyajikan gambar
+yang sama berulang kali ke ribuan pengunjung; penyedia lain menagih per GB
+keluar, dan itu komponen biaya yang paling mudah membengkak tanpa disadari.
+Kebutuhan situs ini realistis di bawah 1 GB, jadi 10 GB tidak akan tersentuh
+batasnya. R2 juga S3-compatible sehingga memakai adapter resmi Payload.
+
+### Cara menyiapkan (± 10 menit)
+
+1. Buat akun di [dash.cloudflare.com](https://dash.cloudflare.com) — tier gratis
+   R2 tidak meminta kartu kredit.
+2. Menu **R2 Object Storage** → **Create bucket**. Nama bebas, mis.
+   `puskesmas-batulicin`. Lokasi: **Asia-Pacific (APAC)**.
+3. Di halaman R2, catat **Account ID** (ada di kanan). Endpoint-nya berbentuk:
+   `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`
+4. **Manage R2 API Tokens** → **Create API token**:
+   - Permission: **Object Read & Write**
+   - Specify bucket: pilih bucket yang tadi dibuat — jangan beri akses ke
+     seluruh akun
+   - Salin **Access Key ID** dan **Secret Access Key**. Secret hanya
+     ditampilkan sekali.
+5. Isi `.env`:
+
+   ```bash
+   R2_BUCKET=puskesmas-batulicin
+   R2_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+   R2_ACCESS_KEY_ID=...
+   R2_SECRET_ACCESS_KEY=...
+   ```
+
+6. Jalankan ulang aplikasi, lalu unggah satu gambar lewat `/dashboard/media`.
+   Berkasnya harus muncul di bucket R2 dan **tidak** muncul di folder `media/`.
+
+**Bucket tidak perlu dibuat publik.** Berkas dilayani lewat route Payload
+`/api/media/...`, jadi kredensial R2 tidak pernah sampai ke browser.
+
+### Memindahkan berkas lama ke R2
+
+Berkas yang terlanjur ada di `media/` tidak ikut pindah sendiri. Salin sekali
+dengan `rclone` atau AWS CLI sebelum mengaktifkan R2, atau unggah ulang lewat
+dashboard bila jumlahnya sedikit.
+
+---
+
 ## Variabel lingkungan
 
 | Variabel | Wajib | Keterangan |
@@ -114,6 +183,7 @@ Dikendalikan lewat `PAYLOAD_DB_PUSH` di `.env`.
 | `GOOGLE_CLIENT_ID` | tidak | Login Google. Kosong = tombolnya disembunyikan |
 | `GOOGLE_CLIENT_SECRET` | tidak | Pasangan `GOOGLE_CLIENT_ID` |
 | `PAYLOAD_DB_PUSH` | tidak | `false` untuk memaksa memakai migrasi |
+| `R2_BUCKET` / `R2_ENDPOINT` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | produksi serverless | Cloudflare R2. Kosong = disk lokal. Keempatnya harus terisi |
 | `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | tidak | Akun pertama yang dibuat seed |
 | `APP_PORT` / `DB_PORT` | tidak | Ganti port bila bentrok |
 
