@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useLinkStatus } from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ExternalLink, LogOut } from 'lucide-react'
+import { Menu, X, ExternalLink, LogOut, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { menuUntuk, JUDUL_GRUP, type MenuItem } from './menu'
 
@@ -13,6 +14,24 @@ type UserRingkas = { nama: string; email: string; role: string; lokasi?: string 
 function aktifkah(pathname: string, href: string): boolean {
     if (href === '/dashboard') return pathname === '/dashboard'
     return pathname === href || pathname.startsWith(`${href}/`)
+}
+
+/** Penanda "sedang dibuka" di menu yang baru diklik.
+ *
+ *  `loading.tsx` baru muncul setelah navigasinya dimulai; jeda sebelum itu —
+ *  saat Next masih mengambil kode halaman — terasa seperti klik tidak terbaca.
+ *  `useLinkStatus` (Next 15.3+) mengisi jeda itu, dan HARUS dipanggil dari
+ *  komponen di dalam <Link> karena ia membaca status link terdekat.
+ *
+ *  Ikonnya menggantikan ikon menu, bukan ditambahkan di sebelahnya, supaya
+ *  baris menu tidak melebar dan daftarnya tidak bergeser. */
+function IkonMenu({ Ikon }: { Ikon: MenuItem['ikon'] }) {
+    const { pending } = useLinkStatus()
+    return pending ? (
+        <Loader2 size={18} className="shrink-0 animate-spin" aria-hidden />
+    ) : (
+        <Ikon size={18} className="shrink-0" aria-hidden />
+    )
 }
 
 function DaftarMenu({ menu, pathname, onKlik }: { menu: MenuItem[]; pathname: string; onKlik?: () => void }) {
@@ -30,7 +49,6 @@ function DaftarMenu({ menu, pathname, onKlik }: { menu: MenuItem[]; pathname: st
                         </p>
                         {isi.map((m) => {
                             const aktif = aktifkah(pathname, m.href)
-                            const Ikon = m.ikon
                             return (
                                 <Link
                                     key={m.href}
@@ -44,7 +62,7 @@ function DaftarMenu({ menu, pathname, onKlik }: { menu: MenuItem[]; pathname: st
                                             : 'text-white/70 hover:bg-white/10 hover:text-white'
                                     )}
                                 >
-                                    <Ikon size={18} className="shrink-0" />
+                                    <IkonMenu Ikon={m.ikon} />
                                     {m.label}
                                 </Link>
                             )

@@ -28,6 +28,11 @@ services:
       retries: 5
 
   app:
+    # Tidak ada `apk add` di command: `sharp` (pengolah gambar Payload)
+    # menyertakan biner musl sendiri (@img/sharp-linuxmusl-x64), jadi
+    # `libc6-compat` tidak diperlukan. Memasang paket saat container start
+    # membuat setiap `docker compose up` bergantung pada CDN Alpine — cukup
+    # sekali jaringan lambat, container tidak pernah siap.
     image: node:22-alpine
     container_name: puskesmas-app
     working_dir: /app
@@ -69,11 +74,18 @@ services:
       - puskesmas_next:/app/.next-docker
       # Berkas unggahan disimpan di volume agar tidak hilang saat container dibuat ulang.
       - puskesmas_media:/app/media
+    # `--forceAcceptWarning` pada migrate: Payload menolak jalan tanpa konfirmasi
+    # bila database pernah disentuh auto-push (mis. seseorang menjalankan
+    # `pnpm dev` di komputernya lebih dulu). Tanpa TTY, pertanyaan itu
+    # menggantung dan container tidak pernah siap.
+    #
+    # Jangan menaruh komentar "#" DI DALAM string command: YAML `>` menggabungkan
+    # semuanya jadi satu baris, sehingga "#" akan mematikan seluruh perintah
+    # sesudahnya.
     command: >
-      sh -c "apk add --no-cache libc6-compat >/dev/null &&
-             corepack enable &&
+      sh -c "corepack enable &&
              pnpm install --frozen-lockfile &&
-             pnpm payload migrate &&
+             pnpm payload migrate --forceAcceptWarning &&
              pnpm dev --hostname 0.0.0.0"
 
   # Pengisian data awal. Sengaja dipisah dengan `profiles` supaya TIDAK ikut
@@ -98,8 +110,7 @@ services:
       - puskesmas_node_modules:/app/node_modules
       - puskesmas_media:/app/media
     command: >
-      sh -c "apk add --no-cache libc6-compat >/dev/null &&
-             corepack enable &&
+      sh -c "corepack enable &&
              pnpm install --frozen-lockfile &&
              pnpm seed"
 

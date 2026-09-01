@@ -251,3 +251,43 @@ lingkungan yang belum dikonfigurasi.
 
 **Akun pertama (`/dashboard/setup`) selalu berbasis kata sandi**, karena pada saat
 itu belum ada siapa pun yang bisa mendaftarkan akun Google.
+
+---
+
+## 7. Keadaan memuat (loading)
+
+Setiap folder halaman di `dashboard/(app)/` punya `loading.tsx`. Karena Shell
+(sidebar + bilah atas) milik layout, yang berganti hanya area isi — menu tetap
+terlihat dan terasa responsif.
+
+**Aturannya: kerangka harus MENYERUPAI isi yang akan menggantikannya.** Kotak
+seukuran tabel di tempat tabel, kartu seukuran kartu. Kerangka asal-asalan
+membuat halaman "melompat" saat isinya datang, dan itu lebih mengganggu daripada
+layar kosong.
+
+Komponennya di `components/dashboard/ui/`:
+
+| Komponen | Untuk |
+| --- | --- |
+| `KerangkaHalaman` | Pembungkus wajib — satu-satunya yang bicara ke pembaca layar |
+| `Skeleton`, `SkeletonTeks` | Blok dan paragraf |
+| `SkeletonJudul` | Seukuran `PageHeader` |
+| `SkeletonTabel` | Modul Artikel, Dokter, Vaksin, Sertifikat, Pengguna |
+| `SkeletonKartuAngka`, `SkeletonGrafik` | Beranda & Statistik |
+| `SkeletonGaleri` | Galeri Gambar |
+| `SkeletonForm` | Pengaturan & Akun Saya |
+
+Seluruh kotak skeleton `aria-hidden`; pengumumannya diringkas jadi satu kalimat
+di `KerangkaHalaman` (`role="status"`), supaya pembaca layar tidak membacakan
+puluhan kotak kosong.
+
+Sidebar juga menampilkan ikon berputar pada menu yang baru diklik lewat
+`useLinkStatus` (Next 15.3+). Itu mengisi jeda SEBELUM `loading.tsx` muncul —
+saat Next masih mengambil kode halaman — yang tanpa penanda terasa seperti klik
+tidak terbaca.
+
+**Kursor tombol:** preflight Tailwind v4 menghapus `cursor: pointer` pada
+`<button>` yang dulu ada di v3, sehingga tombol memakai kursor panah dan terasa
+tidak bisa diklik. Diperbaiki sekali di `globals.css` (`@layer base`), bukan
+dengan menempelkan `cursor-pointer` di tiap komponen — kalau ditempel satu per
+satu, tombol berikutnya pasti terlewat lagi.
