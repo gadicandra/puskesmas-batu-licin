@@ -295,6 +295,10 @@ export interface MedicalStaff {
   id: number;
   nama: string;
   jabatan: 'dokter' | 'perawat' | 'bidan' | 'apoteker' | 'analis' | 'gizi' | 'sanitarian' | 'administrasi' | 'lainnya';
+  /**
+   * Mis. "Perawat Ahli Madya". Inilah yang tampil di situs.
+   */
+  jabatanLengkap?: string | null;
   foto?: (number | null) | Media;
   aktif?: boolean | null;
   /**
@@ -769,6 +773,7 @@ export interface DoctorsSelect<T extends boolean = true> {
 export interface MedicalStaffSelect<T extends boolean = true> {
   nama?: T;
   jabatan?: T;
+  jabatanLengkap?: T;
   foto?: T;
   aktif?: T;
   poli?: T;

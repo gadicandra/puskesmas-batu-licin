@@ -56,7 +56,7 @@ tidak aktif serta mengurutkannya.
 | `ambilPengaturanSitus()` | `pengaturan-situs.ts` | `PengaturanSitus` — nama, alamat, telepon, email, sosmed |
 | `ambilProfil()` | `profil.ts` | `ProfilPuskesmas` — visi, misi, motto, maklumat, budaya kerja |
 | `ambilDokter()` | `dokter.ts` | `DokterPublik[]` — jadwal praktik sudah terurut Senin→Minggu |
-| `ambilNakes()` | `nakes.ts` | `NakesPublik[]` — tenaga medis |
+| `ambilNakes()` | `nakes.ts` | `NakesPublik[]` — 68 tenaga kesehatan, `jabatan` = jabatan fungsional lengkap |
 | `ambilLayanan()` | `layanan.ts` | `LayananPublik[]` — semua layanan aktif |
 | `ambilLayananDalamGedung()` | `layanan.ts` | `LayananPublik[]` |
 | `ambilLayananLuarGedung()` | `layanan.ts` | `LayananPublik[]` |
@@ -126,6 +126,8 @@ export default async function HalamanNakes() {
                 <div className="avatar-inisial">{n.nama.charAt(0)}</div>
             )}
             <h3>{n.nama}</h3>
+            {/* `jabatan` = jabatan fungsional lengkap ("Perawat Ahli Madya").
+                Pakai `kategori` / `kodeKategori` untuk mengelompokkan. */}
             <p>{n.jabatan}</p>
         </div>
     ))

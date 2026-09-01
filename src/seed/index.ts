@@ -3,6 +3,7 @@ import config from '@payload-config'
 import { JADWAL_SK, CATATAN_SK } from './data/jam-pelayanan'
 import { IDENTITAS } from './data/identitas'
 import { LAYANAN } from './data/layanan'
+import { NAKES } from './data/nakes'
 
 /**
  * Pengisian data awal database.
@@ -122,10 +123,53 @@ async function seed() {
         catat(`layanan sudah ada (${jumlahLayanan}) — dilewati`)
     }
 
-    // --- Menunggu berkas di data/sumber/ --------------------------------
-    // Nakes, posyandu, fasilitas, sertifikat, dan struktur organisasi
-    // menyusul setelah berkas mentahnya tersedia dan pemetaan kolomnya
-    // disepakati. Lihat docs/KONTRAK-DATA.md bagian "Mengisi data".
+    // --- 5. Tenaga kesehatan --------------------------------------------
+    const { totalDocs: jumlahNakes } = await payload.count({ collection: 'medical-staff' })
+    if (jumlahNakes === 0) {
+        for (const n of NAKES) {
+            await payload.create({
+                collection: 'medical-staff',
+                // `foto` sengaja tidak diisi: belum ada fotonya. Lapisan konten
+                // mengembalikan `null` dan UI yang memilih penggantinya.
+                data: { ...n, aktif: true },
+                overrideAccess: true,
+            })
+        }
+        catat(`${NAKES.length} tenaga kesehatan dibuat`)
+    } else {
+        catat(`tenaga kesehatan sudah ada (${jumlahNakes}) — dilewati`)
+    }
+
+    // --- 6. Dokter -------------------------------------------------------
+    // Dokter sengaja tercatat di dua tempat dengan peran berbeda:
+    // `medical-staff` menjawab "siapa saja pegawainya", `doctors` menjawab
+    // "kapan dokter praktik" (punya jadwal, STR, pendidikan).
+    const { totalDocs: jumlahDokter } = await payload.count({ collection: 'doctors' })
+    if (jumlahDokter === 0) {
+        const dariNakes = NAKES.filter((n) => n.jabatan === 'dokter')
+        for (const d of dariNakes) {
+            await payload.create({
+                collection: 'doctors',
+                data: {
+                    nama: d.nama,
+                    spesialisasi: d.jabatanLengkap,
+                    // Jadwal praktik, STR, dan pendidikan belum ada di berkas
+                    // sumber — diisi staf lewat /dashboard/dokter.
+                    aktif: true,
+                },
+                overrideAccess: true,
+            })
+        }
+        catat(`${dariNakes.length} dokter dibuat`)
+    } else {
+        catat(`dokter sudah ada (${jumlahDokter}) — dilewati`)
+    }
+
+    // --- Menunggu berkas berikutnya -------------------------------------
+    // Posyandu, fasilitas, sertifikat, dan struktur organisasi menyusul.
+    // Berkas sumbernya sudah ada di `data/` (Sertifikat/,
+    // StrukturOrganisasiMaster.png, DataAngkaYangTerlayani.jpeg) tapi masih
+    // berupa gambar — perlu dibaca dan dipetakan dulu bersama Puskesmas.
 
     catat('selesai.')
 }

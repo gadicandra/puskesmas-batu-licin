@@ -20,10 +20,14 @@ const LABEL_JABATAN: Record<string, string> = {
 export type NakesPublik = {
     id: number
     nama: string
-    /** Sudah berupa label siap tampil ("Analis Laboratorium"), bukan kode. */
+    /** Jabatan fungsional lengkap dari dokumen kepegawaian, mis. "Perawat Ahli
+     *  Madya". INI yang sebaiknya ditampilkan. Jatuh kembali ke label kategori
+     *  bila belum diisi. */
     jabatan: string
-    /** Kode jabatan, untuk mengelompokkan atau menyaring di UI. */
-    kodeJabatan: string
+    /** Label kategori ("Perawat"), untuk judul kelompok. */
+    kategori: string
+    /** Kode kategori ("perawat"), untuk menyaring & mengelompokkan di UI. */
+    kodeKategori: string
     /** Nama poli/unit siap tampil. `null` bila tidak diisi. */
     poli: string | null
     /** `null` bila fotonya belum ada — UI yang memutuskan penggantinya. */
@@ -52,8 +56,9 @@ export const ambilNakes = unstable_cache(
         return docs.map((d) => ({
             id: d.id,
             nama: d.nama,
-            jabatan: LABEL_JABATAN[d.jabatan] ?? d.jabatan,
-            kodeJabatan: d.jabatan,
+            jabatan: d.jabatanLengkap?.trim() || LABEL_JABATAN[d.jabatan] || d.jabatan,
+            kategori: LABEL_JABATAN[d.jabatan] ?? d.jabatan,
+            kodeKategori: d.jabatan,
             poli: labelUnit(d.poli),
             foto: ringkasGambar(d.foto, `Foto ${d.nama}`),
         }))
