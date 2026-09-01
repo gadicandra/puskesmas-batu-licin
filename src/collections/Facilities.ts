@@ -24,7 +24,8 @@ export const Facilities: CollectionConfig = {
             required: true,
             defaultValue: 'ruang',
             options: [
-                { label: 'Ruang & Bangunan', value: 'ruang' },
+                { label: 'Ruang Pelayanan', value: 'ruang' },
+                { label: 'Ruang Kantor', value: 'kantor' },
                 { label: 'Alat Kesehatan', value: 'alat' },
                 { label: 'Kendaraan', value: 'kendaraan' },
                 { label: 'Sarana Penunjang', value: 'penunjang' },

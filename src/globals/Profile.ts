@@ -18,7 +18,55 @@ export const Profile: GlobalConfig = {
         update: isSuperAdmin,
     },
     fields: [
+        {
+            // Data kelembagaan & wilayah kerja. Angka-angka ini dikutip di
+            // halaman profil dan bahan presentasi, jadi harus bisa diperbarui
+            // staf tanpa menyentuh kode.
+            type: 'collapsible',
+            label: 'Data Kelembagaan',
+            fields: [
+                { name: 'kodePuskesmas', type: 'text', label: 'Kode Puskesmas' },
+                { name: 'kepalaPuskesmas', type: 'text', label: 'Kepala Puskesmas' },
+                {
+                    name: 'kategori',
+                    type: 'text',
+                    admin: { description: 'Mis. Perkotaan / Pedesaan' },
+                },
+                {
+                    name: 'jenis',
+                    type: 'text',
+                    admin: { description: 'Mis. Puskesmas Non Perawatan' },
+                },
+                { name: 'letak', type: 'text', admin: { description: 'Mis. Ibu Kota Kab/Kota' } },
+                { name: 'topografi', type: 'text', admin: { description: 'Mis. Perbatasan' } },
+            ],
+        },
+        {
+            type: 'collapsible',
+            label: 'Wilayah Kerja',
+            fields: [
+                { name: 'luasWilayah', type: 'text', admin: { description: 'Mis. 105,760 Km²' } },
+                {
+                    name: 'jumlahDesa',
+                    type: 'text',
+                    label: 'Jumlah Desa/Kelurahan',
+                    admin: { description: 'Mis. 9 (7 Desa, 2 Kelurahan)' },
+                },
+                { name: 'jumlahRT', type: 'number', label: 'Jumlah RT' },
+                { name: 'jumlahPenduduk', type: 'number', label: 'Jumlah Penduduk' },
+                { name: 'jumlahKK', type: 'number', label: 'Jumlah KK' },
+            ],
+        },
         { name: 'visi', type: 'textarea' },
+        {
+            // Visi di sumber data adalah visi Kabupaten (RPJMD), bukan visi
+            // Puskesmas sendiri. Atributnya wajib ikut tampil supaya pembaca
+            // tidak salah mengira itu rumusan Puskesmas.
+            name: 'sumberVisi',
+            type: 'text',
+            label: 'Sumber / Atribusi Visi',
+            admin: { description: 'Mis. "Visi pembangunan Kabupaten Tanah Bumbu, RPJMD 2025–2029"' },
+        },
         {
             name: 'misi',
             type: 'array',

@@ -53,15 +53,15 @@ tidak aktif serta mengurutkannya.
 | Fungsi | Berkas | Mengembalikan |
 | --- | --- | --- |
 | `ambilJamPelayanan()` | `jam-pelayanan.ts` | `JamPelayanan` — jadwal + catatan |
-| `ambilPengaturanSitus()` | `pengaturan-situs.ts` | `PengaturanSitus` — nama, alamat, telepon, email, sosmed |
-| `ambilProfil()` | `profil.ts` | `ProfilPuskesmas` — visi, misi, motto, maklumat, budaya kerja |
+| `ambilPengaturanSitus()` | `pengaturan-situs.ts` | `PengaturanSitus` — nama, alamat, telepon, nomor darurat, email, sosmed |
+| `ambilProfil()` | `profil.ts` | `ProfilPuskesmas` — visi, misi, motto, maklumat, budaya kerja, `kelembagaan` (kode, kepala, wilayah kerja) |
 | `ambilDokter()` | `dokter.ts` | `DokterPublik[]` — jadwal praktik sudah terurut Senin→Minggu |
 | `ambilNakes()` | `nakes.ts` | `NakesPublik[]` — 68 tenaga kesehatan, `jabatan` = jabatan fungsional lengkap |
 | `ambilLayanan()` | `layanan.ts` | `LayananPublik[]` — semua layanan aktif |
 | `ambilLayananDalamGedung()` | `layanan.ts` | `LayananPublik[]` |
 | `ambilLayananLuarGedung()` | `layanan.ts` | `LayananPublik[]` |
 | `ambilPosyandu()` | `posyandu.ts` | `PosyanduPublik[]` — termasuk daftar layanannya |
-| `ambilFasilitas()` | `fasilitas.ts` | `FasilitasPublik[]` |
+| `ambilFasilitas()` | `fasilitas.ts` | `FasilitasPublik[]` — 68 sarana & ruangan |
 | `ambilSertifikat()` | `sertifikat.ts` | `SertifikatPublik[]` — akreditasi + penghargaan |
 | `ambilAkreditasi()` | `sertifikat.ts` | `SertifikatPublik[]` — akreditasi saja |
 | `ambilPenghargaan()` | `sertifikat.ts` | `SertifikatPublik[]` — penghargaan saja |
@@ -179,6 +179,36 @@ export default async function HalamanStruktur() {
     const akar = await ambilStrukturOrganisasi()
     return <ul>{akar.map((s) => <Simpul key={s.id} simpul={s} />)}</ul>
 }
+```
+
+### Visi — atribusi wajib ikut
+
+Visi yang tersimpan berasal dari **RPJMD Kabupaten Tanah Bumbu**, bukan rumusan
+Puskesmas sendiri. `sumberVisi` harus ikut ditampilkan; tanpa itu pembaca akan
+mengira Puskesmas yang merumuskannya.
+
+```tsx
+const profil = await ambilProfil()
+
+{profil.visi && (
+    <blockquote>
+        <p>{profil.visi}</p>
+        {profil.sumberVisi && <cite>{profil.sumberVisi}</cite>}
+    </blockquote>
+)}
+```
+
+### Angka yang boleh kosong
+
+`FasilitasPublik.jumlah` bernilai `null` untuk sarana yang di sumbernya tertulis
+"ada" alih-alih angka (CCTV, Wifi, Sound System, dsb). Jangan menampilkannya
+sebagai 0 atau 1 — sembunyikan angkanya saja.
+
+```tsx
+<li>
+    {f.nama}
+    {f.jumlah !== null && <span> — {f.jumlah} unit</span>}
+</li>
 ```
 
 ### Menandai "praktik hari ini"

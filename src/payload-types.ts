@@ -491,7 +491,7 @@ export interface Posyandu {
 export interface Facility {
   id: number;
   nama: string;
-  kategori: 'ruang' | 'alat' | 'kendaraan' | 'penunjang';
+  kategori: 'ruang' | 'kantor' | 'alat' | 'kendaraan' | 'penunjang';
   deskripsi?: string | null;
   /**
    * Banyaknya unit. Kosongkan bila tidak relevan.
@@ -986,6 +986,11 @@ export interface SiteSetting {
   alamat?: string | null;
   telepon?: string | null;
   email?: string | null;
+  /**
+   * Nomor gawat darurat / PSC 119, tampil terpisah dari telepon utama.
+   */
+  teleponDarurat?: string | null;
+  namaPetugasDarurat?: string | null;
   sosialMedia?:
     | {
         platform: string;
@@ -1002,7 +1007,40 @@ export interface SiteSetting {
  */
 export interface Profile {
   id: number;
+  kodePuskesmas?: string | null;
+  kepalaPuskesmas?: string | null;
+  /**
+   * Mis. Perkotaan / Pedesaan
+   */
+  kategori?: string | null;
+  /**
+   * Mis. Puskesmas Non Perawatan
+   */
+  jenis?: string | null;
+  /**
+   * Mis. Ibu Kota Kab/Kota
+   */
+  letak?: string | null;
+  /**
+   * Mis. Perbatasan
+   */
+  topografi?: string | null;
+  /**
+   * Mis. 105,760 Km²
+   */
+  luasWilayah?: string | null;
+  /**
+   * Mis. 9 (7 Desa, 2 Kelurahan)
+   */
+  jumlahDesa?: string | null;
+  jumlahRT?: number | null;
+  jumlahPenduduk?: number | null;
+  jumlahKK?: number | null;
   visi?: string | null;
+  /**
+   * Mis. "Visi pembangunan Kabupaten Tanah Bumbu, RPJMD 2025–2029"
+   */
+  sumberVisi?: string | null;
   misi?:
     | {
         isi: string;
@@ -1063,6 +1101,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   alamat?: T;
   telepon?: T;
   email?: T;
+  teleponDarurat?: T;
+  namaPetugasDarurat?: T;
   sosialMedia?:
     | T
     | {
@@ -1079,7 +1119,19 @@ export interface SiteSettingsSelect<T extends boolean = true> {
  * via the `definition` "profile_select".
  */
 export interface ProfileSelect<T extends boolean = true> {
+  kodePuskesmas?: T;
+  kepalaPuskesmas?: T;
+  kategori?: T;
+  jenis?: T;
+  letak?: T;
+  topografi?: T;
+  luasWilayah?: T;
+  jumlahDesa?: T;
+  jumlahRT?: T;
+  jumlahPenduduk?: T;
+  jumlahKK?: T;
   visi?: T;
+  sumberVisi?: T;
   misi?:
     | T
     | {

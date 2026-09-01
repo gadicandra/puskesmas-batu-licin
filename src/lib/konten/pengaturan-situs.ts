@@ -13,6 +13,9 @@ export type PengaturanSitus = {
     alamat: string | null
     telepon: string | null
     email: string | null
+    /** Nomor gawat darurat / PSC 119, terpisah dari telepon utama. */
+    teleponDarurat: string | null
+    namaPetugasDarurat: string | null
     /** Kosong = belum ada akun resmi; footer sebaiknya menyembunyikan barisnya
      *  (lihat C9 di docs/PROJECT_PLAN.md). */
     sosialMedia: AkunSosialMedia[]
@@ -32,6 +35,8 @@ export const ambilPengaturanSitus = unstable_cache(
             alamat: data.alamat?.trim() || null,
             telepon: data.telepon?.trim() || null,
             email: data.email?.trim() || null,
+            teleponDarurat: data.teleponDarurat?.trim() || null,
+            namaPetugasDarurat: data.namaPetugasDarurat?.trim() || null,
             sosialMedia: (data.sosialMedia ?? [])
                 .filter((s) => s.platform && s.url)
                 .map((s) => ({ platform: s.platform, url: s.url })),

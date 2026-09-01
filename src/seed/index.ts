@@ -4,6 +4,8 @@ import { JADWAL_SK, CATATAN_SK } from './data/jam-pelayanan'
 import { IDENTITAS } from './data/identitas'
 import { LAYANAN } from './data/layanan'
 import { NAKES } from './data/nakes'
+import { PROFIL } from './data/profil'
+import { FASILITAS } from './data/fasilitas'
 
 /**
  * Pengisian data awal database.
@@ -108,7 +110,15 @@ async function seed() {
         catat('identitas sudah diisi — dilewati')
     }
 
-    // --- 4. Katalog layanan ---------------------------------------------
+    // --- 4. Profil kelembagaan -------------------------------------------
+    if (!(await globalTersimpan(payload, 'profile'))) {
+        await payload.updateGlobal({ slug: 'profile', data: PROFIL, overrideAccess: true })
+        catat('profil (visi, misi, motto, budaya kerja, data wilayah) diisi')
+    } else {
+        catat('profil sudah diisi — dilewati')
+    }
+
+    // --- 5. Katalog layanan ---------------------------------------------
     const { totalDocs: jumlahLayanan } = await payload.count({ collection: 'services' })
     if (jumlahLayanan === 0) {
         for (const [i, l] of LAYANAN.entries()) {
@@ -123,7 +133,22 @@ async function seed() {
         catat(`layanan sudah ada (${jumlahLayanan}) — dilewati`)
     }
 
-    // --- 5. Tenaga kesehatan --------------------------------------------
+    // --- 6. Sarana & ruangan ---------------------------------------------
+    const { totalDocs: jumlahFasilitas } = await payload.count({ collection: 'facilities' })
+    if (jumlahFasilitas === 0) {
+        for (const [i, f] of FASILITAS.entries()) {
+            await payload.create({
+                collection: 'facilities',
+                data: { ...f, urutan: i + 1, aktif: true },
+                overrideAccess: true,
+            })
+        }
+        catat(`${FASILITAS.length} sarana & ruangan dibuat`)
+    } else {
+        catat(`sarana sudah ada (${jumlahFasilitas}) — dilewati`)
+    }
+
+    // --- 7. Tenaga kesehatan --------------------------------------------
     const { totalDocs: jumlahNakes } = await payload.count({ collection: 'medical-staff' })
     if (jumlahNakes === 0) {
         for (const n of NAKES) {
@@ -140,7 +165,7 @@ async function seed() {
         catat(`tenaga kesehatan sudah ada (${jumlahNakes}) — dilewati`)
     }
 
-    // --- 6. Dokter -------------------------------------------------------
+    // --- 8. Dokter -------------------------------------------------------
     // Dokter sengaja tercatat di dua tempat dengan peran berbeda:
     // `medical-staff` menjawab "siapa saja pegawainya", `doctors` menjawab
     // "kapan dokter praktik" (punya jadwal, STR, pendidikan).

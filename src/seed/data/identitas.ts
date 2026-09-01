@@ -7,5 +7,7 @@ export const IDENTITAS = {
         'Jl. Pemerintahan No.071 RT.005 RW.001, Kel. Batulicin, Kec. Batulicin, Kab. Tanah Bumbu, Prov. Kalimantan Selatan',
     telepon: '0811 4881 2882',
     email: 'puskesmasbatulicin@yahoo.com',
+    teleponDarurat: '0852 4931 2786',
+    namaPetugasDarurat: 'Syaiful Fahrin (PSC 119)',
     sosialMedia: [],
 }
