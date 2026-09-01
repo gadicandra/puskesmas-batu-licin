@@ -6,7 +6,7 @@ export const Certificates: CollectionConfig = {
     labels: { singular: 'Sertifikat', plural: 'Sertifikat' },
     admin: {
         useAsTitle: 'judul',
-        defaultColumns: ['judul', 'penerbit', 'tanggal'],
+        defaultColumns: ['judul', 'jenis', 'penerbit', 'tanggal'],
         group: 'Profil',
     },
     access: {
@@ -17,6 +17,20 @@ export const Certificates: CollectionConfig = {
     },
     fields: [
         { name: 'judul', type: 'text', required: true },
+        {
+            // Akreditasi dan penghargaan tampil di tempat berbeda dan berbentuk
+            // berbeda, tapi isinya sama-sama "dokumen bergambar + tanggal +
+            // penerbit". Satu field pembeda lebih ringan daripada koleksi kedua,
+            // dan `ambilSertifikat({ jenis })` tetap memisahkannya untuk UI.
+            name: 'jenis',
+            type: 'select',
+            required: true,
+            defaultValue: 'akreditasi',
+            options: [
+                { label: 'Sertifikat Akreditasi', value: 'akreditasi' },
+                { label: 'Piagam Penghargaan', value: 'penghargaan' },
+            ],
+        },
         { name: 'penerbit', type: 'text' },
         { name: 'tanggal', type: 'date' },
         {

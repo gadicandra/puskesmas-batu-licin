@@ -13,8 +13,14 @@ import { Vaccines } from './collections/Vaccines'
 import { Certificates } from './collections/Certificates'
 import { Articles } from './collections/Articles'
 import { PageViews } from './collections/PageViews'
+import { Services } from './collections/Services'
+import { Posyandu } from './collections/Posyandu'
+import { Facilities } from './collections/Facilities'
+import { Complaints } from './collections/Complaints'
+import { OrgChart } from './collections/OrgChart'
 import { OperationalHours } from './globals/OperationalHours'
 import { SiteSettings } from './globals/SiteSettings'
+import { Profile } from './globals/Profile'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -37,8 +43,13 @@ export default buildConfig({
     Certificates,
     Articles,
     PageViews,
+    Services,
+    Posyandu,
+    Facilities,
+    Complaints,
+    OrgChart,
   ],
-  globals: [OperationalHours, SiteSettings],
+  globals: [OperationalHours, SiteSettings, Profile],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -48,6 +59,19 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
+    // `push` mencocokkan tabel dengan definisi koleksi secara otomatis. Enak
+    // untuk iterasi cepat, TAPI saat perubahannya ambigu (mis. kolom hilang dan
+    // kolom baru muncul bersamaan) ia BERTANYA lewat prompt interaktif. Tanpa
+    // TTY — di dalam container, di CI, di produksi — prompt itu menggantung dan
+    // push berhenti separuh jalan tanpa pesan galat: skema jadi basi diam-diam.
+    //
+    // Karena itu push hanya dinyalakan saat `pnpm dev` langsung di komputer
+    // (ada TTY untuk menjawab). Docker dan produksi memakai migrasi:
+    //   `pnpm payload migrate:create`  setelah mengubah koleksi
+    //   `pnpm payload migrate`         untuk menerapkannya
+    push: process.env.PAYLOAD_DB_PUSH
+        ? process.env.PAYLOAD_DB_PUSH === 'true'
+        : process.env.NODE_ENV !== 'production',
   }),
   sharp,
   plugins: [],

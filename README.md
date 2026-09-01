@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Website UPTD Puskesmas Batulicin
 
-## Getting Started
+Situs publik + dashboard pengelolaan isi. Next.js 15 (App Router) + React 19,
+dengan Payload CMS 3 di atas Postgres sebagai backend (skema, auth, access
+control, upload, Local API). Admin UI bawaan Payload sudah diganti dashboard
+buatan sendiri di `/dashboard`.
 
-First, run the development server:
+---
+
+## Mulai cepat (Docker — disarankan)
+
+Tidak perlu memasang Node, pnpm, atau Postgres.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <url-repo>
+cd puskesmas-batu-licin
+docker compose up         # .env opsional — lihat catatan di bawah
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tunggu sampai muncul `✓ Ready`, lalu buka **http://localhost:3000**.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Database kosong? Isi data awalnya (jam pelayanan SK, identitas Puskesmas,
+katalog 22 layanan) dan buat akun admin pertama:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+docker compose --profile seed up seed
+```
 
-## Learn More
+Akun awal: `admin@puskesmas.local` / `puskesmas123`
+(ubah lewat `SEED_ADMIN_EMAIL` dan `SEED_ADMIN_PASSWORD` di `.env`).
 
-To learn more about Next.js, take a look at the following resources:
+Masuk lewat **http://localhost:3000/dashboard**. Kalau belum ada akun sama
+sekali, `/dashboard/setup` akan memandu membuat Super Admin pertama.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Port 3000 sudah dipakai? `APP_PORT=3100 docker compose up`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Semua variabel lingkungan sudah punya default yang aman untuk pengembangan, jadi
+`docker compose up` jalan tanpa `.env`. Ingin mengubah salah satunya (mis.
+mengaktifkan login Google)? `cp docs/env-contoh.txt .env` lalu sunting.
 
-## Deploy on Vercel
+### Perintah Docker sehari-hari
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+docker compose up                       # nyalakan db + app
+docker compose down                     # matikan (data tetap tersimpan)
+docker compose logs -f app              # lihat log aplikasi
+docker compose --profile seed up seed   # isi data awal (aman diulang)
+docker compose down -v                  # HAPUS database beserta isinya
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Mulai cepat (tanpa Docker)
+
+Butuh Node 22+, pnpm 10.24, dan Postgres 16.
+
+```bash
+docker compose up -d db     # atau pakai Postgres yang sudah ada
+cp docs/env-contoh.txt .env # sesuaikan DATABASE_URL
+pnpm install
+pnpm payload migrate
+pnpm seed
+pnpm dev
+```
+
+---
+
+## Perintah
+
+```bash
+pnpm dev                     # server pengembangan
+pnpm build                   # build produksi
+pnpm start                   # jalankan hasil build
+pnpm lint                    # ESLint
+pnpm seed                    # isi data awal (idempoten)
+pnpm payload migrate         # terapkan migrasi database
+pnpm payload migrate:create  # buat migrasi setelah mengubah koleksi
+pnpm payload generate:types  # regenerasi src/payload-types.ts
+```
+
+**Setelah mengubah berkas di `src/collections/` atau `src/globals/`**, jalankan
+`pnpm payload migrate:create <nama>` lalu `pnpm payload generate:types`.
+`src/payload-types.ts` dan `src/migrations/` ikut ter-commit; jangan disunting
+manual.
+
+---
+
+## Skema database: migrasi vs auto-push
+
+Payload bisa mencocokkan tabel dengan definisi koleksi secara otomatis
+(`push`). Enak untuk iterasi, tapi saat perubahannya ambigu ia **bertanya lewat
+prompt interaktif**. Tanpa TTY — di dalam container, di CI, di produksi — prompt
+itu menggantung dan push berhenti separuh jalan tanpa pesan galat, meninggalkan
+skema yang basi diam-diam.
+
+Karena itu:
+
+| Lingkungan | Perilaku |
+| --- | --- |
+| `pnpm dev` langsung di komputer | `push` aktif (ada TTY untuk menjawab) |
+| Docker & produksi | `push` mati, memakai `pnpm payload migrate` |
+
+Dikendalikan lewat `PAYLOAD_DB_PUSH` di `.env`.
+
+---
+
+## Variabel lingkungan
+
+| Variabel | Wajib | Keterangan |
+| --- | --- | --- |
+| `DATABASE_URL` | ya | Koneksi Postgres. Di dalam Docker memakai host `db`, bukan `localhost` |
+| `PAYLOAD_SECRET` | ya | Kunci penandatanganan sesi. **Ganti dengan nilai acak di produksi** |
+| `APP_URL` | produksi | Alamat publik, dipakai menyusun redirect URI Google |
+| `GOOGLE_CLIENT_ID` | tidak | Login Google. Kosong = tombolnya disembunyikan |
+| `GOOGLE_CLIENT_SECRET` | tidak | Pasangan `GOOGLE_CLIENT_ID` |
+| `PAYLOAD_DB_PUSH` | tidak | `false` untuk memaksa memakai migrasi |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | tidak | Akun pertama yang dibuat seed |
+| `APP_PORT` / `DB_PORT` | tidak | Ganti port bila bentrok |
+
+---
+
+## Dokumentasi
+
+| Berkas | Isi |
+| --- | --- |
+| **`docs/KONTRAK-DATA.md`** | **Cara mengambil data untuk halaman publik — baca ini sebelum membuat halaman** |
+| `docs/DASHBOARD.md` | Acuan dashboard: aturan binding, prinsip UI, daftar halaman, login Google |
+| `docs/PROJECT_PLAN.md` | Rencana tim, jadwal mingguan, daftar utang teknis |
+| `PRODUCT.md` | Brief produk & desain |
+| `CLAUDE.md` | Panduan arsitektur untuk asisten AI |
+
+Seluruh teks antarmuka, label field, dan komentar kode ditulis dalam bahasa
+Indonesia. Mohon dipertahankan.

@@ -1,4 +1,4 @@
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { getPayload } from 'payload'
 import type { CollectionSlug } from 'payload'
 import config from '@payload-config'
@@ -6,6 +6,7 @@ import type { z } from 'zod'
 import { requireSuperAdmin } from './auth'
 import { petaError } from './validation'
 import { pesanError } from './errors'
+import type { NamaTag } from '@/lib/konten/tags'
 
 export type FormState = {
     error?: string
@@ -21,17 +22,24 @@ export function buatAksiCrud<S extends z.ZodType>({
     collection,
     skema,
     pathRevalidate = [],
+    tagRevalidate = [],
     labelData,
 }: {
     collection: CollectionSlug
     skema: S
     /** Path publik yang ikut disegarkan setelah data berubah. */
     pathRevalidate?: string[]
+    /** Tag konten yang cache-nya dibuang setelah data berubah — inilah yang
+     *  membuat halaman publik ikut berubah begitu admin menyimpan. Tanpa ini,
+     *  data tersimpan tapi situs tetap menampilkan yang lama sampai
+     *  `UMUR_CACHE_DETIK` habis. Lihat docs/KONTRAK-DATA.md. */
+    tagRevalidate?: NamaTag[]
     labelData: string
 }) {
     const segarkan = () => {
         revalidatePath(`/dashboard/${collection}`)
         pathRevalidate.forEach((p) => revalidatePath(p))
+        tagRevalidate.forEach((t) => revalidateTag(t))
     }
 
     async function simpan(_prev: FormState, formData: FormData): Promise<FormState> {
