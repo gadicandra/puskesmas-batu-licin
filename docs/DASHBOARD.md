@@ -151,9 +151,92 @@ memakai helper resmi yang diekspor Payload — `addSessionToUser` (`payload/shar
 secara default: setiap sesi punya baris di tabel `users_sessions` dan token yang
 `sid`-nya tidak terdaftar akan ditolak `payload.auth()`.
 
-### Konfigurasi
+### Setup di Google Cloud Console
 
-Tiga variabel di `.env`, semuanya opsional:
+Sekali kerja, sekitar 10 menit. Butuh akun Google mana pun (tidak harus akun
+Puskesmas, tapi sebaiknya akun instansi supaya tidak menempel ke pribadi orang).
+
+**1. Buat project**
+`https://console.cloud.google.com/` → pemilih project di kiri atas → **New
+project** → nama mis. `puskesmas-batulicin` → **Create**. Kalau sudah punya
+project, lewati.
+
+**2. Isi OAuth consent screen** (wajib sebelum bisa membuat credential)
+Menu → **APIs & Services** → **OAuth consent screen**.
+- User type: **External** → Create.
+  (**Internal** hanya muncul kalau instansi punya Google Workspace. Kalau ada,
+  pilih itu: lebih aman, otomatis terbatas ke domain instansi, dan tidak perlu
+  langkah test user di bawah.)
+- App name: `Dashboard Puskesmas Batulicin` · User support email: email petugas
+  · Developer contact: email yang sama → Save and continue.
+- Scopes: **lewati**, tekan Save and continue. Scope `openid email profile`
+  sudah termasuk yang non-sensitive dan tidak perlu didaftarkan.
+- Test users: tambahkan email staf yang akan dipakai masuk → Save.
+
+**3. Buat OAuth client ID**
+**APIs & Services** → **Credentials** → **Create credentials** → **OAuth client ID**.
+- Application type: **Web application**
+- Name: `Dashboard Puskesmas`
+- **Authorized redirect URIs** → Add URI, daftarkan **semua** alamat yang dipakai:
+
+  ```
+  http://localhost:3000/dashboard/login/google/callback
+  https://<domain-produksi>/dashboard/login/google/callback
+  ```
+
+  Harus **sama persis** — beda `http`/`https`, ada/tidaknya `www`, atau garis
+  miring di ujung akan ditolak Google dengan `redirect_uri_mismatch`.
+  *Authorized JavaScript origins* dikosongkan saja; alur ini tidak memakainya.
+- **Create** → salin **Client ID** dan **Client secret**.
+
+**4. Isi `.env`**
+
+```bash
+GOOGLE_CLIENT_ID=xxxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=xxxxx
+APP_URL=                    # kosongkan saat dev
+```
+
+`APP_URL` **wajib diisi di produksi** (mis. `https://puskesmasbatulicin.go.id`).
+Saat kosong, redirect URI disusun dari origin request — benar di localhost, tapi
+bisa salah di balik proxy/kontainer. Restart dev server setelah mengubah `.env`.
+
+**5. Daftarkan akun Google-nya di dashboard**
+Masuk dengan Super Admin yang ada → `/dashboard/pengguna` → **Tambah Akun**
+(atau **Ubah** akun yang sudah ada):
+- Email: **alamat Gmail/Workspace-nya**, harus sama persis dengan yang dipakai masuk
+- Cara masuk: **Akun Google** (tanpa kata sandi) atau **Email + kata sandi, atau
+  akun Google** (boleh dua-duanya)
+- Hak akses: Super Admin atau Admin → **Simpan**
+
+**6. Coba masuk**
+Buka `/dashboard/login` di jendela penyamaran → **Masuk dengan Google** → pilih
+akunnya. Berhasil = langsung ke `/dashboard`. Kolom "Cara masuk" di
+`/dashboard/pengguna` akan menampilkan *"Sudah tertaut ke akun Google"*.
+
+**7. Sebelum go-live**
+Consent screen masih berstatus **Testing**: hanya email di daftar test users yang
+bisa masuk, dan izinnya kedaluwarsa tiap 7 hari. Kalau staf yang masuk lewat
+Google hanya beberapa orang, biarkan saja di Testing dan cukup tambahkan mereka
+sebagai test user — tidak perlu verifikasi Google. Menekan **Publish app** hanya
+diperlukan bila daftarnya akan panjang; untuk scope `openid email profile`
+publikasi tidak memicu proses review.
+
+### Kalau gagal
+
+| Yang terlihat | Sebabnya |
+| --- | --- |
+| Tombol Google tidak muncul | `GOOGLE_CLIENT_ID`/`SECRET` kosong, atau server belum di-restart |
+| Google: `redirect_uri_mismatch` | URI di Credentials tidak sama persis dengan yang dikirim. Cocokkan dengan `<APP_URL>/dashboard/login/google/callback` |
+| Google: `access_blocked` / app belum diverifikasi | Emailnya belum masuk daftar **test users** di consent screen |
+| "Akun Google ini belum didaftarkan…" | Emailnya belum ada di `/dashboard/pengguna` — ini memang perilaku yang diinginkan |
+| "Akun ini disetel untuk masuk memakai email dan kata sandi" | Ubah **Cara masuk** akun itu ke Akun Google atau keduanya |
+| "sudah tertaut ke akun Google yang berbeda" | Staf berganti akun Google. Tekan **Putus tautan** di `/dashboard/pengguna` |
+| Kembali ke login dengan `galat=state` | Halaman izin didiamkan >10 menit, atau cookie diblokir. Ulangi |
+
+### Konfigurasi (ringkas)
+
+Tiga variabel `.env`, semuanya opsional:
 
 ```bash
 GOOGLE_CLIENT_ID=...apps.googleusercontent.com
@@ -165,11 +248,6 @@ Kalau `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` kosong, tombol Google
 disembunyikan, pilihan "cara masuk" di form pengguna dikunci ke kata sandi, dan
 login email tetap berjalan seperti biasa — jadi tidak ada yang rusak di
 lingkungan yang belum dikonfigurasi.
-
-Redirect URI yang harus didaftarkan di Google Cloud Console:
-`<APP_URL>/dashboard/login/google/callback` — daftarkan alamat dev dan produksi.
-`APP_URL` wajib diisi di produksi di balik proxy/kontainer; saat kosong, alamat
-diambil dari origin request.
 
 **Akun pertama (`/dashboard/setup`) selalu berbasis kata sandi**, karena pada saat
 itu belum ada siapa pun yang bisa mendaftarkan akun Google.
