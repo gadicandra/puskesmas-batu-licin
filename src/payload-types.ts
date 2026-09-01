@@ -146,6 +146,14 @@ export interface User {
    */
   role: 'superadmin' | 'admin';
   /**
+   * Cara akun ini boleh masuk ke dashboard. Pilih "Akun Google" bila pengguna tidak diberi kata sandi.
+   */
+  metodeLogin: 'sandi' | 'google' | 'keduanya';
+  /**
+   * Penanda tetap akun Google, terisi otomatis saat pengguna pertama kali masuk lewat Google.
+   */
+  googleSub?: string | null;
+  /**
    * Nama unit/lokasi layanan (untuk akun Admin). Kosongkan untuk Superadmin.
    */
   lokasi?: string | null;
@@ -478,6 +486,8 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   role?: T;
+  metodeLogin?: T;
+  googleSub?: T;
   lokasi?: T;
   updatedAt?: T;
   createdAt?: T;

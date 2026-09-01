@@ -1,6 +1,7 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { requireSuperAdmin } from '@/lib/dashboard/auth'
+import { googleAktif } from '@/lib/dashboard/google'
 import PageHeader from '@/components/dashboard/ui/PageHeader'
 import DaftarPengguna, { type PenggunaBaris } from '@/components/dashboard/pengguna/DaftarPengguna'
 
@@ -26,6 +27,8 @@ export default async function PenggunaPage() {
         name: u.name ?? '',
         email: u.email,
         role: u.role,
+        metodeLogin: u.metodeLogin ?? 'sandi',
+        tertautGoogle: Boolean(u.googleSub),
         lokasi: u.lokasi ?? null,
     }))
 
@@ -33,9 +36,9 @@ export default async function PenggunaPage() {
         <>
             <PageHeader
                 judul="Pengguna"
-                keterangan="Akun yang bisa masuk ke dashboard ini."
+                keterangan="Akun yang bisa masuk ke dashboard ini. Hanya akun yang terdaftar di sini yang bisa masuk — termasuk lewat akun Google."
             />
-            <DaftarPengguna data={data} idSaya={user.id} />
+            <DaftarPengguna data={data} idSaya={user.id} googleAktif={googleAktif()} />
         </>
     )
 }

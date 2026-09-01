@@ -1,11 +1,12 @@
 import type { CollectionConfig } from 'payload'
 import { isSuperAdmin, superAdminOrSelf, superAdminFieldAccess } from '../access'
+import { METODE_LOGIN_DEFAULT, opsiMetodeLogin } from '../lib/dashboard/metode-login'
 
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
-    defaultColumns: ['name', 'email', 'role', 'lokasi'],
+    defaultColumns: ['name', 'email', 'role', 'metodeLogin', 'lokasi'],
     group: 'Sistem',
   },
   auth: {
@@ -53,6 +54,37 @@ export const Users: CollectionConfig = {
       access: {
         // Hanya superadmin yang boleh menetapkan/menaikkan role (termasuk jadi superadmin).
         update: superAdminFieldAccess,
+      },
+    },
+    {
+      name: 'metodeLogin',
+      type: 'select',
+      required: true,
+      defaultValue: METODE_LOGIN_DEFAULT,
+      options: opsiMetodeLogin,
+      admin: {
+        description:
+          'Cara akun ini boleh masuk ke dashboard. Pilih "Akun Google" bila pengguna tidak diberi kata sandi.',
+      },
+      access: {
+        // Menentukan cara masuk = keputusan keamanan, jadi hanya superadmin.
+        update: superAdminFieldAccess,
+      },
+    },
+    {
+      name: 'googleSub',
+      type: 'text',
+      index: true,
+      unique: true,
+      admin: {
+        readOnly: true,
+        description:
+          'Penanda tetap akun Google, terisi otomatis saat pengguna pertama kali masuk lewat Google.',
+      },
+      access: {
+        // Diisi oleh alur OAuth (overrideAccess), bukan oleh siapa pun lewat form.
+        create: () => false,
+        update: () => false,
       },
     },
     {

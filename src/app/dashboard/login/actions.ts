@@ -1,10 +1,10 @@
 'use server'
 
-import { cookies as nextCookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
-import { generatePayloadCookie, generateExpiredPayloadCookie } from 'payload/shared'
 import config from '@payload-config'
+import { bolehLoginSandi } from '@/lib/dashboard/metode-login'
+import { pasangCookieSesi, hapusCookieSesi } from '@/lib/dashboard/sesi'
 
 export type LoginState = { error?: string }
 
@@ -21,12 +21,14 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
     const payload = await getPayload({ config })
 
     let token: string | undefined
+    let metodeLogin: string | null | undefined
     try {
         const hasil = await payload.login({
             collection: 'users',
             data: { email, password },
         })
         token = hasil.token
+        metodeLogin = hasil.user?.metodeLogin
     } catch (err) {
         const pesan = err instanceof Error ? err.message : ''
         // Payload mengunci akun setelah beberapa kali gagal (maxLoginAttempts).
@@ -40,48 +42,26 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
         return { error: 'Email atau kata sandi salah.' }
     }
 
+    // Diperiksa setelah kata sandi terbukti benar, supaya pesan ini tidak bisa
+    // dipakai menebak akun mana yang ada.
+    if (!bolehLoginSandi(metodeLogin)) {
+        return {
+            error:
+                'Akun ini disetel untuk masuk memakai akun Google. Gunakan tombol "Masuk dengan Google" di atas.',
+        }
+    }
+
     if (!token) {
         return { error: 'Gagal membuat sesi. Coba lagi.' }
     }
 
-    const cookie = generatePayloadCookie({
-        collectionAuthConfig: payload.collections.users.config.auth,
-        cookiePrefix: payload.config.cookiePrefix,
-        token,
-        returnCookieAsObject: true,
-    })
-
-    const store = await nextCookies()
-    store.set(cookie.name, cookie.value ?? '', {
-        httpOnly: cookie.httpOnly,
-        path: cookie.path,
-        sameSite: cookie.sameSite?.toLowerCase() as 'lax' | 'none' | 'strict' | undefined,
-        secure: cookie.secure,
-        domain: cookie.domain,
-        expires: cookie.expires ? new Date(cookie.expires) : undefined,
-    })
-
+    await pasangCookieSesi(payload, token)
     redirect('/dashboard')
 }
 
 /** Keluar dari dashboard: hapus cookie sesi. */
 export async function logoutAction(): Promise<void> {
     const payload = await getPayload({ config })
-    const cookie = generateExpiredPayloadCookie({
-        collectionAuthConfig: payload.collections.users.config.auth,
-        cookiePrefix: payload.config.cookiePrefix,
-        returnCookieAsObject: true,
-    })
-
-    const store = await nextCookies()
-    store.set(cookie.name, '', {
-        httpOnly: cookie.httpOnly,
-        path: cookie.path,
-        sameSite: cookie.sameSite?.toLowerCase() as 'lax' | 'none' | 'strict' | undefined,
-        secure: cookie.secure,
-        domain: cookie.domain,
-        expires: new Date(0),
-    })
-
+    await hapusCookieSesi(payload)
     redirect('/dashboard/login')
 }
