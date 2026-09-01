@@ -33,7 +33,9 @@ export async function buatAkunPertama(_prev: SetupState, formData: FormData): Pr
         // Hook beforeChange di Users otomatis menjadikan akun pertama superadmin.
         await payload.create({
             collection: 'users',
-            data: { name, email, password, role: 'superadmin' },
+            // metodeLogin 'sandi': akun pertama tidak mungkin lewat Google —
+            // belum ada siapa pun yang bisa mendaftarkan akun Google-nya.
+            data: { name, email, password, role: 'superadmin', metodeLogin: 'sandi' },
             overrideAccess: true, // belum ada user yang bisa dipakai sebagai aktor
         })
     } catch (err) {

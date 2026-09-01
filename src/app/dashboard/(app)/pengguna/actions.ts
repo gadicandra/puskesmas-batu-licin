@@ -1,11 +1,14 @@
 'use server'
 
+import { randomBytes } from 'crypto'
 import { revalidatePath } from 'next/cache'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { requireSuperAdmin, requireUser } from '@/lib/dashboard/auth'
 import { skemaPengguna, petaError } from '@/lib/dashboard/validation'
 import { pesanError } from '@/lib/dashboard/errors'
+import { googleAktif } from '@/lib/dashboard/google'
+import { bolehLoginSandi } from '@/lib/dashboard/metode-login'
 import type { FormState } from '@/lib/dashboard/crud'
 
 const SANDI_MIN = 8
@@ -32,11 +35,23 @@ export async function simpanPengguna(_prev: FormState, formData: FormData): Prom
         name: String(formData.get('name') || ''),
         email: String(formData.get('email') || ''),
         role: String(formData.get('role') || 'admin'),
+        metodeLogin: String(formData.get('metodeLogin') || 'sandi'),
         lokasi: String(formData.get('lokasi') || ''),
     })
     if (!hasil.success) return { fieldErrors: petaError(hasil.error) }
 
-    if (!id && password.length < SANDI_MIN) {
+    const pakaiSandi = bolehLoginSandi(hasil.data.metodeLogin)
+
+    // Menyetel akun ke "Akun Google" saat login Google belum dikonfigurasi akan
+    // mengunci pemiliknya di luar sistem.
+    if (hasil.data.metodeLogin !== 'sandi' && !googleAktif()) {
+        return {
+            error:
+                'Masuk dengan Google belum diaktifkan di server ini, jadi akun belum bisa disetel memakai akun Google. Minta pengembang mengisi GOOGLE_CLIENT_ID dan GOOGLE_CLIENT_SECRET terlebih dahulu.',
+        }
+    }
+
+    if (!id && pakaiSandi && password.length < SANDI_MIN) {
         return { fieldErrors: { password: `Kata sandi minimal ${SANDI_MIN} karakter.` } }
     }
     if (password && password.length < SANDI_MIN) {
@@ -57,8 +72,16 @@ export async function simpanPengguna(_prev: FormState, formData: FormData): Prom
         name: hasil.data.name,
         email: hasil.data.email,
         role: hasil.data.role,
+        metodeLogin: hasil.data.metodeLogin,
         lokasi: hasil.data.role === 'admin' ? hasil.data.lokasi || null : null,
-        ...(password ? { password } : {}),
+        // Koleksi auth Payload selalu menuntut kata sandi saat dibuat. Untuk akun
+        // yang hanya masuk lewat Google, isi dengan nilai acak yang tidak pernah
+        // diberikan ke siapa pun — praktis mematikan jalur kata sandi.
+        ...(password
+            ? { password }
+            : !id && !pakaiSandi
+              ? { password: randomBytes(32).toString('base64url') }
+              : {}),
     }
 
     try {
@@ -110,6 +133,41 @@ export async function hapusPengguna(_prev: FormState, formData: FormData): Promi
 
     revalidatePath('/dashboard/pengguna')
     return { sukses: 'Akun dihapus.' }
+}
+
+/** Putuskan tautan ke akun Google.
+ *
+ *  Dibutuhkan ketika staf berganti akun Google, atau ketika akun lama sudah
+ *  tidak dipakai: tanpa ini, ikatan `googleSub` lama akan menolak akun Google
+ *  baru meski alamat emailnya sama. */
+export async function putuskanTautanGoogle(
+    _prev: FormState,
+    formData: FormData
+): Promise<FormState> {
+    await requireSuperAdmin()
+    const id = Number(formData.get('id'))
+    if (!id) return { error: 'Pengguna tidak dikenali.' }
+
+    try {
+        const payload = await getPayload({ config })
+        // `googleSub` sengaja tidak bisa ditulis lewat access control field mana
+        // pun (lihat Users.ts); pengecualian ini adalah satu-satunya jalan resmi
+        // untuk mengosongkannya, dan sudah dijaga requireSuperAdmin di atas.
+        await payload.update({
+            collection: 'users',
+            id,
+            data: { googleSub: null },
+            overrideAccess: true,
+        })
+    } catch (err) {
+        return { error: pesanError(err) }
+    }
+
+    revalidatePath('/dashboard/pengguna')
+    return {
+        sukses:
+            'Tautan akun Google diputus. Akun Google mana pun dengan alamat email tersebut kini bisa ditautkan ulang saat masuk berikutnya.',
+    }
 }
 
 /** Ganti kata sandi sendiri — memverifikasi kata sandi lama lebih dulu. */

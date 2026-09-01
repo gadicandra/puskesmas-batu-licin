@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { METODE_LOGIN } from './metode-login'
 
 /** Pesan validasi ditulis dalam bahasa sehari-hari dan selalu memberi tahu
  *  cara memperbaiki — bukan sekadar menyatakan ada yang salah.
@@ -50,6 +51,7 @@ export const skemaPengguna = z.object({
     name: z.string().trim().min(1, 'Nama belum diisi.'),
     email: z.string().trim().email('Format email belum benar. Contoh: nama@puskesmas.go.id'),
     role: z.enum(['superadmin', 'admin']),
+    metodeLogin: z.enum(METODE_LOGIN),
     lokasi: z.string().trim().optional(),
 })
 
