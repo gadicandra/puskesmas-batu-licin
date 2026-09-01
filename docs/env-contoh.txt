@@ -53,3 +53,11 @@ SEED_ADMIN_PASSWORD=puskesmas123
 # --- Port (isi bila bentrok dengan aplikasi lain) ------------------------
 APP_PORT=3000
 DB_PORT=5434
+
+# --- Kredensial Postgres di dalam Docker (opsional) ----------------------
+# Hanya dibaca docker-compose.yml, bukan oleh aplikasi. Biarkan kosong untuk
+# memakai nilai bawaan di bawah. Kalau diubah, DATABASE_URL di atas harus ikut
+# disesuaikan.
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=puskesmas

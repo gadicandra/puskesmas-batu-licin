@@ -186,6 +186,11 @@ dashboard bila jumlahnya sedikit.
 | `R2_BUCKET` / `R2_ENDPOINT` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | produksi serverless | Cloudflare R2. Kosong = disk lokal. Keempatnya harus terisi |
 | `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | tidak | Akun pertama yang dibuat seed |
 | `APP_PORT` / `DB_PORT` | tidak | Ganti port bila bentrok |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | tidak | Hanya dibaca `docker-compose.yml`. Kalau diubah, `DATABASE_URL` harus ikut disesuaikan |
+
+`MEDIA_DIR` dan `NEXT_DIST_DIR` diatur sendiri oleh `docker-compose.yml` supaya
+folder milik container tidak bertabrakan dengan milik komputer — jangan diisi di
+`.env`.
 
 ---
 
