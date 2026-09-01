@@ -18,6 +18,7 @@ import { Posyandu } from './collections/Posyandu'
 import { Facilities } from './collections/Facilities'
 import { Complaints } from './collections/Complaints'
 import { OrgChart } from './collections/OrgChart'
+import { ServiceStatistics } from './collections/ServiceStatistics'
 import { OperationalHours } from './globals/OperationalHours'
 import { SiteSettings } from './globals/SiteSettings'
 import { Profile } from './globals/Profile'
@@ -48,6 +49,7 @@ export default buildConfig({
     Facilities,
     Complaints,
     OrgChart,
+    ServiceStatistics,
   ],
   globals: [OperationalHours, SiteSettings, Profile],
   editor: lexicalEditor(),

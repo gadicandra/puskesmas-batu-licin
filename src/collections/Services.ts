@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isSuperAdmin } from '../access'
+import { slugField } from '../fields/slug'
 
 /** Katalog layanan kesehatan — satu sumber untuk semua tempat yang menyebut
  *  nama layanan (halaman Layanan, daftar layanan tiap Posyandu, dsb).
@@ -16,7 +17,7 @@ export const Services: CollectionConfig = {
     labels: { singular: 'Layanan', plural: 'Layanan' },
     admin: {
         useAsTitle: 'nama',
-        defaultColumns: ['nama', 'kategori', 'urutan', 'aktif'],
+        defaultColumns: ['nama', 'kategori', 'induk', 'urutan', 'aktif'],
         group: 'Layanan',
     },
     access: {
@@ -27,6 +28,32 @@ export const Services: CollectionConfig = {
     },
     fields: [
         { name: 'nama', type: 'text', required: true },
+        slugField('nama'),
+        {
+            // Jenjang layanan dinyatakan lewat relasi ke koleksi ini sendiri,
+            // pola yang sama dengan `org-chart`. SK memang berjenjang:
+            // Laboratorium → Pemeriksaan Serologi → Widal Test, dan
+            // UKM Esensial → Pelayanan KIA-KB → Posyandu Balita.
+            //
+            // Halaman daftar hanya menampilkan layanan tanpa induk; sub-layanan
+            // muncul di halaman detail masing-masing.
+            name: 'induk',
+            type: 'relationship',
+            relationTo: 'services',
+            label: 'Bagian dari',
+            admin: {
+                description:
+                    'Kosongkan bila ini layanan utama. Isi bila ini rincian dari layanan lain.',
+            },
+        },
+        {
+            name: 'jadwal',
+            type: 'text',
+            admin: {
+                description:
+                    'Mis. "Senin–Kamis 08.00–11.00", "24 jam", "Sesuai Jadwal", "Jika ada kasus".',
+            },
+        },
         {
             name: 'kategori',
             type: 'select',

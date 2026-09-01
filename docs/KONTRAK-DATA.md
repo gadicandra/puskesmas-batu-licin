@@ -57,9 +57,12 @@ tidak aktif serta mengurutkannya.
 | `ambilProfil()` | `profil.ts` | `ProfilPuskesmas` — visi, misi, motto, maklumat, budaya kerja, `kelembagaan` (kode, kepala, wilayah kerja) |
 | `ambilDokter()` | `dokter.ts` | `DokterPublik[]` — jadwal praktik sudah terurut Senin→Minggu |
 | `ambilNakes()` | `nakes.ts` | `NakesPublik[]` — 68 tenaga kesehatan, `jabatan` = jabatan fungsional lengkap |
-| `ambilLayanan()` | `layanan.ts` | `LayananPublik[]` — semua layanan aktif |
+| `ambilLayanan()` | `layanan.ts` | `LayananPublik[]` — layanan **utama** saja (tanpa induk), untuk halaman daftar |
 | `ambilLayananDalamGedung()` | `layanan.ts` | `LayananPublik[]` |
 | `ambilLayananLuarGedung()` | `layanan.ts` | `LayananPublik[]` |
+| `ambilLayananDetail(slug)` | `layanan.ts` | `LayananLengkap \| null` — satu layanan + sub-layanan bertingkat |
+| `ambilSlugLayanan()` | `layanan.ts` | `string[]` — untuk `generateStaticParams()` |
+| `ambilAngkaPelayanan(periode?)` | `angka-pelayanan.ts` | `AngkaPelayanan \| null` — 16.688 kunjungan 2025, 4 pengelompokan + persentase |
 | `ambilPosyandu()` | `posyandu.ts` | `PosyanduPublik[]` — termasuk daftar layanannya |
 | `ambilFasilitas()` | `fasilitas.ts` | `FasilitasPublik[]` — 68 sarana & ruangan |
 | `ambilSertifikat()` | `sertifikat.ts` | `SertifikatPublik[]` — akreditasi + penghargaan |
@@ -179,6 +182,79 @@ export default async function HalamanStruktur() {
     const akar = await ambilStrukturOrganisasi()
     return <ul>{akar.map((s) => <Simpul key={s.id} simpul={s} />)}</ul>
 }
+```
+
+### Layanan: daftar → detail
+
+Layanan berjenjang mengikuti SK (Laboratorium → Pemeriksaan Serologi → Widal
+Test). `ambilLayanan()` mengembalikan **hanya layanan utama**, jadi halaman
+daftar tidak dibanjiri 93 baris; rinciannya muncul di halaman detail.
+
+```tsx
+// app/(frontend)/layanan/page.tsx
+const layanan = await ambilLayananDalamGedung()
+
+{layanan.map((l) => (
+    <Link key={l.id} href={`/layanan/${l.slug}`}>
+        <h2>{l.nama}</h2>
+        {l.jadwal && <p>{l.jadwal}</p>}
+        {l.jumlahSubLayanan > 0 && <span>{l.jumlahSubLayanan} jenis layanan</span>}
+    </Link>
+))}
+```
+
+```tsx
+// app/(frontend)/layanan/[slug]/page.tsx
+import { notFound } from 'next/navigation'
+import { ambilLayananDetail, ambilSlugLayanan, type LayananLengkap } from '@/lib/konten/layanan'
+
+export async function generateStaticParams() {
+    return (await ambilSlugLayanan()).map((slug) => ({ slug }))
+}
+
+function Sub({ l }: { l: LayananLengkap }) {
+    return (
+        <li>
+            {l.nama}
+            {l.subLayanan.length > 0 && (
+                <ul>{l.subLayanan.map((s) => <Sub key={s.id} l={s} />)}</ul>
+            )}
+        </li>
+    )
+}
+
+export default async function DetailLayanan({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params
+    const layanan = await ambilLayananDetail(slug)
+    if (!layanan) notFound()
+
+    return (
+        <article>
+            <h1>{layanan.nama}</h1>
+            {layanan.jadwal && <p>{layanan.jadwal}</p>}
+            <ul>{layanan.subLayanan.map((s) => <Sub key={s.id} l={s} />)}</ul>
+        </article>
+    )
+}
+```
+
+### Angka pelayanan (grafik)
+
+Persentase sudah dihitung di lapisan konten supaya setiap grafik memakai
+pembulatan yang sama.
+
+```tsx
+const angka = await ambilAngkaPelayanan()
+
+{angka && angka.kelompok.map((k) => (
+    <section key={k.kelompok}>
+        <h3>{k.label}</h3>
+        {k.baris.map((b) => (
+            <div key={b.label}>{b.label}: {b.jumlah} ({b.persen}%)</div>
+        ))}
+    </section>
+))}
+{angka?.sumber && <small>Sumber: {angka.sumber}</small>}
 ```
 
 ### Visi — atribusi wajib ikut

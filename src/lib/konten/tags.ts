@@ -18,6 +18,7 @@ export const TAG = {
     fasilitas: 'fasilitas',
     strukturOrganisasi: 'struktur-organisasi',
     profil: 'profil',
+    angkaPelayanan: 'angka-pelayanan',
 } as const
 
 export type NamaTag = (typeof TAG)[keyof typeof TAG]

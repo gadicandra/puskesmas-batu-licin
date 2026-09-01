@@ -80,6 +80,7 @@ export interface Config {
     facilities: Facility;
     complaints: Complaint;
     'org-chart': OrgChart;
+    'service-statistics': ServiceStatistic;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -100,6 +101,7 @@ export interface Config {
     facilities: FacilitiesSelect<false> | FacilitiesSelect<true>;
     complaints: ComplaintsSelect<false> | ComplaintsSelect<true>;
     'org-chart': OrgChartSelect<false> | OrgChartSelect<true>;
+    'service-statistics': ServiceStatisticsSelect<false> | ServiceStatisticsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -427,6 +429,18 @@ export interface PageView {
 export interface Service {
   id: number;
   nama: string;
+  /**
+   * Dikosongkan = dibuat otomatis dari judul.
+   */
+  slug?: string | null;
+  /**
+   * Kosongkan bila ini layanan utama. Isi bila ini rincian dari layanan lain.
+   */
+  induk?: (number | null) | Service;
+  /**
+   * Mis. "Senin–Kamis 08.00–11.00", "24 jam", "Sesuai Jadwal", "Jika ada kasus".
+   */
+  jadwal?: string | null;
   kategori: 'dalam-gedung' | 'luar-gedung' | 'posyandu';
   /**
    * Penjelasan singkat untuk warga. Hindari istilah medis yang tidak umum.
@@ -557,6 +571,33 @@ export interface OrgChart {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-statistics".
+ */
+export interface ServiceStatistic {
+  id: number;
+  /**
+   * Mis. "2025". Satu periode = satu kumpulan angka.
+   */
+  periode: string;
+  kelompok: 'umur' | 'asuransi' | 'poli' | 'status-pulang';
+  /**
+   * Mis. "Balita (0-5 Tahun)", "BPJS Kesehatan".
+   */
+  label: string;
+  jumlah: number;
+  /**
+   * Urutan tampil dalam kelompoknya.
+   */
+  urutan?: number | null;
+  /**
+   * Dari mana angkanya diambil, mis. "e-Puskesmas, diakses 31 Januari 2026".
+   */
+  sumber?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -630,6 +671,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'org-chart';
         value: number | OrgChart;
+      } | null)
+    | ({
+        relationTo: 'service-statistics';
+        value: number | ServiceStatistic;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -842,6 +887,9 @@ export interface PageViewsSelect<T extends boolean = true> {
  */
 export interface ServicesSelect<T extends boolean = true> {
   nama?: T;
+  slug?: T;
+  induk?: T;
+  jadwal?: T;
   kategori?: T;
   deskripsi?: T;
   persyaratan?:
@@ -918,6 +966,20 @@ export interface OrgChartSelect<T extends boolean = true> {
   foto?: T;
   atasan?: T;
   urutan?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-statistics_select".
+ */
+export interface ServiceStatisticsSelect<T extends boolean = true> {
+  periode?: T;
+  kelompok?: T;
+  label?: T;
+  jumlah?: T;
+  urutan?: T;
+  sumber?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -2,10 +2,12 @@ import { getPayload, type Payload } from 'payload'
 import config from '@payload-config'
 import { JADWAL_SK, CATATAN_SK } from './data/jam-pelayanan'
 import { IDENTITAS } from './data/identitas'
-import { LAYANAN } from './data/layanan'
+import { LAYANAN, type LayananSeed } from './data/layanan'
 import { NAKES } from './data/nakes'
 import { PROFIL } from './data/profil'
 import { FASILITAS } from './data/fasilitas'
+import { STRUKTUR, type SimpulSeed } from './data/struktur-organisasi'
+import { ANGKA_PELAYANAN, PERIODE, SUMBER, TOTAL_KUNJUNGAN } from './data/angka-pelayanan'
 
 /**
  * Pengisian data awal database.
@@ -121,14 +123,30 @@ async function seed() {
     // --- 5. Katalog layanan ---------------------------------------------
     const { totalDocs: jumlahLayanan } = await payload.count({ collection: 'services' })
     if (jumlahLayanan === 0) {
-        for (const [i, l] of LAYANAN.entries()) {
-            await payload.create({
-                collection: 'services',
-                data: { ...l, urutan: i + 1, aktif: true },
-                overrideAccess: true,
-            })
+        // Ditulis rekursif karena SK-nya berjenjang sampai tiga tingkat
+        // (Laboratorium → Pemeriksaan Serologi → Widal Test). Induk dibuat
+        // lebih dulu supaya id-nya tersedia saat anaknya dibuat.
+        let dibuat = 0
+        const buatLayanan = async (daftar: LayananSeed[], idInduk: number | null) => {
+            for (const [i, l] of daftar.entries()) {
+                const doc = await payload.create({
+                    collection: 'services',
+                    data: {
+                        nama: l.nama,
+                        kategori: l.kategori,
+                        jadwal: l.jadwal ?? null,
+                        induk: idInduk,
+                        urutan: i + 1,
+                        aktif: true,
+                    },
+                    overrideAccess: true,
+                })
+                dibuat++
+                if (l.anak?.length) await buatLayanan(l.anak, doc.id)
+            }
         }
-        catat(`${LAYANAN.length} layanan dibuat`)
+        await buatLayanan(LAYANAN, null)
+        catat(`${dibuat} layanan dibuat (termasuk sub-layanan)`)
     } else {
         catat(`layanan sudah ada (${jumlahLayanan}) — dilewati`)
     }
@@ -190,11 +208,67 @@ async function seed() {
         catat(`dokter sudah ada (${jumlahDokter}) — dilewati`)
     }
 
+    // --- 9. Struktur organisasi ------------------------------------------
+    const { totalDocs: jumlahJabatan } = await payload.count({ collection: 'org-chart' })
+    if (jumlahJabatan === 0) {
+        let simpul = 0
+        const buatSimpul = async (daftar: SimpulSeed[], idAtasan: number | null) => {
+            for (const [i, n] of daftar.entries()) {
+                const doc = await payload.create({
+                    collection: 'org-chart',
+                    data: { jabatan: n.jabatan, nama: n.nama, atasan: idAtasan, urutan: i + 1 },
+                    overrideAccess: true,
+                })
+                simpul++
+                if (n.anak?.length) await buatSimpul(n.anak, doc.id)
+            }
+        }
+        await buatSimpul(STRUKTUR, null)
+        catat(`${simpul} jabatan struktur organisasi dibuat`)
+    } else {
+        catat(`struktur organisasi sudah ada (${jumlahJabatan}) — dilewati`)
+    }
+
+    // --- 10. Angka pelayanan ---------------------------------------------
+    const { totalDocs: jumlahAngka } = await payload.count({ collection: 'service-statistics' })
+    if (jumlahAngka === 0) {
+        // Pemeriksaan silang: keempat pengelompokan harus menjumlah ke total
+        // yang sama. Kalau meleset, ada baris yang salah salin dari gambar
+        // sumbernya — lebih baik seed berhenti daripada memublikasikan angka
+        // yang tidak bisa dipertanggungjawabkan.
+        const kelompok = [...new Set(ANGKA_PELAYANAN.map((a) => a.kelompok))]
+        for (const k of kelompok) {
+            const jumlah = ANGKA_PELAYANAN.filter((a) => a.kelompok === k).reduce(
+                (t, a) => t + a.jumlah,
+                0,
+            )
+            if (jumlah !== TOTAL_KUNJUNGAN) {
+                throw new Error(
+                    `Angka pelayanan kelompok "${k}" berjumlah ${jumlah}, seharusnya ${TOTAL_KUNJUNGAN}.`,
+                )
+            }
+        }
+
+        for (const [i, a] of ANGKA_PELAYANAN.entries()) {
+            await payload.create({
+                collection: 'service-statistics',
+                data: { ...a, periode: PERIODE, urutan: i + 1, sumber: SUMBER },
+                overrideAccess: true,
+            })
+        }
+        catat(`${ANGKA_PELAYANAN.length} angka pelayanan periode ${PERIODE} dibuat`)
+    } else {
+        catat(`angka pelayanan sudah ada (${jumlahAngka}) — dilewati`)
+    }
+
     // --- Menunggu berkas berikutnya -------------------------------------
-    // Posyandu, fasilitas, sertifikat, dan struktur organisasi menyusul.
-    // Berkas sumbernya sudah ada di `data/` (Sertifikat/,
-    // StrukturOrganisasiMaster.png, DataAngkaYangTerlayani.jpeg) tapi masih
-    // berupa gambar — perlu dibaca dan dipetakan dulu bersama Puskesmas.
+    // Belum di-seed:
+    // - Posyandu: daftarnya belum tersedia dari Puskesmas.
+    // - Sertifikat: teksnya sudah disalin ke `data/sertifikat.ts`, tapi field
+    //   `berkas` wajib berisi unggahan. Foto piagam di `data/Sertifikat/` harus
+    //   masuk Galeri Gambar lewat /dashboard/media lebih dulu, baru datanya
+    //   ditautkan. Diunggah dari dashboard, bukan dari seed, supaya berkasnya
+    //   ikut tervalidasi (tipe, ukuran) seperti unggahan lain.
 
     catat('selesai.')
 }
