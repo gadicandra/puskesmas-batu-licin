@@ -150,14 +150,28 @@ batasnya. R2 juga S3-compatible sehingga memakai adapter resmi Payload.
      seluruh akun
    - Salin **Access Key ID** dan **Secret Access Key**. Secret hanya
      ditampilkan sekali.
-5. Isi `.env`:
+5. Isi `.env` — bentuknya seperti ini (nilai di bawah hanya contoh):
 
    ```bash
    R2_BUCKET=puskesmas-batulicin
-   R2_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
-   R2_ACCESS_KEY_ID=...
-   R2_SECRET_ACCESS_KEY=...
+   R2_ENDPOINT=https://8f3c1d0e5a7b492c1a6d4e2f9b0c3a15.r2.cloudflarestorage.com
+   R2_ACCESS_KEY_ID=1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d
+   R2_SECRET_ACCESS_KEY=9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c5b4a39281706f5e4d3c2b1a0
    ```
+
+   | Variabel | Bentuk | Dari mana |
+   | --- | --- | --- |
+   | `R2_BUCKET` | Nama bucket apa adanya | Yang Anda ketik di langkah 2 |
+   | `R2_ENDPOINT` | `https://` + Account ID (32 karakter) + `.r2.cloudflarestorage.com` | Account ID di kanan halaman R2 |
+   | `R2_ACCESS_KEY_ID` | 32 huruf/angka | Muncul saat token dibuat |
+   | `R2_SECRET_ACCESS_KEY` | 64 huruf/angka | Muncul **sekali** saat token dibuat |
+
+   ⚠️ **`R2_ENDPOINT` tidak boleh memuat nama bucket.** Halaman bucket
+   Cloudflare menampilkan alamat "S3 API" berbentuk
+   `https://<ACCOUNT_ID>.r2.cloudflarestorage.com/puskesmas-batulicin` — kalau
+   itu yang disalin, AWS SDK menambahkan nama bucket sekali lagi dan semua
+   unggahan gagal. Aplikasi menolaknya saat menyala dan menyebutkan bagian mana
+   yang harus dibuang, jadi kesalahan ini tidak akan lolos diam-diam.
 
 6. Jalankan ulang aplikasi, lalu unggah satu gambar lewat `/dashboard/media`.
    Berkasnya harus muncul di bucket R2 dan **tidak** muncul di folder `media/`.

@@ -49,7 +49,7 @@ export function r2Kurang(): string[] {
 export function konfigurasiR2() {
     return {
         region: 'auto',
-        endpoint: process.env.R2_ENDPOINT as string,
+        endpoint: endpointR2(),
         credentials: {
             accessKeyId: process.env.R2_ACCESS_KEY_ID as string,
             secretAccessKey: process.env.R2_SECRET_ACCESS_KEY as string,
@@ -58,7 +58,42 @@ export function konfigurasiR2() {
 }
 
 export function namaBucketR2(): string {
-    return process.env.R2_BUCKET as string
+    return (process.env.R2_BUCKET as string).trim()
+}
+
+/**
+ * Endpoint R2 yang sudah dibersihkan dan diperiksa.
+ *
+ * Halaman bucket di Cloudflare menampilkan alamat "S3 API" yang SUDAH memuat
+ * nama bucket di belakangnya:
+ *
+ *     https://<account_id>.r2.cloudflarestorage.com/puskesmas-batulicin
+ *                                                  ^^^^^^^^^^^^^^^^^^^^ ikut tersalin
+ *
+ * Kalau itu yang dipakai, AWS SDK menambahkan nama bucket SEKALI LAGI dan
+ * setiap unggahan gagal dengan galat yang tidak menyebut penyebabnya sama
+ * sekali. Ini kesalahan paling sering pada setup R2, jadi ditolak di sini
+ * dengan pesan yang menyebutkan persis apa yang harus dibuang.
+ */
+export function endpointR2(): string {
+    const mentah = (process.env.R2_ENDPOINT as string).trim().replace(/\/+$/, '')
+
+    if (!/^https:\/\//.test(mentah)) {
+        throw new Error(
+            `R2_ENDPOINT harus diawali https:// — sekarang berisi "${mentah}".`,
+        )
+    }
+
+    const url = new URL(mentah)
+    if (url.pathname && url.pathname !== '/') {
+        throw new Error(
+            `R2_ENDPOINT tidak boleh memuat nama bucket. Buang "${url.pathname}" ` +
+                `dari akhirnya sehingga menjadi "${url.origin}". ` +
+                `Nama bucket diisi terpisah di R2_BUCKET.`,
+        )
+    }
+
+    return url.origin
 }
 
 /** Ringkasan untuk log saat aplikasi menyala — supaya keliru konfigurasi
