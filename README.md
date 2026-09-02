@@ -19,15 +19,33 @@ docker compose up         # .env opsional — lihat catatan di bawah
 
 Tunggu sampai muncul `✓ Ready`, lalu buka **http://localhost:3000**.
 
-Database kosong? Isi data awalnya (jam pelayanan SK, identitas Puskesmas,
-katalog 22 layanan) dan buat akun admin pertama:
+Database kosong? Isi data awalnya dan buat akun admin pertama:
 
 ```bash
 docker compose --profile seed up seed
 ```
 
+Aman diulang berapa kali pun: setiap bagian memeriksa dulu apakah datanya sudah
+ada. Yang terisi:
+
+| Isi | Jumlah |
+| --- | --- |
+| Layanan (termasuk sub-layanan) | 93 |
+| Sarana & ruangan | 68 |
+| Tenaga kesehatan | 68 |
+| Dokter | 6 |
+| Jabatan struktur organisasi | 32 |
+| Angka pelayanan 2025 | 24 |
+| Jam pelayanan (SK), identitas, profil | 3 global |
+
 Akun awal: `admin@puskesmas.local` / `puskesmas123`
 (ubah lewat `SEED_ADMIN_EMAIL` dan `SEED_ADMIN_PASSWORD` di `.env`).
+
+> **Sertifikat & penghargaan tidak ikut terisi.** Seed akan mencetak
+> `folder data/Sertifikat tidak ada — sertifikat dilewati` lalu melanjutkan.
+> Sembilan foto piagamnya berukuran 8,4 MB dan sengaja tidak ikut di repo.
+> Minta foldernya ke pemilik repo, taruh sebagai `data/Sertifikat/`, lalu
+> jalankan seed sekali lagi — bagian yang sudah terisi tidak akan tergandakan.
 
 Masuk lewat **http://localhost:3000/dashboard**. Kalau belum ada akun sama
 sekali, `/dashboard/setup` akan memandu membuat Super Admin pertama.
