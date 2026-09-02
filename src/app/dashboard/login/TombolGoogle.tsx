@@ -1,9 +1,9 @@
 /** Tombol "Masuk dengan Google". Sengaja tautan biasa, bukan tombol JavaScript:
  *  alurnya memang berpindah halaman ke Google, jadi tidak perlu komponen klien. */
-export default function TombolGoogle() {
+export default function TombolGoogle({ tujuan }: { tujuan?: string | null }) {
     return (
         <a
-            href="/dashboard/login/google"
+            href={tujuan ? `/dashboard/login/google?lanjut=${encodeURIComponent(tujuan)}` : '/dashboard/login/google'}
             className="inline-flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl border border-primary/15 bg-white px-5 text-sm font-semibold text-primary transition hover:border-secondary hover:text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
         >
             <LogoGoogle />

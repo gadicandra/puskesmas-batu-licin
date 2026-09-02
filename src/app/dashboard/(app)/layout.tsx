@@ -1,4 +1,4 @@
-import { requireUser } from '@/lib/dashboard/auth'
+import { requireAkses } from '@/lib/dashboard/auth'
 import { logoutAction } from '../login/actions'
 import Shell from '@/components/dashboard/shell/Shell'
 
@@ -9,9 +9,11 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-    // Lapis pertama (UX). Penegak sebenarnya tetap access control Payload di
+    // Penjaga rute: belum login → halaman masuk; peran kurang → halaman 403.
+    // Aturannya dibaca dari `lib/dashboard/akses.ts`, daftar yang sama yang
+    // dipakai menu sidebar. Penegak sebenarnya tetap access control Payload di
     // setiap server action lewat `overrideAccess: false`.
-    const user = await requireUser()
+    const user = await requireAkses()
 
     return (
         <Shell
