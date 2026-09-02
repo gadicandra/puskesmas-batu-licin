@@ -95,6 +95,13 @@ export default function KoleksiSederhana({
 }) {
     const [stateSimpan, aksiSimpan, sedangSimpan] = useActionState<FormState, FormData>(simpanAksi, {})
     const [stateHapus, aksiHapus, sedangHapus] = useActionState<FormState, FormData>(hapusAksi, {})
+    // Pesan hasil dibaca dari aksi yang PALING BARU dijalankan. Tanpa penanda
+    // ini, `stateSimpan.sukses` yang lama menang atas `stateHapus.sukses` yang
+    // baru, dan sesudah menghapus staf membaca "… tersimpan." — kalimat yang
+    // menyesatkan persis di saat ia perlu yakin datanya benar-benar hilang.
+    const [aksiTerakhir, setAksiTerakhir] = useState<'simpan' | 'hapus'>('simpan')
+    const state = aksiTerakhir === 'hapus' ? stateHapus : stateSimpan
+
     const [formTerbuka, setFormTerbuka] = useState(false)
     const [sedangUbah, setSedangUbah] = useState<BarisData | null>(null)
     const [berkasTerpilih, setBerkasTerpilih] = useState<Record<string, MediaRingkas | null>>({})
@@ -139,14 +146,14 @@ export default function KoleksiSederhana({
 
     return (
         <div className="flex flex-col gap-5">
-            {(stateSimpan.error || stateHapus.error) && (
+            {state.error && (
                 <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-                    {stateSimpan.error || stateHapus.error}
+                    {state.error}
                 </p>
             )}
-            {(stateSimpan.sukses || stateHapus.sukses) && (
+            {state.sukses && (
                 <p role="status" className="rounded-xl border border-secondary/30 bg-secondary/10 px-4 py-3 text-sm font-medium text-secondary">
-                    {stateSimpan.sukses || stateHapus.sukses}
+                    {state.sukses}
                 </p>
             )}
 
@@ -165,6 +172,7 @@ export default function KoleksiSederhana({
                     // nilai data sebelumnya saat tombol Ubah ditekan dua kali.
                     key={sedangUbah ? sedangUbah.id : 'baru'}
                     action={aksiSimpan}
+                    onSubmit={() => setAksiTerakhir('simpan')}
                     className="rounded-2xl border border-primary/10 bg-white p-5"
                 >
                     <div className="mb-4 flex items-center justify-between">
@@ -277,9 +285,13 @@ export default function KoleksiSederhana({
                                 <div key={f.nama} className={f.tipe === 'panjang' ? 'sm:col-span-2' : ''}>
                                     <Field label={f.label} htmlFor={idField} wajib={f.wajib} keterangan={f.keterangan} error={error}>
                                         {f.tipe === 'panjang' ? (
-                                            <Textarea id={idField} name={f.nama} defaultValue={nilaiAwal(f)} placeholder={f.contoh} />
+                                            <Textarea id={idField} name={f.nama} defaultValue={nilaiAwal(f)} placeholder={f.contoh} required={f.wajib} />
                                         ) : f.tipe === 'pilihan' || f.tipe === 'relasi' ? (
-                                            <Select id={idField} name={f.nama} defaultValue={nilaiAwal(f)}>
+                                            // `required` di sini yang menahan pilihan "— pilih —" terkirim.
+                                            // Tanpa itu isian wajib berbentuk dropdown lolos ke server dan
+                                            // baru ditolak zod — perjalanan yang jauh lebih panjang untuk
+                                            // kesalahan yang bisa dicegah di tempat.
+                                            <Select id={idField} name={f.nama} defaultValue={nilaiAwal(f)} required={f.wajib}>
                                                 <option value="">— pilih —</option>
                                                 {(f.bukanDiriSendiri && sedangUbah
                                                     ? (f.pilihan ?? []).filter((p) => p.value !== String(sedangUbah.id))
@@ -367,7 +379,9 @@ export default function KoleksiSederhana({
                                                     const nama = String(baris[kunciJudul] ?? '')
                                                     if (!window.confirm(`Hapus ${labelSatuan.toLowerCase()} "${nama}"? Tindakan ini tidak bisa dibatalkan.`)) {
                                                         e.preventDefault()
+                                                        return
                                                     }
+                                                    setAksiTerakhir('hapus')
                                                 }}
                                             >
                                                 <input type="hidden" name="id" value={baris.id} />
