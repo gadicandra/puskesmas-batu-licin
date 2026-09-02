@@ -117,6 +117,9 @@ export default function Navbar() {
                         <NavigationMenuTrigger>Layanan</NavigationMenuTrigger>
                         <NavigationMenuContent>
                           <div className="flex w-full flex-col">
+                            <ListItem href="/layanan" title="Semua Layanan">
+                              Daftar layanan, jadwal &amp; tim dokter
+                            </ListItem>
                             <ListItem
                               href="/informasi-layanan-mutu"
                               title="Informasi Layanan dan Mutu"
@@ -234,7 +237,7 @@ export default function Navbar() {
                 className="font-avenir-regular relative flex w-full flex-col items-start"
               >
                 <div
-                  className={`flex w-full cursor-pointer items-center justify-between p-2 ${pathname.startsWith("/informasi-layanan") ? "font-semibold text-secondary" : ""
+                  className={`flex w-full cursor-pointer items-center justify-between p-2 ${pathname.startsWith("/layanan") || pathname.startsWith("/informasi-layanan") ? "font-semibold text-secondary" : ""
                     }`}
                   onClick={() => toggleAccordion("layanan")}
                 >
@@ -257,6 +260,11 @@ export default function Navbar() {
                       transition={{ duration: 0.3 }}
                       className="z-101 ml-3 flex w-fit flex-col gap-3 border-l border-white/20 py-1 pl-3"
                     >
+                      <Link href="/layanan" onClick={closeMobileMenu}>
+                        <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
+                          <span className="font-avenir font-medium">Semua Layanan</span>
+                        </div>
+                      </Link>
                       <Link href="/informasi-layanan-mutu" onClick={closeMobileMenu}>
                         <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
                           <span className="font-avenir font-medium">Informasi Layanan dan Mutu</span>

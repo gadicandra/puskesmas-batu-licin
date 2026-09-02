@@ -66,6 +66,20 @@ export const Services: CollectionConfig = {
             ],
         },
         {
+            // Satu gambar, dipakai dua kali: sebagai sampul kartu di /layanan
+            // dan sebagai latar hero di /layanan/<slug>. Sengaja bukan dua
+            // field terpisah — mengisi dua foto per layanan hampir pasti tidak
+            // akan dikerjakan, dan yang kedua akan terus kosong.
+            name: 'gambar',
+            type: 'upload',
+            relationTo: 'media',
+            label: 'Foto layanan',
+            admin: {
+                description:
+                    'Tampil sebagai sampul di halaman Layanan. Boleh dikosongkan.',
+            },
+        },
+        {
             name: 'deskripsi',
             type: 'textarea',
             admin: { description: 'Penjelasan singkat untuk warga. Hindari istilah medis yang tidak umum.' },

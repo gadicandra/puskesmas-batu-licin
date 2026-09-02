@@ -239,6 +239,12 @@ components:
         pendidikan: { type: [string, 'null'] }
         nomorSTR: { type: [string, 'null'] }
         deskripsi: { type: [string, 'null'] }
+        layanan:
+          type: array
+          description: >-
+            Relasi banyak ke `services`. Menentukan halaman `/layanan/<slug>` mana
+            yang menampilkan dokter ini pada bagian "Tim Dokter".
+          items: { $ref: '#/components/schemas/Relasi' }
         aktif: { type: boolean, default: true, description: false = tidak ditampilkan di situs publik }
         poli: { $ref: '#/components/schemas/Poli' }
         createdAt: { type: string, format: date-time, readOnly: true }
@@ -325,6 +331,11 @@ components:
           description: Layanan induk. Kosong berarti layanan utama; terisi berarti rincian dari layanan lain.
         jadwal: { type: [string, 'null'], description: 'Teks bebas, mis. "Senin–Kamis 08.00–11.00", "24 jam".' }
         kategori: { type: string, enum: [dalam-gedung, luar-gedung, posyandu] }
+        gambar:
+          allOf: [{ $ref: '#/components/schemas/Relasi' }]
+          description: >-
+            Relasi ke `media`. Dipakai sebagai sampul kartu di `/layanan` dan
+            latar hero di `/layanan/<slug>`. Boleh kosong.
         deskripsi: { type: [string, 'null'] }
         persyaratan:
           type: array

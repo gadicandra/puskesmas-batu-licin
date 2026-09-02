@@ -37,6 +37,12 @@ function bangunFields(pilihanInduk: { value: string; label: string }[]): Spesifi
             keterangan: 'Ditulis apa adanya. Contoh lain: "24 jam", "Sesuai Jadwal", "Jika ada kasus".',
         },
         {
+            nama: 'gambar',
+            label: 'Foto layanan',
+            tipe: 'berkas',
+            keterangan: 'Tampil sebagai sampul kartu di halaman Layanan dan latar di halaman detailnya. Sebaiknya foto mendatar, minimal 1200 piksel. Boleh dikosongkan.',
+        },
+        {
             nama: 'deskripsi',
             label: 'Penjelasan untuk warga',
             tipe: 'panjang',

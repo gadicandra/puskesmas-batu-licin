@@ -1,7 +1,8 @@
 import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
-import type { Where } from 'payload'
 import config from '@payload-config'
+import { ambilDokter, type DokterPublik } from './dokter'
+import { ringkasGambar, type GambarPublik } from './media'
 import { TAG, UMUR_CACHE_DETIK } from './tags'
 
 export type KategoriLayanan = 'dalam-gedung' | 'luar-gedung' | 'posyandu'
@@ -23,6 +24,8 @@ export type LayananPublik = {
     /** Mis. "Senin–Kamis 08.00–11.00", "24 jam", "Sesuai Jadwal". */
     jadwal: string | null
     persyaratan: string[]
+    /** `null` bila fotonya belum ada — UI yang memutuskan penggantinya. */
+    gambar: GambarPublik | null
     /** Banyaknya sub-layanan langsung. Berguna untuk memberi petunjuk
      *  "lihat 5 jenis pemeriksaan" di kartu daftar. */
     jumlahSubLayanan: number
@@ -32,6 +35,10 @@ export type LayananPublik = {
  *  detail `/layanan/<slug>`. */
 export type LayananLengkap = LayananPublik & {
     subLayanan: LayananLengkap[]
+    /** Dokter yang bertugas di layanan ini ATAU di salah satu sub-layanannya,
+     *  sehingga halaman "Laboratorium" tetap menampilkan dokter yang hanya
+     *  ditautkan ke "Pemeriksaan Serologi". Kosong bila belum ada. */
+    dokter: DokterPublik[]
 }
 
 type DokLayanan = {
@@ -43,6 +50,7 @@ type DokLayanan = {
     jadwal?: string | null
     persyaratan?: { isi: string }[] | null
     induk?: number | { id: number } | null
+    gambar?: Parameters<typeof ringkasGambar>[0]
     urutan?: number | null
 }
 
@@ -62,6 +70,7 @@ function ringkas(d: DokLayanan, jumlahSub: number): LayananPublik {
         deskripsi: d.deskripsi?.trim() || null,
         jadwal: d.jadwal?.trim() || null,
         persyaratan: (d.persyaratan ?? []).map((p) => p.isi).filter(Boolean),
+        gambar: ringkasGambar(d.gambar, `Layanan ${d.nama}`),
         jumlahSubLayanan: jumlahSub,
     }
 }
@@ -72,7 +81,7 @@ async function semuaLayanan(): Promise<DokLayanan[]> {
         collection: 'services',
         where: { aktif: { equals: true } },
         sort: ['urutan', 'nama'],
-        depth: 0, // `induk` cukup berupa id
+        depth: 1, // resolve relasi `gambar`; `induk` ikut jadi objek, ditangani idInduk()
         limit: 500,
         pagination: false,
     })
@@ -127,7 +136,7 @@ export const ambilLayananLuarGedung = unstable_cache(
 export function ambilLayananDetail(slug: string): Promise<LayananLengkap | null> {
     return unstable_cache(
         async (): Promise<LayananLengkap | null> => {
-            const semua = await semuaLayanan()
+            const [semua, dokter] = await Promise.all([semuaLayanan(), ambilDokter()])
             const akar = semua.find((d) => (d.slug ?? String(d.id)) === slug)
             if (!akar) return null
 
@@ -148,13 +157,26 @@ export function ambilLayananDetail(slug: string): Promise<LayananLengkap | null>
                 return {
                     ...ringkas(d, anak.length),
                     subLayanan: anak.map(susun),
+                    dokter: [],
                 }
             }
 
-            return susun(akar)
+            const pohon = susun(akar)
+
+            // Dokter dikumpulkan setelah pohon jadi, bukan di dalam `susun`:
+            // yang ditampilkan hanyalah "Tim Dokter" milik halaman ini, gabungan
+            // dari layanan induk dan seluruh keturunannya. `dikunjungi` sudah
+            // berisi persis id-id itu.
+            pohon.dokter = dokter.filter((dok) =>
+                dok.layanan.some((idLayanan) => dikunjungi.has(idLayanan)),
+            )
+
+            return pohon
         },
         ['konten:layanan:detail', slug],
-        { tags: [TAG.layanan], revalidate: UMUR_CACHE_DETIK },
+        // TAG.dokter ikut: halaman ini menampilkan "Tim Dokter", jadi menyimpan
+        // data dokter harus menyegarkannya juga.
+        { tags: [TAG.layanan, TAG.dokter], revalidate: UMUR_CACHE_DETIK },
     )()
 }
 
