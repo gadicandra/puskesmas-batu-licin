@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { SkeletonJudul } from './Skeleton'
+import PemuatLayar from './PemuatLayar'
 
 /** Pembungkus semua tampilan pemuatan halaman dashboard.
  *
@@ -28,6 +29,12 @@ export default function KerangkaHalaman({
             <span className="sr-only">{label}…</span>
             {!tanpaJudul && <SkeletonJudul />}
             {children}
+            {/* Popup di tengah layar. Skeleton menjelaskan *bentuk* halaman
+                yang akan datang; popup ini menjelaskan bahwa halamannya memang
+                sedang diambil — dua pesan berbeda, keduanya perlu.
+                `umumkan` dimatikan: pengumuman untuk pembaca layar sudah
+                dipegang `sr-only` di atas, cukup sekali. */}
+            <PemuatLayar label={label} keterangan="Mohon tunggu sebentar." />
         </div>
     )
 }

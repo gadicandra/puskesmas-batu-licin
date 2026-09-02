@@ -8,6 +8,7 @@ import Card from '@/components/dashboard/ui/Card'
 import Field from '@/components/dashboard/ui/Field'
 import Input from '@/components/dashboard/ui/Input'
 import Badge from '@/components/dashboard/ui/Badge'
+import PemuatLayar from '@/components/dashboard/ui/PemuatLayar'
 
 function Pesan({ state }: { state: FormState }) {
     if (state.error) {
@@ -88,6 +89,12 @@ export default function FormAkun({
                     </div>
                 </form>
             </Card>
+            {(sedangProfil || sedangSandi) && (
+                <PemuatLayar
+                    umumkan
+                    label={sedangSandi ? 'Mengganti kata sandi…' : 'Menyimpan profil…'}
+                />
+            )}
         </div>
     )
 }

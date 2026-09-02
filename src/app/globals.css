@@ -453,3 +453,34 @@ html {
         background-color: color-mix(in oklab, var(--color-primary) 8%, transparent);
     }
 }
+
+/* ---------------------------------------------------------------------------
+   Pemuat di tengah layar
+   ---------------------------------------------------------------------------
+   Dipakai `components/dashboard/ui/PemuatLayar`.
+
+   Tertunda 150 ms lalu memudar masuk. Penundaannya yang penting: perpindahan
+   yang selesai seketika tidak sempat memunculkan kotak ini, jadi tidak ada
+   kedipan — tapi jangan terlalu panjang, atau justru tidak pernah terlihat pada
+   halaman yang memang perlu menunggu sebentar. `both` menahan keadaan awal
+   (opacity 0) selama penundaan berlangsung. */
+@keyframes munculPemuat {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pemuat-layar {
+    animation: munculPemuat 160ms ease-out 150ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pemuat-layar {
+        animation: munculPemuat 1ms linear 150ms both;
+    }
+}
