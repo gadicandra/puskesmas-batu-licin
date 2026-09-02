@@ -213,10 +213,31 @@ folder milik container tidak bertabrakan dengan milik komputer — jangan diisi 
 | Berkas | Isi |
 | --- | --- |
 | **`docs/KONTRAK-DATA.md`** | **Cara mengambil data untuk halaman publik — baca ini sebelum membuat halaman** |
-| `docs/DASHBOARD.md` | Acuan dashboard: aturan binding, prinsip UI, daftar halaman, login Google |
+| `docs/DASHBOARD.md` | Acuan dashboard: aturan binding, prinsip UI, daftar halaman, login Google, penjaga rute, paginasi |
+| `public/openapi.yaml` | Kontrak REST lengkap (lihat di bawah) |
 | `docs/PROJECT_PLAN.md` | Rencana tim, jadwal mingguan, daftar utang teknis |
+| `docs/RENCANA-BERIKUTNYA.md` | Sisa pekerjaan yang sudah ditelusuri, siap dilanjutkan |
 | `PRODUCT.md` | Brief produk & desain |
 | `CLAUDE.md` | Panduan arsitektur untuk asisten AI |
+
+### Kontrak API (Swagger)
+
+Jalankan `pnpm dev` lalu buka **http://localhost:3000/api-docs.html** — Swagger UI
+membaca `public/openapi.yaml`. Isinya seluruh endpoint REST Payload: daftar,
+ambil satu, tambah, ubah, hapus, beserta bentuk payload dan **semua kode balasan
+termasuk yang galat** (400 validasi, 401 login gagal, 403 tanpa hak, 404).
+
+Tiga hal yang paling sering menjebak dan sudah diuji, bukan dugaan:
+
+1. **Mengubah data memakai `PATCH`, bukan `PUT`** — `PUT` menjawab
+   `404 Route not found`.
+2. `GET` daftar mengembalikan objek `{ docs, totalDocs, page, … }`, bukan array.
+3. Relasi berupa angka saat `depth=0` dan objek saat `depth >= 1` (bawaan 1).
+
+**Halaman publik situs ini tidak memakai REST API.** Halaman server membaca
+lewat `src/lib/konten/` supaya isinya berubah seketika saat admin menyimpan —
+lihat `docs/KONTRAK-DATA.md`. Kontrak REST dipakai untuk aplikasi lain, skrip,
+integrasi, dan formulir yang benar-benar mengirim dari browser.
 
 Seluruh teks antarmuka, label field, dan komentar kode ditulis dalam bahasa
 Indonesia. Mohon dipertahankan.

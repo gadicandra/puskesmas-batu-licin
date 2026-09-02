@@ -1,0 +1,1996 @@
+openapi: 3.1.0
+info:
+  title: API UPTD Puskesmas Batulicin
+  version: "1.0.0"
+  description: |
+    Kontrak REST untuk tim frontend. Seluruh endpoint di bawah ini **dihasilkan
+    Payload CMS 3** dan dilayani `src/app/(payload)/api/` — kecuali `/api/track`
+    yang ditulis tangan.
+
+    ## Baca dulu sebelum memakai
+
+    **Halaman publik situs ini TIDAK memanggil REST API.** Halaman server
+    membaca lewat lapisan kontrak `src/lib/konten/` (`unstable_cache` + tag),
+    supaya isinya ikut berubah seketika saat admin menyimpan dan tidak ada
+    permintaan tambahan dari browser. Lihat `docs/KONTRAK-DATA.md`.
+
+    Pakai REST API ini untuk: aplikasi lain (mobile, papan informasi), skrip,
+    integrasi, atau bagian yang benar-benar harus mengambil data dari browser
+    (mis. formulir pengaduan). Untuk halaman biasa, tetap pakai `src/lib/konten`.
+
+    ## Yang paling sering menjebak
+
+    1. **Mengubah data memakai `PATCH`, bukan `PUT`.** `PUT /api/{koleksi}/{id}`
+       menjawab `404 Route not found` — sudah diuji, bukan dugaan.
+    2. **`GET` daftar tidak mengembalikan array**, tapi objek berisi `docs` +
+       data paginasi.
+    3. **Relasi berupa angka** bila `depth=0`, dan berupa objek dokumen bila
+       `depth >= 1` (bawaan `depth=1`). Tulis kode yang menerima keduanya.
+    4. **Berkas media disajikan lewat `/api/media/file/{filename}`**, bukan URL
+       bucket. Alamat itu tetap sama baik berkasnya di disk lokal maupun di
+       Cloudflare R2.
+    5. **Artikel yang belum terbit tidak terlihat publik.** Tanpa login, daftar
+       artikel hanya berisi yang `_status = published`.
+
+    ## Autentikasi
+
+    Login menaruh cookie `payload-token` (httpOnly). Untuk pemanggil non-browser,
+    gunakan header `Authorization: JWT <token>` dengan token dari `/api/users/login`.
+
+servers:
+  - url: http://localhost:3000
+    description: Pengembangan lokal
+  - url: https://CONTOH-DOMAIN-PRODUKSI
+    description: Produksi (ganti setelah domain final)
+
+tags:
+  - name: Autentikasi
+  - name: Konten publik
+  - name: Data layanan
+  - name: Profil & kelembagaan
+  - name: Pengaduan
+  - name: Media
+  - name: Pengaturan situs
+  - name: Statistik
+
+security: []
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: payload-token
+      description: Dipasang otomatis oleh `POST /api/users/login`.
+    bearerJWT:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Format: `JWT <token>`. Perhatikan skema `JWT`, bukan `Bearer`.'
+
+  parameters:
+    limit:
+      name: limit
+      in: query
+      schema: { type: integer, default: 10, minimum: 0 }
+      description: Jumlah dokumen per halaman. `0` berarti tanpa batas.
+    page:
+      name: page
+      in: query
+      schema: { type: integer, default: 1, minimum: 1 }
+    sort:
+      name: sort
+      in: query
+      schema: { type: string }
+      description: 'Nama field. Awali `-` untuk menurun, mis. `-createdAt`.'
+    depth:
+      name: depth
+      in: query
+      schema: { type: integer, default: 1, minimum: 0, maximum: 10 }
+      description: Kedalaman relasi yang ikut diambil. `0` = relasi berupa id saja.
+    where:
+      name: where
+      in: query
+      schema: { type: string }
+      description: |
+        Penyaring bergaya Payload, ditulis sebagai query bersarang, mis.
+        `where[aktif][equals]=true` atau `where[nama][like]=posyandu`.
+        Operator: `equals`, `not_equals`, `greater_than`, `less_than`, `like`,
+        `contains`, `in`, `not_in`, `exists`.
+    idPath:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer }
+
+  responses:
+    Galat400:
+      description: Isian tidak lolos validasi.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ValidationError' }
+          example:
+            errors:
+              - name: ValidationError
+                message: 'The following field is invalid: Nama'
+                data:
+                  collection: vaccines
+                  errors:
+                    - label: Nama
+                      message: This field is required.
+                      path: nama
+    Galat401:
+      description: Belum login atau token tidak sah.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example:
+            errors: [{ message: 'The email or password provided is incorrect.' }]
+    Galat403:
+      description: |
+        Sudah login tetapi tidak berhak. **Juga dipakai untuk permintaan tanpa
+        login pada koleksi yang tertutup** — Payload menjawab 403, bukan 401.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example:
+            errors: [{ message: 'You are not allowed to perform this action.' }]
+    Galat404:
+      description: Dokumen tidak ada, atau rutenya tidak dikenal.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example:
+            errors: [{ message: Not Found }]
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message: { type: string }
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string, examples: [ValidationError] }
+              message: { type: string }
+              data:
+                type: object
+                properties:
+                  collection: { type: string }
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        label: { type: string, description: Nama field yang terbaca manusia }
+                        message: { type: string }
+                        path: { type: string, description: Nama field teknis }
+    Paginasi:
+      type: object
+      required: [docs, totalDocs, limit, page, totalPages, hasNextPage, hasPrevPage]
+      properties:
+        totalDocs: { type: integer }
+        limit: { type: integer }
+        page: { type: integer }
+        totalPages: { type: integer }
+        pagingCounter: { type: integer }
+        hasNextPage: { type: boolean }
+        hasPrevPage: { type: boolean }
+        nextPage: { type: [integer, 'null'] }
+        prevPage: { type: [integer, 'null'] }
+    BalasanTulis:
+      type: object
+      properties:
+        message: { type: string, examples: ['Vaksin successfully created.'] }
+        doc: { type: object, description: Dokumen setelah disimpan, bentuknya sama dengan hasil GET }
+
+    Relasi:
+      description: Angka bila `depth=0`, objek dokumen bila `depth >= 1`.
+      oneOf:
+        - type: integer
+        - type: object
+        - type: 'null'
+
+    Media:
+      type: object
+      properties:
+        id: { type: integer }
+        alt: { type: string, description: Wajib. Dibacakan pembaca layar. }
+        url: { type: string, examples: ['/api/media/file/logo.webp'] }
+        thumbnailURL: { type: [string, 'null'] }
+        filename: { type: string }
+        mimeType: { type: string }
+        filesize: { type: integer, description: Byte. Batas unggah 5 MB. }
+        width: { type: [integer, 'null'] }
+        height: { type: [integer, 'null'] }
+        sizes:
+          type: object
+          description: Varian ukuran (`thumbnail` 200x200, `card` 400x300), masing-masing berisi url/width/height/filesize.
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    Dokter:
+      type: object
+      required: [nama, spesialisasi]
+      properties:
+        id: { type: integer, readOnly: true }
+        nama: { type: string }
+        spesialisasi: { type: string }
+        foto: { $ref: '#/components/schemas/Relasi' }
+        jadwalPraktik:
+          type: array
+          items:
+            type: object
+            required: [hari, jamMulai, jamSelesai]
+            properties:
+              hari: { type: string, enum: [senin, selasa, rabu, kamis, jumat, sabtu, minggu] }
+              jamMulai: { type: string, examples: ['08.00'] }
+              jamSelesai: { type: string, examples: ['11.00'] }
+        pendidikan: { type: [string, 'null'] }
+        nomorSTR: { type: [string, 'null'] }
+        deskripsi: { type: [string, 'null'] }
+        aktif: { type: boolean, default: true, description: false = tidak ditampilkan di situs publik }
+        poli: { $ref: '#/components/schemas/Poli' }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    Poli:
+      type: [string, 'null']
+      description: Pengelompokan unit. BUKAN pembatas hak akses.
+      enum: [umum, gigi, kia-kb, lansia, gizi, sanitasi, mtbs, lab, farmasi, iva, promkes, ugd, tata-usaha, keuangan, null]
+
+    TenagaMedis:
+      type: object
+      required: [nama, jabatan]
+      properties:
+        id: { type: integer, readOnly: true }
+        nama: { type: string }
+        jabatan: { type: string, enum: [dokter, perawat, bidan, apoteker, analis, gizi, sanitarian, administrasi, lainnya] }
+        jabatanLengkap: { type: [string, 'null'], description: 'Gelar jabatan resmi, mis. "Bidan Ahli Madya".' }
+        foto: { $ref: '#/components/schemas/Relasi' }
+        aktif: { type: boolean, default: true }
+        poli: { $ref: '#/components/schemas/Poli' }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    Vaksin:
+      type: object
+      required: [nama, stok]
+      properties:
+        id: { type: integer, readOnly: true }
+        nama: { type: string }
+        jenis: { type: [string, 'null'] }
+        stok: { type: integer, minimum: 0 }
+        satuan: { type: string, default: dosis }
+        keterangan: { type: [string, 'null'] }
+        poli: { $ref: '#/components/schemas/Poli' }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    Sertifikat:
+      type: object
+      required: [judul, jenis, berkas]
+      properties:
+        id: { type: integer, readOnly: true }
+        judul: { type: string }
+        jenis: { type: string, enum: [akreditasi, penghargaan] }
+        penerbit: { type: [string, 'null'] }
+        tanggal: { type: [string, 'null'], format: date-time }
+        berkas: { $ref: '#/components/schemas/Relasi' }
+        keterangan: { type: [string, 'null'] }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    Artikel:
+      type: object
+      required: [title]
+      properties:
+        id: { type: integer, readOnly: true }
+        title: { type: string }
+        slug: { type: string, description: Dibuat otomatis dari judul bila dikosongkan. Unik. }
+        cover: { $ref: '#/components/schemas/Relasi' }
+        excerpt: { type: [string, 'null'] }
+        content:
+          type: [string, 'null']
+          description: |
+            **HTML yang sudah disanitasi**, bukan Lexical richText. Sanitasi
+            dilakukan dua kali: saat disimpan dan saat dirender. Kalau Anda
+            menampilkannya sendiri, sanitasi lagi di sisi Anda.
+        category: { type: [string, 'null'], enum: [berita, pengumuman, kegiatan, kesehatan, null] }
+        author: { $ref: '#/components/schemas/Relasi' }
+        publishedDate: { type: [string, 'null'], format: date-time }
+        _status: { type: string, enum: [draft, published], description: Tanpa login hanya `published` yang terlihat. }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    Layanan:
+      type: object
+      required: [nama, kategori]
+      properties:
+        id: { type: integer, readOnly: true }
+        nama: { type: string }
+        slug: { type: string }
+        induk:
+          allOf: [{ $ref: '#/components/schemas/Relasi' }]
+          description: Layanan induk. Kosong berarti layanan utama; terisi berarti rincian dari layanan lain.
+        jadwal: { type: [string, 'null'], description: 'Teks bebas, mis. "Senin–Kamis 08.00–11.00", "24 jam".' }
+        kategori: { type: string, enum: [dalam-gedung, luar-gedung, posyandu] }
+        deskripsi: { type: [string, 'null'] }
+        persyaratan:
+          type: array
+          items:
+            type: object
+            required: [isi]
+            properties:
+              isi: { type: string, examples: ['Kartu BPJS'] }
+        urutan: { type: integer, default: 0 }
+        aktif: { type: boolean, default: true }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    Posyandu:
+      type: object
+      required: [nama]
+      properties:
+        id: { type: integer, readOnly: true }
+        nama: { type: string }
+        alamat: { type: [string, 'null'] }
+        layanan:
+          type: array
+          items: { $ref: '#/components/schemas/Relasi' }
+          description: Relasi banyak ke `services`.
+        jadwal:
+          type: array
+          items:
+            type: object
+            required: [hari]
+            properties:
+              hari: { type: string, enum: [senin, selasa, rabu, kamis, jumat, sabtu, minggu] }
+              keterangan: { type: [string, 'null'], examples: ['Minggu ke-2 setiap bulan, 08.00–11.00'] }
+        penanggungJawab: { type: [string, 'null'] }
+        kontak: { type: [string, 'null'] }
+        urutan: { type: integer, default: 0 }
+        aktif: { type: boolean, default: true }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    Fasilitas:
+      type: object
+      required: [nama, kategori]
+      properties:
+        id: { type: integer, readOnly: true }
+        nama: { type: string }
+        kategori: { type: string, enum: [ruang, kantor, alat, kendaraan, penunjang] }
+        deskripsi: { type: [string, 'null'] }
+        jumlah: { type: [integer, 'null'], minimum: 0 }
+        foto: { $ref: '#/components/schemas/Relasi' }
+        urutan: { type: integer, default: 0 }
+        aktif: { type: boolean, default: true }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    Jabatan:
+      type: object
+      required: [jabatan]
+      properties:
+        id: { type: integer, readOnly: true }
+        jabatan: { type: string }
+        nama: { type: [string, 'null'], description: Nama pejabat. Kosong bila posisinya lowong. }
+        foto: { $ref: '#/components/schemas/Relasi' }
+        atasan:
+          allOf: [{ $ref: '#/components/schemas/Relasi' }]
+          description: Menunjuk dokumen `org-chart` lain. Kosong hanya untuk Kepala Puskesmas.
+        urutan: { type: integer, default: 0, description: Urutan di antara jabatan dengan atasan yang sama. }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    AngkaPelayanan:
+      type: object
+      required: [periode, kelompok, label, jumlah]
+      properties:
+        id: { type: integer, readOnly: true }
+        periode: { type: string, examples: ['2025'] }
+        kelompok: { type: string, enum: [umur, asuransi, poli, status-pulang] }
+        label: { type: string }
+        jumlah: { type: integer }
+        urutan: { type: integer }
+        sumber: { type: [string, 'null'] }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    PengaduanBaru:
+      type: object
+      required: [ringkasan, isi, persetujuanPrivasi]
+      properties:
+        ringkasan: { type: string, description: Satu kalimat pokok masalah. }
+        isi: { type: string }
+        nama: { type: [string, 'null'], description: Boleh dikosongkan bila pengadu ingin anonim. }
+        kontak: { type: [string, 'null'], description: Nomor HP atau email untuk menyampaikan tanggapan. }
+        kategori: { type: string, enum: [layanan, petugas, sarana, saran, lainnya], default: layanan }
+        persetujuanPrivasi:
+          type: boolean
+          description: Wajib `true`. Formulir publik harus meminta persetujuan sebelum mengirim.
+
+    Pengaduan:
+      allOf:
+        - $ref: '#/components/schemas/PengaduanBaru'
+        - type: object
+          properties:
+            id: { type: integer, readOnly: true }
+            status:
+              type: string
+              enum: [baru, diproses, selesai]
+              description: 'Hanya superadmin yang boleh mengisi. Dikirim publik? Diabaikan.'
+            tanggapan: { type: [string, 'null'], description: Hanya superadmin yang boleh mengisi. }
+            createdAt: { type: string, format: date-time, readOnly: true }
+            updatedAt: { type: string, format: date-time, readOnly: true }
+
+    JamPelayanan:
+      type: object
+      properties:
+        jadwal:
+          type: array
+          items:
+            type: object
+            properties:
+              hari: { type: string, examples: ['Senin – Kamis'] }
+              jam: { type: string, examples: ['08.00 – 11.00'] }
+        catatan: { type: [string, 'null'], examples: ['UGD & UGD Kebidanan melayani 24 jam, Senin–Minggu.'] }
+        updatedAt: { type: string, format: date-time }
+
+    PengaturanSitus:
+      type: object
+      properties:
+        namaInstansi: { type: string }
+        alamat: { type: string }
+        telepon: { type: string }
+        email: { type: string }
+        sosialMedia:
+          type: array
+          items:
+            type: object
+            properties:
+              platform: { type: string }
+              url: { type: string, format: uri }
+        updatedAt: { type: string, format: date-time }
+
+    Profil:
+      type: object
+      description: Visi, misi, motto, sejarah, dan wilayah kerja. Bentuk lengkapnya lihat `src/globals/Profile.ts`.
+      additionalProperties: true
+
+    Pengguna:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+        role: { type: string, enum: [superadmin, admin] }
+        metodeLogin: { type: string, enum: [sandi, google, keduanya] }
+        lokasi: { type: [string, 'null'] }
+
+paths:
+  /api/doctors:
+    get:
+      tags: [Konten publik]
+      summary: Daftar dokter
+      description: Bisa dibaca publik tanpa login.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/Dokter' }
+    post:
+      tags: [Konten publik]
+      summary: Tambah dokter
+      description: Hanya superadmin.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Dokter' }
+      responses:
+        '201':
+          description: Dibuat.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Dokter' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/doctors/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Konten publik]
+      summary: Satu dokter
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/depth'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Dokter' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    patch:
+      tags: [Konten publik]
+      summary: Ubah dokter
+      description: |
+        **Gunakan `PATCH`, bukan `PUT`.** `PUT` pada alamat ini menjawab
+        `404 Route not found`. Kirim hanya field yang berubah.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Dokter' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Dokter' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Konten publik]
+      summary: Hapus dokter
+      description: Hanya superadmin. Tidak bisa dibatalkan.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus. Dokumen yang dihapus ikut dikembalikan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Dokter' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/medical-staff:
+    get:
+      tags: [Konten publik]
+      summary: Daftar tenaga medis
+      description: Bisa dibaca publik tanpa login.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/TenagaMedis' }
+    post:
+      tags: [Konten publik]
+      summary: Tambah tenaga medis
+      description: Hanya superadmin.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TenagaMedis' }
+      responses:
+        '201':
+          description: Dibuat.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/TenagaMedis' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/medical-staff/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Konten publik]
+      summary: Satu tenaga medis
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/depth'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenagaMedis' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    patch:
+      tags: [Konten publik]
+      summary: Ubah tenaga medis
+      description: |
+        **Gunakan `PATCH`, bukan `PUT`.** `PUT` pada alamat ini menjawab
+        `404 Route not found`. Kirim hanya field yang berubah.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TenagaMedis' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/TenagaMedis' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Konten publik]
+      summary: Hapus tenaga medis
+      description: Hanya superadmin. Tidak bisa dibatalkan.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus. Dokumen yang dihapus ikut dikembalikan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/TenagaMedis' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/vaccines:
+    get:
+      tags: [Data layanan]
+      summary: Daftar vaksin
+      description: Bisa dibaca publik tanpa login.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/Vaksin' }
+    post:
+      tags: [Data layanan]
+      summary: Tambah vaksin
+      description: Hanya superadmin.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Vaksin' }
+      responses:
+        '201':
+          description: Dibuat.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Vaksin' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/vaccines/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Data layanan]
+      summary: Satu vaksin
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/depth'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Vaksin' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    patch:
+      tags: [Data layanan]
+      summary: Ubah vaksin
+      description: |
+        **Gunakan `PATCH`, bukan `PUT`.** `PUT` pada alamat ini menjawab
+        `404 Route not found`. Kirim hanya field yang berubah.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Vaksin' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Vaksin' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Data layanan]
+      summary: Hapus vaksin
+      description: Hanya superadmin. Tidak bisa dibatalkan.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus. Dokumen yang dihapus ikut dikembalikan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Vaksin' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/certificates:
+    get:
+      tags: [Profil & kelembagaan]
+      summary: Daftar sertifikat & penghargaan
+      description: Bisa dibaca publik tanpa login.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/Sertifikat' }
+    post:
+      tags: [Profil & kelembagaan]
+      summary: Tambah sertifikat & penghargaan
+      description: Hanya superadmin.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Sertifikat' }
+      responses:
+        '201':
+          description: Dibuat.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Sertifikat' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/certificates/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Profil & kelembagaan]
+      summary: Satu sertifikat & penghargaan
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/depth'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sertifikat' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    patch:
+      tags: [Profil & kelembagaan]
+      summary: Ubah sertifikat & penghargaan
+      description: |
+        **Gunakan `PATCH`, bukan `PUT`.** `PUT` pada alamat ini menjawab
+        `404 Route not found`. Kirim hanya field yang berubah.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Sertifikat' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Sertifikat' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Profil & kelembagaan]
+      summary: Hapus sertifikat & penghargaan
+      description: Hanya superadmin. Tidak bisa dibatalkan.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus. Dokumen yang dihapus ikut dikembalikan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Sertifikat' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/services:
+    get:
+      tags: [Data layanan]
+      summary: Daftar layanan
+      description: Bisa dibaca publik tanpa login.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/Layanan' }
+    post:
+      tags: [Data layanan]
+      summary: Tambah layanan
+      description: Hanya superadmin.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Layanan' }
+      responses:
+        '201':
+          description: Dibuat.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Layanan' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/services/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Data layanan]
+      summary: Satu layanan
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/depth'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Layanan' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    patch:
+      tags: [Data layanan]
+      summary: Ubah layanan
+      description: |
+        **Gunakan `PATCH`, bukan `PUT`.** `PUT` pada alamat ini menjawab
+        `404 Route not found`. Kirim hanya field yang berubah.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Layanan' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Layanan' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Data layanan]
+      summary: Hapus layanan
+      description: Hanya superadmin. Tidak bisa dibatalkan.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus. Dokumen yang dihapus ikut dikembalikan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Layanan' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/posyandu:
+    get:
+      tags: [Data layanan]
+      summary: Daftar posyandu
+      description: Bisa dibaca publik tanpa login.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/Posyandu' }
+    post:
+      tags: [Data layanan]
+      summary: Tambah posyandu
+      description: Hanya superadmin.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Posyandu' }
+      responses:
+        '201':
+          description: Dibuat.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Posyandu' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/posyandu/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Data layanan]
+      summary: Satu posyandu
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/depth'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Posyandu' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    patch:
+      tags: [Data layanan]
+      summary: Ubah posyandu
+      description: |
+        **Gunakan `PATCH`, bukan `PUT`.** `PUT` pada alamat ini menjawab
+        `404 Route not found`. Kirim hanya field yang berubah.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Posyandu' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Posyandu' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Data layanan]
+      summary: Hapus posyandu
+      description: Hanya superadmin. Tidak bisa dibatalkan.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus. Dokumen yang dihapus ikut dikembalikan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Posyandu' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/facilities:
+    get:
+      tags: [Profil & kelembagaan]
+      summary: Daftar fasilitas
+      description: Bisa dibaca publik tanpa login.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/Fasilitas' }
+    post:
+      tags: [Profil & kelembagaan]
+      summary: Tambah fasilitas
+      description: Hanya superadmin.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Fasilitas' }
+      responses:
+        '201':
+          description: Dibuat.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Fasilitas' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/facilities/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Profil & kelembagaan]
+      summary: Satu fasilitas
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/depth'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Fasilitas' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    patch:
+      tags: [Profil & kelembagaan]
+      summary: Ubah fasilitas
+      description: |
+        **Gunakan `PATCH`, bukan `PUT`.** `PUT` pada alamat ini menjawab
+        `404 Route not found`. Kirim hanya field yang berubah.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Fasilitas' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Fasilitas' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Profil & kelembagaan]
+      summary: Hapus fasilitas
+      description: Hanya superadmin. Tidak bisa dibatalkan.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus. Dokumen yang dihapus ikut dikembalikan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Fasilitas' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/org-chart:
+    get:
+      tags: [Profil & kelembagaan]
+      summary: Daftar struktur organisasi
+      description: Bisa dibaca publik tanpa login.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/Jabatan' }
+    post:
+      tags: [Profil & kelembagaan]
+      summary: Tambah struktur organisasi
+      description: Hanya superadmin.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Jabatan' }
+      responses:
+        '201':
+          description: Dibuat.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Jabatan' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/org-chart/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Profil & kelembagaan]
+      summary: Satu struktur organisasi
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/depth'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Jabatan' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    patch:
+      tags: [Profil & kelembagaan]
+      summary: Ubah struktur organisasi
+      description: |
+        **Gunakan `PATCH`, bukan `PUT`.** `PUT` pada alamat ini menjawab
+        `404 Route not found`. Kirim hanya field yang berubah.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Jabatan' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Jabatan' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Profil & kelembagaan]
+      summary: Hapus struktur organisasi
+      description: Hanya superadmin. Tidak bisa dibatalkan.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus. Dokumen yang dihapus ikut dikembalikan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Jabatan' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/service-statistics:
+    get:
+      tags: [Statistik]
+      summary: Daftar angka pelayanan
+      description: Bisa dibaca publik tanpa login.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/AngkaPelayanan' }
+    post:
+      tags: [Statistik]
+      summary: Tambah angka pelayanan
+      description: Hanya superadmin.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AngkaPelayanan' }
+      responses:
+        '201':
+          description: Dibuat.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/AngkaPelayanan' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/service-statistics/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Statistik]
+      summary: Satu angka pelayanan
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/depth'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AngkaPelayanan' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    patch:
+      tags: [Statistik]
+      summary: Ubah angka pelayanan
+      description: |
+        **Gunakan `PATCH`, bukan `PUT`.** `PUT` pada alamat ini menjawab
+        `404 Route not found`. Kirim hanya field yang berubah.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AngkaPelayanan' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/AngkaPelayanan' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Statistik]
+      summary: Hapus angka pelayanan
+      description: Hanya superadmin. Tidak bisa dibatalkan.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus. Dokumen yang dihapus ikut dikembalikan.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/AngkaPelayanan' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/articles:
+    get:
+      tags: [Konten publik]
+      summary: Daftar artikel
+      description: |
+        Tanpa login, hanya artikel `_status = published` yang muncul — penyaringan
+        itu dikerjakan access control di server, bukan oleh query Anda.
+        Admin unit yang login melihat artikelnya sendiri; superadmin melihat semua.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/Artikel' }
+    post:
+      tags: [Konten publik]
+      summary: Tulis artikel
+      description: |
+        Perlu login. Admin unit boleh membuat artikel, dan field `author`
+        **dipaksa** ke dirinya sendiri oleh hook di server — mengirim `author`
+        orang lain tidak berpengaruh.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Artikel' }
+      responses:
+        '201':
+          description: Dibuat.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Artikel' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/articles/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Konten publik]
+      summary: Satu artikel
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/depth'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Artikel' }
+        '404':
+          $ref: '#/components/responses/Galat404'
+    patch:
+      tags: [Konten publik]
+      summary: Ubah artikel
+      description: Penulisnya sendiri atau superadmin. Pakai `PATCH`, bukan `PUT`.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Artikel' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BalasanTulis' }
+        '400': { $ref: '#/components/responses/Galat400' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Konten publik]
+      summary: Hapus artikel
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BalasanTulis' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/media:
+    get:
+      tags: [Media]
+      summary: Daftar berkas
+      description: Bisa dibaca publik — situs perlu menampilkan gambarnya.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/Media' }
+    post:
+      tags: [Media]
+      summary: Unggah berkas
+      description: |
+        Perlu login. Kirim sebagai `multipart/form-data`, BUKAN JSON.
+        Batas 5 MB; hanya gambar dan PDF. Field `alt` wajib.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, _payload]
+              properties:
+                file: { type: string, format: binary }
+                _payload:
+                  type: string
+                  description: 'JSON berisi field non-berkas, mis. `{"alt":"Petugas menimbang balita"}`.'
+      responses:
+        '201':
+          description: Terunggah.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Media' }
+        '400':
+          description: Berkas terlalu besar, tipe tidak didukung, atau `alt` kosong.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ValidationError' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/media/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    get:
+      tags: [Media]
+      summary: Satu berkas (metadata)
+      security: []
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Media' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Media]
+      summary: Hapus berkas
+      description: Perlu login. Berkas yang masih dipakai artikel sebaiknya dicek dulu di sisi Anda.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BalasanTulis' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/media/file/{filename}:
+    parameters:
+      - name: filename
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Media]
+      summary: Isi berkas
+      description: |
+        Inilah alamat yang dipakai `<img src>`. Tetap sama baik berkasnya
+        tersimpan di disk lokal maupun di Cloudflare R2 — jangan pernah menyusun
+        URL bucket sendiri.
+      security: []
+      responses:
+        '200':
+          description: Berkas.
+          content:
+            image/*: { schema: { type: string, format: binary } }
+            application/pdf: { schema: { type: string, format: binary } }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/complaints:
+    post:
+      tags: [Pengaduan]
+      summary: Kirim pengaduan (publik)
+      description: |
+        Siapa pun boleh mengirim; **tidak ada yang boleh membacanya kecuali
+        superadmin**. Isi aduan sering memuat keluhan pribadi tentang layanan
+        atau petugas tertentu.
+
+        `status` dan `tanggapan` diabaikan bila dikirim dari publik — pengadu
+        tidak boleh menentukan status aduannya sendiri.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PengaduanBaru' }
+      responses:
+        '201':
+          description: Terkirim.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BalasanTulis'
+                  - type: object
+                    properties:
+                      doc: { $ref: '#/components/schemas/Pengaduan' }
+        '400': { $ref: '#/components/responses/Galat400' }
+    get:
+      tags: [Pengaduan]
+      summary: Daftar pengaduan
+      description: Hanya superadmin. Tanpa login menjawab 403.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/where'
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginasi'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items: { $ref: '#/components/schemas/Pengaduan' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/complaints/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idPath'
+    patch:
+      tags: [Pengaduan]
+      summary: Tanggapi pengaduan
+      description: Hanya superadmin, dan praktiknya hanya `status` + `tanggapan` yang diubah.
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [baru, diproses, selesai] }
+                tanggapan: { type: string }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BalasanTulis' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+    delete:
+      tags: [Pengaduan]
+      summary: Hapus pengaduan
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Terhapus.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BalasanTulis' }
+        '403': { $ref: '#/components/responses/Galat403' }
+        '404': { $ref: '#/components/responses/Galat404' }
+
+  /api/globals/operational-hours:
+    get:
+      tags: [Pengaturan situs]
+      summary: Jam pelayanan
+      description: |
+        Sumbernya SK Kepala Puskesmas No. B/445.61/003/PKM.Btl-Adm/I/2023.
+        Jangan menuliskan jam pelayanan sebagai teks tetap di kode frontend —
+        ambil dari sini supaya perubahan di dashboard ikut terlihat.
+      security: []
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JamPelayanan' }
+    post:
+      tags: [Pengaturan situs]
+      summary: Ubah jam pelayanan
+      description: 'Hanya superadmin. Global diubah dengan `POST` (bukan PATCH/PUT).'
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/JamPelayanan' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BalasanTulis' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/globals/site-settings:
+    get:
+      tags: [Pengaturan situs]
+      summary: Identitas & kontak Puskesmas
+      security: []
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PengaturanSitus' }
+    post:
+      tags: [Pengaturan situs]
+      summary: Ubah identitas & kontak
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PengaturanSitus' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BalasanTulis' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/globals/profile:
+    get:
+      tags: [Profil & kelembagaan]
+      summary: Visi, misi, motto, sejarah
+      security: []
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Profil' }
+    post:
+      tags: [Profil & kelembagaan]
+      summary: Ubah profil
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Profil' }
+      responses:
+        '200':
+          description: Tersimpan.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BalasanTulis' }
+        '403': { $ref: '#/components/responses/Galat403' }
+
+  /api/users/login:
+    post:
+      tags: [Autentikasi]
+      summary: Masuk
+      description: |
+        Berhasil = cookie `payload-token` dipasang (httpOnly) **dan** token
+        dikembalikan di badan respons untuk pemanggil non-browser.
+
+        Pesan gagal sengaja tidak membedakan "email salah" dan "kata sandi
+        salah". Akun terkunci sementara setelah beberapa kali gagal.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, examples: [Authentication Passed] }
+                  token: { type: string }
+                  exp: { type: integer, description: Waktu kedaluwarsa (epoch detik). }
+                  user: { $ref: '#/components/schemas/Pengguna' }
+        '401': { $ref: '#/components/responses/Galat401' }
+
+  /api/users/logout:
+    post:
+      tags: [Autentikasi]
+      summary: Keluar
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Cookie sesi dihapus.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+
+  /api/users/me:
+    get:
+      tags: [Autentikasi]
+      summary: Siapa yang sedang login
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: |
+            Selalu 200. Bila belum login, `user` bernilai `null` — periksa
+            isinya, jangan mengandalkan kode status.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    oneOf:
+                      - $ref: '#/components/schemas/Pengguna'
+                      - type: 'null'
+                  token: { type: [string, 'null'] }
+                  exp: { type: [integer, 'null'] }
+
+  /api/users/refresh-token:
+    post:
+      tags: [Autentikasi]
+      summary: Perpanjang sesi
+      security: [{ cookieAuth: [] }, { bearerJWT: [] }]
+      responses:
+        '200':
+          description: Token baru.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  refreshedToken: { type: string }
+                  exp: { type: integer }
+        '401': { $ref: '#/components/responses/Galat401' }
+
+  /api/track:
+    post:
+      tags: [Statistik]
+      summary: Catat kunjungan halaman
+      description: |
+        Route buatan sendiri (`src/app/api/track/route.ts`), bukan bawaan Payload.
+        Dipanggil `PageViewTracker` pada setiap perpindahan halaman publik.
+
+        Tidak menyimpan IP maupun cookie: User-Agent di-hash. Bot disaring,
+        dibatasi 30 permintaan per menit per IP, dan path divalidasi.
+
+        **Selalu menjawab `200`**, termasuk saat permintaannya diabaikan —
+        beacon statistik tidak boleh membuat halaman terlihat gagal. Kolom
+        `skipped` menjelaskan alasannya.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path: { type: string, examples: ['/artikel/pekan-imunisasi'] }
+                referrer: { type: string }
+      responses:
+        '200':
+          description: Diterima atau sengaja diabaikan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  skipped:
+                    type: string
+                    enum: [bot, rate-limit, invalid-path]
+                    description: Hanya ada bila permintaannya tidak dicatat.

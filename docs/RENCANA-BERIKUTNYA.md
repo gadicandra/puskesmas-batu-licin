@@ -39,63 +39,21 @@ Berkas yang belum di-commit (sengaja, menunggu keputusan): 4 berkas sumber di
 
 ---
 
-## A. Verifikasi R2 — ✅ SELESAI (2 September 2026)
+## A–C — sudah selesai (2 September 2026)
 
-`R2_ENDPOINT` sudah dibetulkan (tidak lagi memuat nama bucket), `pnpm build`
-lolos, dan uji unggah lewat Local API memberi hasil yang diharapkan:
+Rincian langkah-langkahnya sengaja tidak disimpan di sini: yang perlu dibaca
+lagi sudah pindah ke tempat yang tepat, dan menyimpan dua salinan hanya membuat
+salah satunya basi tanpa ketahuan.
 
-```
-[uji] penyimpanan: Cloudflare R2 (bucket: puskesmas-batu-licin)
-[uji] url = /api/media/file/logo_puskesmas.webp
-[uji] ada di disk lokal? false
-```
+| Bagian | Hasil | Rujukan |
+| --- | --- | --- |
+| A. Verifikasi R2 | `R2_ENDPOINT` dibetulkan, `pnpm build` lolos, uji unggah masuk bucket dan tidak menyentuh disk lokal. Berkas ujinya sudah dihapus lagi. **Belum diuji lewat antarmuka `/dashboard/media`.** | README bagian "Penyimpanan berkas", `src/lib/penyimpanan.ts` |
+| B. 5 modul dashboard | Layanan, Posyandu, Fasilitas, Struktur Organisasi, Pengaduan — semuanya bisa disunting staf dan sudah ada di menu | `docs/DASHBOARD.md` §3 dan §10 |
+| C. Sertifikat | Bagian 11 seed mengunggah 9 foto piagam sekaligus menautkannya; idempoten dan melewat dengan tenang bila folder sumbernya tidak ada | `src/seed/index.ts` |
 
-Berkas ujinya sudah dihapus lagi dari bucket dan dari Galeri Gambar.
-
-⚠️ **Belum diuji lewat antarmuka:** unggah satu gambar dari `/dashboard/media`
-dan pastikan pratinjaunya tampil — itu yang membuktikan `/api/media/...`
-melayani berkas dari R2, bukan hanya menuliskannya.
-
----
-
-## B. Modul dashboard untuk 5 koleksi baru — ✅ SELESAI
-
-Kelimanya sudah bisa disunting staf, menunya sudah muncul di grup **Data
-Layanan**, dan masing-masing punya `loading.tsx`.
-
-| # | Modul | Rute | Catatan |
-| --- | --- | --- | --- |
-| B1 | Layanan | `/dashboard/layanan` | Relasi `induk` ke dirinya sendiri lewat tipe field `relasi` |
-| B2 | Posyandu | `/dashboard/posyandu` | `relasiBanyak` ke layanan + `daftar` untuk jadwal |
-| B3 | Fasilitas | `/dashboard/fasilitas` | Paling sederhana |
-| B4 | Struktur Organisasi | `/dashboard/struktur-organisasi` | Tabel diurutkan mengikuti bagan, bukan abjad; tahan data atasan melingkar |
-| B5 | Pengaduan | `/dashboard/pengaduan` | Bukan CRUD — baca lalu tanggapi (status + tanggapan) |
-
-`KoleksiSederhana` bertambah tiga tipe field (`relasi`, `relasiBanyak`,
-`daftar`) dan `buatAksiCrud` bertambah `kosongkanJadiNull` — tanpa yang terakhir,
-relasi atau foto yang sudah terisi tidak pernah bisa dilepas lagi (gagal tanpa
-pesan galat: tombol Simpan sukses, nilainya tetap).
-
-**Sengaja tidak disentuh:** `pathRevalidate` di modul-modul ini hanya menyebut
-rute `/dashboard/...`, tidak menyebut rute situs publik. Halaman publiknya
-digarap di branch lain; `tagRevalidate` sudah cukup membuat halaman itu ikut
-tersegar begitu ada.
-
-**Yang belum:** aksi simpan/hapus tiap modul baru diuji lewat skema validasinya,
-belum dicoba dengan tangan di browser. Layak dicek sekali sebelum go-live.
-
----
-
-## C. Sertifikat & penghargaan — ✅ SELESAI
-
-Bagian 11 di `src/seed/index.ts` sekarang mengunggah 9 foto piagam dari
-`data/Sertifikat/` sekaligus menautkannya — tidak perlu mencocokkan nama berkas
-dengan tangan. Sudah dijalankan: 9 dokumen `certificates` terbentuk, fotonya ada
-di R2.
-
-Idempoten, dan **melewat dengan tenang** kalau folder `data/Sertifikat/` tidak
-ada (mis. saat seed jalan di container) — berhenti dengan galat akan
-menggagalkan sepuluh bagian lain yang tidak ada hubungannya.
+**Sisa dari B yang belum dikerjakan:** aksi simpan/hapus tiap modul sudah diuji
+QA (lihat `.gstack/qa-reports/`), tapi peran *admin unit* belum dicoba dengan
+tangan pada alur tulis artikel.
 
 ---
 
@@ -138,6 +96,10 @@ Sudah ada kontraknya (`docs/KONTRAK-DATA.md`), tinggal dibangun. Yang perlu Anda
 sampaikan kepadanya:
 
 - Baca `docs/KONTRAK-DATA.md` **sebelum** menulis halaman pertama
+- Kontrak REST lengkap ada di `public/openapi.yaml`, bisa dibuka sebagai Swagger
+  UI di `http://localhost:3000/api-docs.html` selagi `pnpm dev` jalan. Itu untuk
+  aplikasi lain dan untuk formulir yang benar-benar mengirim dari browser —
+  **bukan** untuk halaman biasa, yang tetap membaca lewat `src/lib/konten/`
 - Jangan `getPayload` langsung, jangan `force-dynamic`, jangan fetch dari client
 - Contoh acuan yang sudah jadi: `(frontend)/layout.tsx` → `Footer` (server
   component mengambil data, komponen klien menerima lewat props)
