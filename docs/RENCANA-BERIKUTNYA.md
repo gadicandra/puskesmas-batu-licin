@@ -1,26 +1,37 @@
 # Rencana Sesi Berikutnya
 
-Dokumen ini ditulis di akhir sesi 1 September 2026 supaya pekerjaan bisa
-dilanjutkan tanpa mengulang penelusuran. Kerjakan berurutan — bagian A memblokir
-yang lain.
+Dokumen ini ditulis di akhir sesi 1 September 2026 dan diperbarui 2 September
+2026, supaya pekerjaan bisa dilanjutkan tanpa mengulang penelusuran.
+
+Bagian **A, B, dan C sudah selesai** — riwayatnya ditinggalkan di bawah karena
+memuat hasil verifikasi yang tidak perlu diulang. Yang tersisa: **D** (data yang
+perlu dikonfirmasi ke Puskesmas), **E** (pembersihan kode mati, menunggu
+keputusan Anda), **F** (halaman publik, bagian teman Anda), **G** (push & PR).
 
 **Cara memulai sesi berikutnya:** buka Claude Code di folder proyek, lalu minta
-_"baca docs/RENCANA-BERIKUTNYA.md dan kerjakan bagian A"_.
+_"baca docs/RENCANA-BERIKUTNYA.md dan kerjakan bagian E"_.
 
 ---
 
 ## Keadaan saat ini
 
-Branch: **`feat/lapisan-data.adi`** — 8 commit **belum ter-push**.
+Diperbarui **2 September 2026**. Branch: **`feat/lapisan-data.adi`** — commit lama
+belum ter-push, ditambah pekerjaan sesi ini yang belum di-commit.
 
 Yang sudah jalan dan terverifikasi:
 
 - `docker compose up` menyalakan Postgres + aplikasi, migrasi otomatis, siap ±10 detik
 - Lapisan kontrak `src/lib/konten/` — 18 fungsi baca ber-cache (lihat `docs/KONTRAK-DATA.md`)
-- Seed idempoten: 93 layanan, 68 nakes, 6 dokter, 68 sarana, 32 jabatan, 24 angka pelayanan, profil, jam SK
+- Seed idempoten: 93 layanan, 68 nakes, 6 dokter, 68 sarana, 32 jabatan, 24 angka
+  pelayanan, **9 sertifikat beserta fotonya**, profil, jam SK
 - Login Google + login kata sandi
-- Kerangka pemuatan (`loading.tsx`) di 13 halaman dashboard, kursor tombol diperbaiki
-- Penyimpanan berkas: disk lokal atau Cloudflare R2, dipilih otomatis dari `.env`
+- Kerangka pemuatan (`loading.tsx`) di 18 halaman dashboard + **`PemuatLayar`**,
+  kotak berputar di tengah layar saat pindah halaman dan saat menyimpan
+  (`docs/DASHBOARD.md` §7)
+- **Penyimpanan Cloudflare R2 terverifikasi dengan kredensial sungguhan** —
+  unggahan masuk ke bucket, tidak tersentuh disk lokal
+- **Modul dashboard lengkap** untuk Layanan, Posyandu, Fasilitas, Struktur
+  Organisasi, dan Pengaduan
 
 Berkas yang belum di-commit (sengaja, menunggu keputusan): 4 berkas sumber di
 `data/` berukuran ±4,7 MB (`Sertifikat/`, `StrukturOrganisasiMaster.png`,
@@ -28,111 +39,63 @@ Berkas yang belum di-commit (sengaja, menunggu keputusan): 4 berkas sumber di
 
 ---
 
-## A. Verifikasi R2 dengan kredensial sungguhan
+## A. Verifikasi R2 — ✅ SELESAI (2 September 2026)
 
-### A0. WAJIB LEBIH DULU — betulkan `R2_ENDPOINT` di `.env`
-
-Nilai yang terisi sekarang **memuat nama bucket di belakangnya**, dan itu
-membuat `pnpm build` gagal:
+`R2_ENDPOINT` sudah dibetulkan (tidak lagi memuat nama bucket), `pnpm build`
+lolos, dan uji unggah lewat Local API memberi hasil yang diharapkan:
 
 ```
-Error: R2_ENDPOINT tidak boleh memuat nama bucket.
-Buang "/puskesmas-batu-licin" dari akhirnya.
+[uji] penyimpanan: Cloudflare R2 (bucket: puskesmas-batu-licin)
+[uji] url = /api/media/file/logo_puskesmas.webp
+[uji] ada di disk lokal? false
 ```
 
-Buang bagian `/puskesmas-batu-licin` dari ujung `R2_ENDPOINT` sehingga berhenti
-di `.r2.cloudflarestorage.com`. Nama bucket tetap diisi terpisah di `R2_BUCKET`.
+Berkas ujinya sudah dihapus lagi dari bucket dan dari Galeri Gambar.
 
-Ini kesalahan yang wajar: halaman bucket di Cloudflare memang menampilkan
-alamat "S3 API" yang sudah memuat nama bucket. Kalau dipakai apa adanya, AWS SDK
-menambahkan nama bucket sekali lagi dan semua unggahan gagal — karena itu
-ditolak lebih awal, saat aplikasi menyala, bukan diam-diam saat staf mengunggah.
-
-Sesudah dibetulkan, `rm -rf .next && pnpm build` harus lolos.
-
-### A1. Uji unggah
-
-1. Nyalakan DB: `docker compose up -d db`
-2. Jalankan uji unggah:
-
-   ```bash
-   cat > src/seed/uji-unggah.ts <<'EOF'
-   import { getPayload } from 'payload'
-   import config from '@payload-config'
-   import { ringkasanPenyimpanan } from '../lib/penyimpanan'
-   import path from 'path'
-   import fs from 'fs'
-
-   const payload = await getPayload({ config })
-   console.log('[uji] penyimpanan:', ringkasanPenyimpanan())
-
-   const doc = await payload.create({
-       collection: 'media',
-       data: { alt: 'Uji unggah R2' },
-       filePath: path.resolve('public/logo_puskesmas.webp'),
-       overrideAccess: true,
-   })
-   console.log('[uji] url =', doc.url, '| filename =', doc.filename)
-   console.log('[uji] ada di disk lokal?', fs.existsSync(path.resolve('media', doc.filename as string)))
-   process.exit(0)
-   EOF
-   pnpm payload run src/seed/uji-unggah.ts
-   rm src/seed/uji-unggah.ts
-   ```
-
-3. **Yang diharapkan:** mode terbaca `Cloudflare R2 (bucket: ...)`, tidak ada
-   galat, `ada di disk lokal? false`, dan berkasnya muncul di bucket R2 di
-   dashboard Cloudflare.
-4. Buka `/dashboard/media`, unggah satu gambar lewat antarmuka, pastikan
-   pratinjaunya tampil (membuktikan `/api/media/...` melayani berkas dari R2).
-5. Kalau gagal: `endpointR2()` di `src/lib/penyimpanan.ts` sudah menolak endpoint
-   yang memuat nama bucket dan menyebutkan bagian yang harus dibuang. Galat lain
-   yang mungkin: kredensial salah ketik, atau token dibuat dengan izin
-   *Admin Read & Write* alih-alih *Object Read & Write*.
-
-**Setelah berhasil**, pindahkan 9 foto piagam di `data/Sertifikat/` ke Galeri
-Gambar lewat `/dashboard/media`, lalu lanjut ke bagian C.
+⚠️ **Belum diuji lewat antarmuka:** unggah satu gambar dari `/dashboard/media`
+dan pastikan pratinjaunya tampil — itu yang membuktikan `/api/media/...`
+melayani berkas dari R2, bukan hanya menuliskannya.
 
 ---
 
-## B. Modul dashboard untuk 5 koleksi baru — paling memblokir
+## B. Modul dashboard untuk 5 koleksi baru — ✅ SELESAI
 
-Koleksi, data, dan fungsi tarik-datanya sudah ada, **tapi staf belum bisa
-menyuntingnya** karena belum ada formulir di dashboard. Ini yang paling mendesak.
+Kelimanya sudah bisa disunting staf, menunya sudah muncul di grup **Data
+Layanan**, dan masing-masing punya `loading.tsx`.
 
-Template: salin `src/app/dashboard/(app)/vaksin/` (pola `KoleksiSederhana`).
-Langkahnya ada di `CLAUDE.md` bagian "Adding a simple collection module".
-
-| # | Modul | Koleksi | Catatan |
+| # | Modul | Rute | Catatan |
 | --- | --- | --- | --- |
-| B1 | **Layanan** | `services` | Perlu penanganan `induk` (relasi ke dirinya sendiri) — `KoleksiSederhana` belum mendukung relasi, kemungkinan perlu form khusus |
-| B2 | **Posyandu** | `posyandu` | Relasi banyak-ke-banyak ke `services` + array jadwal |
-| B3 | **Fasilitas** | `facilities` | Paling sederhana, paling cocok dikerjakan lebih dulu sebagai pemanasan |
-| B4 | **Struktur Organisasi** | `org-chart` | Relasi `atasan` ke dirinya sendiri |
-| B5 | **Pengaduan** | `complaints` | **Bukan CRUD** — alurnya baca lalu tanggapi (ubah status + isi tanggapan). Butuh form tersendiri |
+| B1 | Layanan | `/dashboard/layanan` | Relasi `induk` ke dirinya sendiri lewat tipe field `relasi` |
+| B2 | Posyandu | `/dashboard/posyandu` | `relasiBanyak` ke layanan + `daftar` untuk jadwal |
+| B3 | Fasilitas | `/dashboard/fasilitas` | Paling sederhana |
+| B4 | Struktur Organisasi | `/dashboard/struktur-organisasi` | Tabel diurutkan mengikuti bagan, bukan abjad; tahan data atasan melingkar |
+| B5 | Pengaduan | `/dashboard/pengaduan` | Bukan CRUD — baca lalu tanggapi (status + tanggapan) |
 
-Setelah tiap modul jadi:
+`KoleksiSederhana` bertambah tiga tipe field (`relasi`, `relasiBanyak`,
+`daftar`) dan `buatAksiCrud` bertambah `kosongkanJadiNull` — tanpa yang terakhir,
+relasi atau foto yang sudah terisi tidak pernah bisa dilepas lagi (gagal tanpa
+pesan galat: tombol Simpan sukses, nilainya tetap).
 
-- Tambahkan `tagRevalidate: [TAG.x]` di `actions.ts`-nya, jika tidak halaman
-  publik tidak akan ikut berubah saat admin menyimpan
-- Menu **Pengaduan** sudah terlanjur ada di `components/dashboard/shell/menu.ts:36`
-  dan sekarang menghasilkan 404 — aktif otomatis begitu B5 selesai
-- Tambahkan menu untuk B1–B4 di berkas yang sama
-- Buat `loading.tsx` (salin dari `dokter/loading.tsx`)
+**Sengaja tidak disentuh:** `pathRevalidate` di modul-modul ini hanya menyebut
+rute `/dashboard/...`, tidak menyebut rute situs publik. Halaman publiknya
+digarap di branch lain; `tagRevalidate` sudah cukup membuat halaman itu ikut
+tersegar begitu ada.
+
+**Yang belum:** aksi simpan/hapus tiap modul baru diuji lewat skema validasinya,
+belum dicoba dengan tangan di browser. Layak dicek sekali sebelum go-live.
 
 ---
 
-## C. Sertifikat & penghargaan
+## C. Sertifikat & penghargaan — ✅ SELESAI
 
-Teks 9 piagam sudah disalin ke `src/seed/data/sertifikat.ts` tapi **belum
-di-seed**: field `berkas` wajib berisi unggahan.
+Bagian 11 di `src/seed/index.ts` sekarang mengunggah 9 foto piagam dari
+`data/Sertifikat/` sekaligus menautkannya — tidak perlu mencocokkan nama berkas
+dengan tangan. Sudah dijalankan: 9 dokumen `certificates` terbentuk, fotonya ada
+di R2.
 
-1. Unggah 9 foto dari `data/Sertifikat/` lewat `/dashboard/media` (butuh A selesai)
-2. Tulis bagian seed yang mencocokkan `berkasSumber` di
-   `src/seed/data/sertifikat.ts` dengan `filename` di koleksi `media`, lalu
-   membuat dokumen `certificates`
-3. Alternatif yang lebih rapi: buat skrip sekali-jalan yang mengunggah sekaligus
-   menautkan, supaya tidak perlu mencocokkan nama berkas secara manual
+Idempoten, dan **melewat dengan tenang** kalau folder `data/Sertifikat/` tidak
+ada (mis. saat seed jalan di container) — berhenti dengan galat akan
+menggagalkan sepuluh bagian lain yang tidak ada hubungannya.
 
 ---
 
