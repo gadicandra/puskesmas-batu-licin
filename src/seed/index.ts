@@ -11,6 +11,7 @@ import { FASILITAS } from './data/fasilitas'
 import { STRUKTUR, type SimpulSeed } from './data/struktur-organisasi'
 import { ANGKA_PELAYANAN, PERIODE, SUMBER, TOTAL_KUNJUNGAN } from './data/angka-pelayanan'
 import { SERTIFIKAT } from './data/sertifikat'
+import { r2Aktif, unduhDariR2 } from '../lib/penyimpanan'
 
 /**
  * Pengisian data awal database.
@@ -268,26 +269,50 @@ async function seed() {
     // Satu-satunya bagian seed yang ikut MENGUNGGAH berkas. Field `berkas`
     // wajib terisi, jadi teks piagam tidak ada gunanya tanpa fotonya; dan
     // mencocokkan sendiri 9 nama berkas lewat /dashboard/media adalah pekerjaan
-    // yang mudah keliru. `payload.create({ filePath })` menempuh jalur unggah
-    // yang sama dengan dashboard, jadi validasi tipe dan ukurannya tetap
-    // berlaku, dan berkasnya masuk ke penyimpanan yang sedang aktif (disk lokal
-    // atau R2) tanpa perlakuan khusus.
+    // yang mudah keliru.
+    //
+    // Sumber fotonya dicari berurutan:
+    //
+    //   1. `data/Sertifikat/` di komputer ini — jalur pertama, dipakai saat
+    //      berkas aslinya memang ada.
+    //   2. Bucket R2, kalau `.env` mengisi keempat `R2_*`. Foto piagamnya 8,4 MB
+    //      sehingga sengaja tidak ikut di repo, TAPI salinannya sudah ada di
+    //      bucket. Tanpa jalur ini, setiap anggota tim harus menunggu kiriman
+    //      folder lewat Drive setiap kali database-nya dibuat ulang.
+    //   3. Menyerah dengan tenang — lihat di bawah.
     const { totalDocs: jumlahSertifikat } = await payload.count({ collection: 'certificates' })
     if (jumlahSertifikat === 0) {
         const dirSumber = path.resolve(process.cwd(), 'data/Sertifikat')
+        const adaFolderLokal = fs.existsSync(dirSumber)
 
-        // Foto piagam ±4,7 MB dan tidak ikut di-commit, jadi folder ini WAJAR
-        // tidak ada — mis. saat seed jalan di container atau di komputer lain.
-        // Seed hanya melewatinya; berhenti dengan galat akan menggagalkan
-        // sembilan bagian lain yang tidak ada hubungannya.
-        if (!fs.existsSync(dirSumber)) {
-            catat('folder data/Sertifikat tidak ada — sertifikat dilewati')
+        if (!adaFolderLokal && !r2Aktif()) {
+            // WAJAR terjadi: komputer tanpa kredensial R2 dan tanpa folder
+            // sumbernya. Berhenti dengan galat akan menggagalkan sepuluh bagian
+            // lain yang tidak ada hubungannya, jadi cukup dilewati — dengan
+            // pesan yang menyebutkan dua jalan keluarnya sekaligus.
+            catat(
+                'sertifikat dilewati — tidak ada folder data/Sertifikat dan R2 belum dikonfigurasi. ' +
+                    'Isi R2_* di .env (fotonya sudah ada di bucket) atau minta foldernya ke pemilik repo.',
+            )
         } else {
             let dibuat = 0
+            let dariR2 = 0
+
             for (const s of SERTIFIKAT) {
-                const berkasSumber = path.join(dirSumber, s.berkasSumber)
-                if (!fs.existsSync(berkasSumber)) {
-                    catat(`foto "${s.berkasSumber}" tidak ada — "${s.judul}" dilewati`)
+                const berkasLokal = path.join(dirSumber, s.berkasSumber)
+
+                let isi: Buffer | null = null
+                if (adaFolderLokal && fs.existsSync(berkasLokal)) {
+                    isi = fs.readFileSync(berkasLokal)
+                } else {
+                    // Nama berkas di bucket sama dengan nama aslinya — itulah
+                    // yang dipakai Payload sebagai kunci objek saat mengunggah.
+                    isi = await unduhDariR2(s.berkasSumber)
+                    if (isi) dariR2++
+                }
+
+                if (!isi) {
+                    catat(`foto "${s.berkasSumber}" tidak ada di folder maupun R2 — "${s.judul}" dilewati`)
                     continue
                 }
 
@@ -308,7 +333,14 @@ async function seed() {
                     (await payload.create({
                         collection: 'media',
                         data: { alt: s.judul },
-                        filePath: berkasSumber,
+                        // Dikirim sebagai buffer, bukan `filePath`: isinya bisa
+                        // datang dari R2 dan tidak selalu ada di disk.
+                        file: {
+                            data: isi,
+                            name: s.berkasSumber,
+                            mimetype: 'image/jpeg',
+                            size: isi.byteLength,
+                        },
                         overrideAccess: true,
                     }))
 
@@ -326,7 +358,9 @@ async function seed() {
                 })
                 dibuat++
             }
-            catat(`${dibuat} sertifikat/penghargaan dibuat beserta fotonya`)
+
+            const asal = dariR2 > 0 ? ` (${dariR2} foto diambil dari R2)` : ''
+            catat(`${dibuat} sertifikat/penghargaan dibuat beserta fotonya${asal}`)
         }
     } else {
         catat(`sertifikat sudah ada (${jumlahSertifikat}) — dilewati`)

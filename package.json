@@ -13,6 +13,7 @@
     "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/index.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1123.0",
     "@payloadcms/db-postgres": "^3.72.0",
     "@payloadcms/next": "^3.72.0",
     "@payloadcms/richtext-lexical": "^3.72.0",

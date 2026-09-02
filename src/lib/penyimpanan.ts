@@ -103,3 +103,37 @@ export function ringkasanPenyimpanan(): string {
     const kurang = r2Kurang()
     return `disk lokal <project>/media — R2 nonaktif (${kurang.length} variabel belum diisi: ${kurang.join(', ')})`
 }
+
+/**
+ * Ambil satu berkas dari bucket R2 sebagai buffer.
+ *
+ * Dipakai seed sertifikat: foto piagamnya berat (8,4 MB untuk sembilan berkas)
+ * sehingga tidak ikut di repo, tapi salinannya sudah ada di R2. Daripada setiap
+ * anggota tim mengirim-kirim folder itu lewat Drive tiap kali database dibuat
+ * ulang, seed mengambilnya sendiri dari bucket.
+ *
+ * `null` bila berkasnya tidak ada atau R2 tidak terkonfigurasi — pemanggilnya
+ * harus tetap jalan tanpa itu, bukan berhenti dengan galat.
+ */
+export async function unduhDariR2(namaBerkas: string): Promise<Buffer | null> {
+    if (!r2Aktif()) return null
+
+    // Diimpor di dalam fungsi supaya AWS SDK hanya dimuat kalau benar-benar
+    // dipakai — seed di komputer tanpa R2 tidak perlu menanggung biayanya.
+    const { S3Client, GetObjectCommand } = await import('@aws-sdk/client-s3')
+    const s3 = new S3Client(konfigurasiR2())
+
+    try {
+        const hasil = await s3.send(
+            new GetObjectCommand({ Bucket: namaBucketR2(), Key: namaBerkas }),
+        )
+        const isi = await hasil.Body?.transformToByteArray()
+        return isi ? Buffer.from(isi) : null
+    } catch {
+        // Termasuk NoSuchKey. Sengaja tidak dibedakan: bagi pemanggilnya,
+        // "tidak ada" dan "gagal diambil" sama-sama berarti lewati saja.
+        return null
+    } finally {
+        s3.destroy()
+    }
+}

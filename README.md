@@ -41,11 +41,18 @@ ada. Yang terisi:
 Akun awal: `admin@puskesmas.local` / `puskesmas123`
 (ubah lewat `SEED_ADMIN_EMAIL` dan `SEED_ADMIN_PASSWORD` di `.env`).
 
-> **Sertifikat & penghargaan tidak ikut terisi.** Seed akan mencetak
-> `folder data/Sertifikat tidak ada — sertifikat dilewati` lalu melanjutkan.
-> Sembilan foto piagamnya berukuran 8,4 MB dan sengaja tidak ikut di repo.
-> Minta foldernya ke pemilik repo, taruh sebagai `data/Sertifikat/`, lalu
-> jalankan seed sekali lagi — bagian yang sudah terisi tidak akan tergandakan.
+> **Sertifikat & penghargaan butuh satu syarat tambahan.** Sembilan foto
+> piagamnya berukuran 8,4 MB dan sengaja tidak ikut di repo, tapi salinannya
+> sudah ada di bucket R2. Seed mencarinya berurutan:
+>
+> 1. folder `data/Sertifikat/` di komputer Anda, kalau ada;
+> 2. **bucket R2**, kalau `.env` sudah mengisi keempat `R2_*` — foto diunduh
+>    sendiri, Anda tidak perlu meminta folder apa pun;
+> 3. kalau dua-duanya tidak ada, bagian ini dilewati dengan pesan yang
+>    menyebutkan kedua jalan keluarnya. Sepuluh bagian seed lainnya tetap jalan.
+>
+> Jadi: isi `R2_*` di `.env` (lihat bagian "Penyimpanan berkas") dan sertifikat
+> ikut terisi otomatis.
 
 Masuk lewat **http://localhost:3000/dashboard**. Kalau belum ada akun sama
 sekali, `/dashboard/setup` akan memandu membuat Super Admin pertama.
