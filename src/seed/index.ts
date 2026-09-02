@@ -1,5 +1,7 @@
 import { getPayload, type Payload } from 'payload'
 import config from '@payload-config'
+import path from 'path'
+import fs from 'fs'
 import { JADWAL_SK, CATATAN_SK } from './data/jam-pelayanan'
 import { IDENTITAS } from './data/identitas'
 import { LAYANAN, type LayananSeed } from './data/layanan'
@@ -8,6 +10,7 @@ import { PROFIL } from './data/profil'
 import { FASILITAS } from './data/fasilitas'
 import { STRUKTUR, type SimpulSeed } from './data/struktur-organisasi'
 import { ANGKA_PELAYANAN, PERIODE, SUMBER, TOTAL_KUNJUNGAN } from './data/angka-pelayanan'
+import { SERTIFIKAT } from './data/sertifikat'
 
 /**
  * Pengisian data awal database.
@@ -261,14 +264,77 @@ async function seed() {
         catat(`angka pelayanan sudah ada (${jumlahAngka}) — dilewati`)
     }
 
+    // --- 11. Sertifikat & penghargaan ------------------------------------
+    // Satu-satunya bagian seed yang ikut MENGUNGGAH berkas. Field `berkas`
+    // wajib terisi, jadi teks piagam tidak ada gunanya tanpa fotonya; dan
+    // mencocokkan sendiri 9 nama berkas lewat /dashboard/media adalah pekerjaan
+    // yang mudah keliru. `payload.create({ filePath })` menempuh jalur unggah
+    // yang sama dengan dashboard, jadi validasi tipe dan ukurannya tetap
+    // berlaku, dan berkasnya masuk ke penyimpanan yang sedang aktif (disk lokal
+    // atau R2) tanpa perlakuan khusus.
+    const { totalDocs: jumlahSertifikat } = await payload.count({ collection: 'certificates' })
+    if (jumlahSertifikat === 0) {
+        const dirSumber = path.resolve(process.cwd(), 'data/Sertifikat')
+
+        // Foto piagam ±4,7 MB dan tidak ikut di-commit, jadi folder ini WAJAR
+        // tidak ada — mis. saat seed jalan di container atau di komputer lain.
+        // Seed hanya melewatinya; berhenti dengan galat akan menggagalkan
+        // sembilan bagian lain yang tidak ada hubungannya.
+        if (!fs.existsSync(dirSumber)) {
+            catat('folder data/Sertifikat tidak ada — sertifikat dilewati')
+        } else {
+            let dibuat = 0
+            for (const s of SERTIFIKAT) {
+                const berkasSumber = path.join(dirSumber, s.berkasSumber)
+                if (!fs.existsSync(berkasSumber)) {
+                    catat(`foto "${s.berkasSumber}" tidak ada — "${s.judul}" dilewati`)
+                    continue
+                }
+
+                // `alt` dipakai sebagai penanda: kalau unggahan sebelumnya
+                // berhasil tapi pembuatan dokumen sertifikatnya gagal, jalan
+                // kedua memakai ulang gambar yang sudah ada, bukan
+                // menggandakannya di Galeri Gambar.
+                const sudahAda = await payload.find({
+                    collection: 'media',
+                    where: { alt: { equals: s.judul } },
+                    limit: 1,
+                    depth: 0,
+                    overrideAccess: true,
+                })
+
+                const gambar =
+                    sudahAda.docs[0] ??
+                    (await payload.create({
+                        collection: 'media',
+                        data: { alt: s.judul },
+                        filePath: berkasSumber,
+                        overrideAccess: true,
+                    }))
+
+                await payload.create({
+                    collection: 'certificates',
+                    data: {
+                        judul: s.judul,
+                        jenis: s.jenis,
+                        penerbit: s.penerbit,
+                        tanggal: s.tanggal,
+                        keterangan: s.keterangan,
+                        berkas: gambar.id,
+                    },
+                    overrideAccess: true,
+                })
+                dibuat++
+            }
+            catat(`${dibuat} sertifikat/penghargaan dibuat beserta fotonya`)
+        }
+    } else {
+        catat(`sertifikat sudah ada (${jumlahSertifikat}) — dilewati`)
+    }
+
     // --- Menunggu berkas berikutnya -------------------------------------
     // Belum di-seed:
     // - Posyandu: daftarnya belum tersedia dari Puskesmas.
-    // - Sertifikat: teksnya sudah disalin ke `data/sertifikat.ts`, tapi field
-    //   `berkas` wajib berisi unggahan. Foto piagam di `data/Sertifikat/` harus
-    //   masuk Galeri Gambar lewat /dashboard/media lebih dulu, baru datanya
-    //   ditautkan. Diunggah dari dashboard, bukan dari seed, supaya berkasnya
-    //   ikut tervalidasi (tipe, ukuran) seperti unggahan lain.
 
     catat('selesai.')
 }
