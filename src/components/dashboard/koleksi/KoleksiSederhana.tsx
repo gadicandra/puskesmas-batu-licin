@@ -47,6 +47,10 @@ export type SpesifikasiField = {
     /** Relasi ke koleksi yang sama: buang data yang sedang diubah dari daftar
      *  pilihan supaya tidak bisa dijadikan induk/atasan dirinya sendiri. */
     bukanDiriSendiri?: boolean
+    /** Khusus tipe `berkas`: berkasnya dokumen (sertifikat, piagam, surat),
+     *  jadi jendela unggah mencentang "simpan apa adanya" sejak awal dan
+     *  gambarnya tidak diubah ke WebP. */
+    pertahankanAsli?: boolean
     /** Tampilkan kolom ini di tabel daftar */
     diTabel?: boolean
     /** Kolom tabel saja — tidak ikut dirender di form. Dipakai untuk kolom
@@ -415,6 +419,7 @@ export default function KoleksiSederhana({
 
             {pemilihUntuk && (
                 <MediaPicker
+                    pertahankanAsli={fields.find((f) => f.nama === pemilihUntuk)?.pertahankanAsli}
                     onTutup={() => setPemilihUntuk(null)}
                     onPilih={(m) => {
                         setBerkasTerpilih((s) => ({ ...s, [pemilihUntuk]: m }))
