@@ -61,7 +61,7 @@ Port 3000 sudah dipakai? `APP_PORT=3100 docker compose up`.
 
 Semua variabel lingkungan sudah punya default yang aman untuk pengembangan, jadi
 `docker compose up` jalan tanpa `.env`. Ingin mengubah salah satunya (mis.
-mengaktifkan login Google)? `cp docs/env-contoh.txt .env` lalu sunting.
+mengaktifkan login Google)? `cp .env.example .env` lalu sunting.
 
 ### Perintah Docker sehari-hari
 
@@ -81,7 +81,7 @@ Butuh Node 22+, pnpm 10.24, dan Postgres 16.
 
 ```bash
 docker compose up -d db     # atau pakai Postgres yang sudah ada
-cp docs/env-contoh.txt .env # sesuaikan DATABASE_URL
+cp .env.example .env # sesuaikan DATABASE_URL
 pnpm install
 pnpm payload migrate
 pnpm seed
@@ -240,8 +240,7 @@ folder milik container tidak bertabrakan dengan milik komputer — jangan diisi 
 | **`docs/KONTRAK-DATA.md`** | **Cara mengambil data untuk halaman publik — baca ini sebelum membuat halaman** |
 | `docs/DASHBOARD.md` | Acuan dashboard: aturan binding, prinsip UI, daftar halaman, login Google, penjaga rute, paginasi |
 | `public/openapi.yaml` | Kontrak REST lengkap (lihat di bawah) |
-| `docs/PROJECT_PLAN.md` | Rencana tim, jadwal mingguan, daftar utang teknis |
-| `docs/RENCANA-BERIKUTNYA.md` | Sisa pekerjaan yang sudah ditelusuri, siap dilanjutkan |
+| `docs/PROJECT_PLAN.md` | Rencana tim, jadwal mingguan, utang teknis, jebakan yang gagal tanpa pesan galat |
 | `PRODUCT.md` | Brief produk & desain |
 | `CLAUDE.md` | Panduan arsitektur untuk asisten AI |
 
