@@ -62,6 +62,22 @@ export const Doctors: CollectionConfig = {
             type: 'textarea',
             admin: { description: 'Perkenalan singkat yang tampil di halaman profil dokter.' },
         },
+        {
+            // Relasi sungguhan ke koleksi `services`, bukan menumpang `poli`.
+            // `poli` adalah daftar select statis di lib/units.ts yang tidak
+            // punya slug dan tidak sinkron dengan isi `services`; memetakannya
+            // lewat kecocokan nama akan diam-diam mengosongkan "Tim Dokter" di
+            // halaman layanan begitu ada nama yang diubah.
+            name: 'layanan',
+            type: 'relationship',
+            relationTo: 'services',
+            hasMany: true,
+            label: 'Bertugas di layanan',
+            admin: {
+                description:
+                    'Dokter akan tampil di halaman layanan yang dipilih. Boleh lebih dari satu.',
+            },
+        },
         { name: 'aktif', type: 'checkbox', defaultValue: true },
         poliField,
     ],

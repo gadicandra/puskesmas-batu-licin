@@ -44,7 +44,16 @@ export const skemaDokter = z.object({
     nama: teksWajib('Nama dokter belum diisi.'),
     spesialisasi: teksWajib('Spesialisasi belum diisi.'),
     foto: z.coerce.number().int().positive().optional().nullable(),
-    jadwalPraktik: z.string().trim().optional(),
+    layanan: daftarJson(z.coerce.number().int().positive()),
+    jadwalPraktik: daftarJson(
+        z.object({
+            hari: z.enum(['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'], {
+                message: 'Ada baris jadwal yang harinya belum dipilih. Pilih hari atau hapus barisnya.',
+            }),
+            jamMulai: teksWajib('Ada baris jadwal yang jam mulainya masih kosong. Isi atau hapus barisnya.'),
+            jamSelesai: teksWajib('Ada baris jadwal yang jam selesainya masih kosong. Isi atau hapus barisnya.'),
+        }),
+    ),
     poli: z.string().trim().optional(),
     aktif: z.boolean().optional(),
 })
@@ -109,6 +118,7 @@ export const skemaLayanan = z.object({
     induk: relasiOpsional,
     jadwal: z.string().trim().nullish(),
     kategori: pilihanWajib(['dalam-gedung', 'luar-gedung', 'posyandu'], 'Kategori belum dipilih. Pilih salah satu.'),
+    gambar: z.coerce.number().int().positive().optional().nullable(),
     deskripsi: z.string().trim().nullish(),
     persyaratan: daftarJson(
         z.object({ isi: z.string().trim().min(1, 'Ada baris syarat yang masih kosong. Isi atau hapus barisnya.') }),

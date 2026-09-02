@@ -10,6 +10,7 @@ import Field from '@/components/dashboard/ui/Field'
 import Card from '@/components/dashboard/ui/Card'
 import EmptyState from '@/components/dashboard/ui/EmptyState'
 import { PaginasiUrl } from '@/components/dashboard/ui/Paginasi'
+import OpsiBerkasAsli from './OpsiBerkasAsli'
 import type { JumlahBaris } from '@/lib/dashboard/paginasi'
 
 const MAKS_UKURAN = 5_000_000
@@ -95,6 +96,9 @@ export default function GaleriMedia({
                     >
                         <Input id="alt" name="alt" required />
                     </Field>
+                    <div className="sm:col-span-2">
+                        <OpsiBerkasAsli />
+                    </div>
                     <div className="sm:col-span-2">
                         <Button type="submit" loading={pending} leftIcon={<Upload size={18} />}>
                             Unggah

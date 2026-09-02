@@ -8,10 +8,9 @@ const aksi = buatAksiCrud({
     collection: 'services',
     skema: skemaLayanan,
     // Posyandu ikut menampilkan nama layanan, jadi tag-nya ikut dibuang.
-    // Rute situs publik tidak disebut — digarap di branch lain; tag sudah cukup.
     pathRevalidate: ['/dashboard/layanan'],
     tagRevalidate: [TAG.layanan, TAG.posyandu],
-    kosongkanJadiNull: ['induk', 'jadwal', 'deskripsi'],
+    kosongkanJadiNull: ['induk', 'jadwal', 'deskripsi', 'gambar'],
     labelData: 'Layanan',
 })
 

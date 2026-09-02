@@ -64,8 +64,8 @@ Staf Puskesmas yang memakai dashboard ini belum pernah mendengar istilah "slug" 
 | Tulis/Ubah artikel | `/dashboard/artikel/baru`, `/[id]` | semua | Judul, pratinjau alamat halaman, ringkasan, editor WYSIWYG, sampul, kategori, tanggal. Bilah aksi menempel: Simpan · Terbitkan/Batalkan Terbit · Lihat di Situs · Hapus. Peringatan saat meninggalkan halaman dengan perubahan |
 | Galeri Gambar | `/dashboard/media` | semua | Unggah (validasi 5MB & tipe di browser dan server), `alt` wajib, panel detail, salin tautan, hapus dengan cek relasi |
 | Statistik | `/dashboard/statistik` | semua | 12 bulan, 7 hari, jam ramai, halaman terpopuler dengan nama yang bisa dibaca |
-| Dokter · Tenaga Medis · Vaksin · Sertifikat | `/dashboard/{dokter,tenaga-medis,vaksin,sertifikat}` | superadmin | Tabel + form inline, digerakkan `KoleksiSederhana` |
-| Layanan · Posyandu · Fasilitas | `/dashboard/{layanan,posyandu,fasilitas}` | superadmin | `KoleksiSederhana` juga, memakai tipe field baru: `relasi` (layanan induk), `relasiBanyak` (layanan di satu posyandu), `daftar` (syarat & jadwal berulang) |
+| Dokter · Tenaga Medis · Vaksin · Sertifikat | `/dashboard/{dokter,tenaga-medis,vaksin,sertifikat}` | superadmin | Tabel + form inline, digerakkan `KoleksiSederhana`. Dokter punya **jadwal praktik berbaris** (hari + jam mulai + jam selesai, tipe `daftar`) dan **relasi ke layanan** (`relasiBanyak`) yang menentukan halaman layanan mana yang menampilkannya di bagian "Tim Dokter" |
+| Layanan · Posyandu · Fasilitas | `/dashboard/{layanan,posyandu,fasilitas}` | superadmin | `KoleksiSederhana` juga, memakai tipe field baru: `relasi` (layanan induk), `relasiBanyak` (layanan di satu posyandu), `daftar` (syarat & jadwal berulang), `berkas` (foto layanan) |
 | Struktur Organisasi | `/dashboard/struktur-organisasi` | superadmin | `KoleksiSederhana` dengan relasi `atasan` ke koleksi yang sama. Tabelnya diurutkan mengikuti bagan (atasan lalu bawahannya), bukan abjad, dan **bisa dipersempit ke satu klaster** — lihat §10 |
 | Pengaduan | `/dashboard/pengaduan` | superadmin | **Bukan CRUD.** Daftar aduan yang bisa dibuka satu per satu; yang boleh diubah hanya status dan tanggapan — isi aduan dari warga tidak bisa disunting |
 | Pengaturan | `/dashboard/pengaturan` | superadmin | Jadwal jam pelayanan (+ tombol "Kembalikan ke Jadwal Resmi SK") dan informasi situs + media sosial |
@@ -77,6 +77,31 @@ Staf Puskesmas yang memakai dashboard ini belum pernah mendengar istilah "slug" 
 Judul, Sub-judul, daftar berpoin, daftar bernomor, kutipan, tautan, gambar, undo/redo.
 Sisip gambar membuka pemilih galeri, bukan isian URL. Konten disimpan sebagai HTML dan
 **disanitasi dua kali** — saat simpan dan saat render di halaman publik.
+
+**Jebakan `text-base`:** proyek ini mendefinisikan `--color-base` di `@theme inline`
+(`globals.css`), sehingga Tailwind memperlakukan `text-base` sebagai utilitas **warna**,
+bukan ukuran font 16px. Menulis `text-base` pada teks berarti mewarnainya dengan warna
+latar — teks putih di atas putih — dan ukuran fontnya tidak ikut berubah. Tulis
+`text-[16px]` bila yang dimaksud ukuran, termasuk pada input (16px mencegah iOS
+memperbesar halaman saat kolom disentuh).
+
+**Unggahan gambar otomatis jadi WebP.** `unggahMedia` memanggil `keWebp()`
+(`src/lib/gambar.ts`) sebelum berkasnya diserahkan ke Payload, jadi foto layanan, foto
+dokter, dan gambar artikel selalu tersimpan dalam format yang jauh lebih ringan —
+staf tidak perlu mengubahnya sendiri. Karena Payload menerima berkas yang sudah WebP,
+ukuran turunan (`thumbnail`, `card`) ikut WebP tanpa konfigurasi tambahan.
+
+Pengubahannya **tidak** memakai `upload.formatOptions` di koleksi `media`, walaupun itu
+cara bawaan Payload: `formatOptions` berlaku untuk seluruh koleksi, sedangkan `media`
+dipakai bersama-sama dengan pindaian sertifikat — dan sertifikat harus tetap dalam
+format aslinya karena diunduh dan dicetak. Payload tidak menyediakan cara mematikannya
+per unggahan.
+
+Perkecualiannya diatur lewat centang **"Ini berkas dokumen — simpan apa adanya"**
+(`OpsiBerkasAsli`, dipakai di Galeri Gambar dan di jendela Pilih Gambar). Form Sertifikat
+mencentangnya sejak awal lewat `pertahankanAsli: true` di spesifikasi field-nya, jadi
+staf tidak perlu mengingatnya. PDF dan SVG tidak pernah disentuh, dan bila hasil WebP-nya
+justru lebih besar daripada aslinya, yang asli yang disimpan.
 
 **Menambah modul koleksi baru:** tulis skema zod di `validation.ts`, `actions.ts` yang
 memanggil `buatAksiCrud`, dan satu halaman yang mengoper spesifikasi field ke

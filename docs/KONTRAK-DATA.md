@@ -55,12 +55,12 @@ tidak aktif serta mengurutkannya.
 | `ambilJamPelayanan()` | `jam-pelayanan.ts` | `JamPelayanan` — jadwal + catatan |
 | `ambilPengaturanSitus()` | `pengaturan-situs.ts` | `PengaturanSitus` — nama, alamat, telepon, nomor darurat, email, sosmed |
 | `ambilProfil()` | `profil.ts` | `ProfilPuskesmas` — visi, misi, motto, maklumat, budaya kerja, `kelembagaan` (kode, kepala, wilayah kerja) |
-| `ambilDokter()` | `dokter.ts` | `DokterPublik[]` — jadwal praktik sudah terurut Senin→Minggu |
+| `ambilDokter()` | `dokter.ts` | `DokterPublik[]` — jadwal praktik sudah terurut Senin→Minggu; `jadwalMingguan` berisi 7 baris lengkap (hari kosong ditandai `libur`), `layanan` berisi id layanan tempatnya bertugas |
 | `ambilNakes()` | `nakes.ts` | `NakesPublik[]` — 68 tenaga kesehatan, `jabatan` = jabatan fungsional lengkap |
-| `ambilLayanan()` | `layanan.ts` | `LayananPublik[]` — layanan **utama** saja (tanpa induk), untuk halaman daftar |
+| `ambilLayanan()` | `layanan.ts` | `LayananPublik[]` — layanan **utama** saja (tanpa induk), untuk halaman daftar; `gambar` berisi sampulnya bila ada |
 | `ambilLayananDalamGedung()` | `layanan.ts` | `LayananPublik[]` |
 | `ambilLayananLuarGedung()` | `layanan.ts` | `LayananPublik[]` |
-| `ambilLayananDetail(slug)` | `layanan.ts` | `LayananLengkap \| null` — satu layanan + sub-layanan bertingkat |
+| `ambilLayananDetail(slug)` | `layanan.ts` | `LayananLengkap \| null` — satu layanan + sub-layanan bertingkat + `dokter` (dokter layanan itu **dan** seluruh sub-layanannya) |
 | `ambilSlugLayanan()` | `layanan.ts` | `string[]` — untuk `generateStaticParams()` |
 | `ambilAngkaPelayanan(periode?)` | `angka-pelayanan.ts` | `AngkaPelayanan \| null` — 16.688 kunjungan 2025, 4 pengelompokan + persentase |
 | `ambilPosyandu()` | `posyandu.ts` | `PosyanduPublik[]` — termasuk daftar layanannya |
@@ -137,6 +137,29 @@ export default async function HalamanNakes() {
 }
 ```
 
+### Ukuran gambar: `src`, `srcKartu`, `srcMini`
+
+`GambarPublik` membawa tiga alamat, bukan satu:
+
+| Bidang | Isi | Dipakai untuk |
+| --- | --- | --- |
+| `src` | berkas asli, bisa 2500px | hero, gambar selebar layar |
+| `srcKartu` | potongan **potret** 768×1024 | kartu berbentuk potret |
+| `srcMini` | potongan **lanskap** 400×300 | petak kecil dan mendatar |
+
+Kedua turunan itu dibuat Payload saat berkasnya diunggah (`imageSizes` di
+koleksi `media`). Keduanya bisa `null` — untuk berkas lama, atau gambar yang
+memang lebih kecil dari ukuran turunannya — jadi **selalu sediakan cadangan**:
+
+```tsx
+<img src={gambar.srcKartu ?? gambar.src} alt={gambar.alt} />
+```
+
+Ini bukan penghematan yang bisa ditunda. Halaman `/layanan` sempat mengunduh
+**3,4 MB** gambar karena ke-19 kartunya memakai `src`, padahal tiap kartu hanya
+dirender selebar ~250px. Memakai berkas asli di petak kecil tidak membuatnya
+lebih tajam, hanya lebih lambat.
+
 ### Berkas yang bisa gambar atau PDF
 
 ```tsx
@@ -202,6 +225,18 @@ const layanan = await ambilLayananDalamGedung()
     </Link>
 ))}
 ```
+
+Halaman `/layanan` yang sebenarnya memakai `ambilLayanan()` (semua kategori) dan
+menyaringnya di peramban lewat `PencarianLayanan`. Penyaringan **tidak** boleh
+pindah ke server: itu memaksa halaman jadi dinamis, yang dilarang aturan §1.
+
+Halaman detail `/layanan/[slug]` memakai `ambilLayananDetail(slug)`. Selain
+sub-layanan, ia sudah membawa `dokter` — dokter yang ditautkan ke layanan itu
+**atau** ke salah satu keturunannya, sehingga halaman "Laboratorium" tetap
+menampilkan dokter yang hanya ditautkan ke "Pemeriksaan Serologi". Cache-nya
+ditandai `TAG.layanan` **dan** `TAG.dokter`; kalau suatu saat halaman ini ikut
+menampilkan data lain, tag data itu harus ikut ditambahkan — kalau tidak, admin
+menyimpan tapi halaman tidak berubah.
 
 ```tsx
 // app/(frontend)/layanan/[slug]/page.tsx

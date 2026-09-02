@@ -1,11 +1,24 @@
 import type { Media } from '@/payload-types'
 
-/** Bentuk gambar yang siap dipakai UI: `src` dan `alt` selalu ada. */
+/** Bentuk gambar yang siap dipakai UI: `src` dan `alt` selalu ada.
+ *
+ *  `src` adalah berkas aslinya — pakai untuk hero atau apa pun yang tampil
+ *  selebar layar. Untuk petak kecil, pakai turunan di bawah: berkas asli
+ *  berukuran 2500px yang dirender di kotak 250px membuat halaman berat tanpa
+ *  terlihat lebih tajam. Halaman daftar layanan sempat mengunduh 3,4 MB gambar
+ *  karena hal ini. */
 export type GambarPublik = {
     src: string
     alt: string
     lebar: number | null
     tinggi: number | null
+    /** Potongan **potret** 768×1024 buatan Payload — untuk kartu berbentuk
+     *  potret. `null` bila turunannya belum ada (berkas lama, atau gambar yang
+     *  lebih kecil dari itu). Pemakainya wajib menyediakan cadangan `src`. */
+    srcKartu: string | null
+    /** Potongan **lanskap** 400×300 — untuk petak kecil dan mendatar. Aturan
+     *  cadangan `src` sama seperti `srcKartu`. */
+    srcMini: string | null
 }
 
 /** Nilai field `upload` dari Payload sebelum diringkas.
@@ -32,6 +45,8 @@ export function ringkasGambar(nilai: NilaiUpload, altCadangan: string): GambarPu
         alt: nilai.alt?.trim() || altCadangan,
         lebar: nilai.width ?? null,
         tinggi: nilai.height ?? null,
+        srcKartu: nilai.sizes?.card?.url || null,
+        srcMini: nilai.sizes?.thumbnail?.url || null,
     }
 }
 

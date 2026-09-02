@@ -6,14 +6,19 @@ import { daftarMedia, unggahMedia, type MediaRingkas } from '@/app/dashboard/(ap
 import Button from '@/components/dashboard/ui/Button'
 import Input from '@/components/dashboard/ui/Input'
 import Field from '@/components/dashboard/ui/Field'
+import OpsiBerkasAsli from './OpsiBerkasAsli'
 
 /** Modal pilih gambar dari galeri, atau unggah baru tanpa meninggalkan halaman. */
 export default function MediaPicker({
     onPilih,
     onTutup,
+    pertahankanAsli = false,
 }: {
     onPilih: (media: MediaRingkas) => void
     onTutup: () => void
+    /** Centang awal "simpan apa adanya". Diisi oleh form yang tahu berkasnya
+     *  dokumen — mis. Sertifikat — supaya staf tidak perlu mengingatnya. */
+    pertahankanAsli?: boolean
 }) {
     const [docs, setDocs] = useState<MediaRingkas[]>([])
     const [cari, setCari] = useState('')
@@ -116,6 +121,7 @@ export default function MediaPicker({
                         >
                             <Input id="picker-alt" name="alt" required />
                         </Field>
+                        <OpsiBerkasAsli awal={pertahankanAsli} />
                         <Button type="submit" loading={pending} className="self-start">
                             Unggah Gambar
                         </Button>

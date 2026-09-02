@@ -264,6 +264,10 @@ export interface Doctor {
    * Perkenalan singkat yang tampil di halaman profil dokter.
    */
   deskripsi?: string | null;
+  /**
+   * Dokter akan tampil di halaman layanan yang dipilih. Boleh lebih dari satu.
+   */
+  layanan?: (number | Service)[] | null;
   aktif?: boolean | null;
   /**
    * Poli/unit layanan terkait.
@@ -286,6 +290,51 @@ export interface Doctor {
         | 'keuangan'
       )
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  nama: string;
+  /**
+   * Dikosongkan = dibuat otomatis dari judul.
+   */
+  slug?: string | null;
+  /**
+   * Kosongkan bila ini layanan utama. Isi bila ini rincian dari layanan lain.
+   */
+  induk?: (number | null) | Service;
+  /**
+   * Mis. "Senin–Kamis 08.00–11.00", "24 jam", "Sesuai Jadwal", "Jika ada kasus".
+   */
+  jadwal?: string | null;
+  kategori: 'dalam-gedung' | 'luar-gedung' | 'posyandu';
+  /**
+   * Tampil sebagai sampul di halaman Layanan. Boleh dikosongkan.
+   */
+  gambar?: (number | null) | Media;
+  /**
+   * Penjelasan singkat untuk warga. Hindari istilah medis yang tidak umum.
+   */
+  deskripsi?: string | null;
+  /**
+   * Mis. "Kartu BPJS", "KTP asli". Satu baris satu syarat.
+   */
+  persyaratan?:
+    | {
+        isi: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Angka lebih kecil tampil lebih dulu. Isi 0 bila tidak ingin diatur.
+   */
+  urutan?: number | null;
+  aktif?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -419,47 +468,6 @@ export interface PageView {
   path: string;
   referrer?: string | null;
   uaHash?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services".
- */
-export interface Service {
-  id: number;
-  nama: string;
-  /**
-   * Dikosongkan = dibuat otomatis dari judul.
-   */
-  slug?: string | null;
-  /**
-   * Kosongkan bila ini layanan utama. Isi bila ini rincian dari layanan lain.
-   */
-  induk?: (number | null) | Service;
-  /**
-   * Mis. "Senin–Kamis 08.00–11.00", "24 jam", "Sesuai Jadwal", "Jika ada kasus".
-   */
-  jadwal?: string | null;
-  kategori: 'dalam-gedung' | 'luar-gedung' | 'posyandu';
-  /**
-   * Penjelasan singkat untuk warga. Hindari istilah medis yang tidak umum.
-   */
-  deskripsi?: string | null;
-  /**
-   * Mis. "Kartu BPJS", "KTP asli". Satu baris satu syarat.
-   */
-  persyaratan?:
-    | {
-        isi: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Angka lebih kecil tampil lebih dulu. Isi 0 bila tidak ingin diatur.
-   */
-  urutan?: number | null;
-  aktif?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -806,6 +814,7 @@ export interface DoctorsSelect<T extends boolean = true> {
   pendidikan?: T;
   nomorSTR?: T;
   deskripsi?: T;
+  layanan?: T;
   aktif?: T;
   poli?: T;
   updatedAt?: T;
@@ -891,6 +900,7 @@ export interface ServicesSelect<T extends boolean = true> {
   induk?: T;
   jadwal?: T;
   kategori?: T;
+  gambar?: T;
   deskripsi?: T;
   persyaratan?:
     | T

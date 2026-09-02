@@ -5,6 +5,8 @@ import { getPayload, type Where } from 'payload'
 import config from '@payload-config'
 import { requireUser } from '@/lib/dashboard/auth'
 import { pesanError } from '@/lib/dashboard/errors'
+import { keWebp } from '@/lib/gambar'
+import { formatUkuran } from '@/lib/dashboard/format'
 
 export type MediaRingkas = {
     id: number
@@ -56,11 +58,16 @@ export async function daftarMedia(cari?: string, halaman = 1, perHalaman = 5) {
 export type UploadState = { error?: string; sukses?: string }
 
 /** Unggah satu berkas. Validasi ukuran & tipe dilakukan lagi di server —
- *  pemeriksaan di browser hanya untuk kenyamanan, bukan pengaman. */
+ *  pemeriksaan di browser hanya untuk kenyamanan, bukan pengaman.
+ *
+ *  Gambar diubah ke WebP di sini, sebelum diserahkan ke Payload — lihat
+ *  `src/lib/gambar.ts` untuk alasannya. Berkas dokumen (sertifikat, piagam)
+ *  dikecualikan lewat `pertahankanAsli`. */
 export async function unggahMedia(_prev: UploadState, formData: FormData): Promise<UploadState> {
     const user = await requireUser()
     const berkas = formData.get('file')
     const alt = String(formData.get('alt') || '').trim()
+    const pertahankanAsli = formData.get('pertahankanAsli') === '1'
 
     if (!(berkas instanceof File) || berkas.size === 0) {
         return { error: 'Belum ada berkas yang dipilih.' }
@@ -76,17 +83,22 @@ export async function unggahMedia(_prev: UploadState, formData: FormData): Promi
         return { error: 'Hanya gambar (JPG, PNG, WebP) dan PDF yang bisa diunggah.' }
     }
 
+    const asli = {
+        data: Buffer.from(await berkas.arrayBuffer()),
+        mimetype: berkas.type,
+        name: berkas.name,
+        size: berkas.size,
+    }
+    // `keWebp` mengembalikan berkas apa adanya bila tidak bisa/tidak layak
+    // diubah (PDF, SVG, atau sudah WebP), jadi tidak perlu dicek di sini.
+    const siap = pertahankanAsli ? asli : await keWebp(asli)
+
     try {
         const payload = await getPayload({ config })
         await payload.create({
             collection: 'media',
             data: { alt },
-            file: {
-                data: Buffer.from(await berkas.arrayBuffer()),
-                mimetype: berkas.type,
-                name: berkas.name,
-                size: berkas.size,
-            },
+            file: siap,
             user,
             overrideAccess: false,
         })
@@ -95,7 +107,13 @@ export async function unggahMedia(_prev: UploadState, formData: FormData): Promi
     }
 
     revalidatePath('/dashboard/media')
-    return { sukses: 'Gambar berhasil diunggah.' }
+
+    const dikonversi = siap.mimetype !== asli.mimetype
+    return {
+        sukses: dikonversi
+            ? `Gambar berhasil diunggah dan diperkecil ke WebP (${formatUkuran(asli.size)} → ${formatUkuran(siap.size)}).`
+            : 'Gambar berhasil diunggah.',
+    }
 }
 
 export type HapusState = { error?: string; sukses?: string }

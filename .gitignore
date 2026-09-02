@@ -42,6 +42,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# Kecuali templatnya — README menyuruh `cp .env.example .env`, jadi berkas
+# ini justru wajib ikut. Tanpa baris ini pola di atas menelannya.
+!.env.example
 
 # vercel
 .vercel
@@ -51,6 +54,11 @@ yarn-error.log*
 next-env.d.ts
 
 media/*
+
+# Gambar sumber layanan — tempat kerja `pnpm gambar-layanan`. Isinya sementara:
+# begitu terunggah, berkasnya hidup di koleksi `media` (R2) dan disajikan dari
+# sana, jadi tidak perlu ada salinan kedua di repo.
+data/layanan-gambar/
 
 # claude
 CLAUDE.md

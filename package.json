@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/index.ts"
+    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/index.ts",
+    "gambar-layanan": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/gambar-layanan.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1123.0",

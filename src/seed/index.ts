@@ -5,6 +5,7 @@ import fs from 'fs'
 import { JADWAL_SK, CATATAN_SK } from './data/jam-pelayanan'
 import { IDENTITAS } from './data/identitas'
 import { LAYANAN, type LayananSeed } from './data/layanan'
+import { INFORMASI_LAYANAN } from './data/layanan-informasi'
 import { NAKES } from './data/nakes'
 import { PROFIL } from './data/profil'
 import { FASILITAS } from './data/fasilitas'
@@ -153,6 +154,71 @@ async function seed() {
         catat(`${dibuat} layanan dibuat (termasuk sub-layanan)`)
     } else {
         catat(`layanan sudah ada (${jumlahLayanan}) — dilewati`)
+    }
+
+    // --- 5b. Keterangan umum tiap layanan --------------------------------
+    // Menambal, bukan menimpa. Bagian 5 dilewati begitu katalognya sudah ada,
+    // padahal `deskripsi` memang tidak pernah diisi dari SK — tanpa langkah
+    // terpisah ini halaman /layanan/<slug> pada database lama akan terus
+    // kosong. Yang sudah diisi staf tidak disentuh.
+    {
+        const { docs: semuaLayanan } = await payload.find({
+            collection: 'services',
+            depth: 0,
+            limit: 1000,
+            pagination: false,
+            overrideAccess: true,
+        })
+
+        const punyaAnak = new Set(
+            semuaLayanan
+                .map((l) => (typeof l.induk === 'number' ? l.induk : l.induk?.id))
+                .filter((id): id is number => typeof id === 'number'),
+        )
+
+        let deskripsiDiisi = 0
+        let rincianDibuat = 0
+
+        for (const l of semuaLayanan) {
+            const info = l.slug ? INFORMASI_LAYANAN[l.slug] : undefined
+            if (!info) continue
+
+            if (!l.deskripsi?.trim()) {
+                await payload.update({
+                    collection: 'services',
+                    id: l.id,
+                    data: { deskripsi: info.deskripsi },
+                    overrideAccess: true,
+                })
+                deskripsiDiisi++
+            }
+
+            // Rincian hanya dibuat untuk layanan yang benar-benar belum punya
+            // sub-layanan; kalau tidak, daftar dari SK akan tercampur dengan
+            // daftar umum ini.
+            if (info.rincian?.length && !punyaAnak.has(l.id)) {
+                for (const [i, nama] of info.rincian.entries()) {
+                    await payload.create({
+                        collection: 'services',
+                        data: {
+                            nama,
+                            kategori: l.kategori,
+                            induk: l.id,
+                            urutan: i + 1,
+                            aktif: true,
+                        },
+                        overrideAccess: true,
+                    })
+                    rincianDibuat++
+                }
+            }
+        }
+
+        catat(
+            deskripsiDiisi || rincianDibuat
+                ? `keterangan layanan: ${deskripsiDiisi} deskripsi diisi, ${rincianDibuat} rincian dibuat`
+                : 'keterangan layanan sudah lengkap — dilewati',
+        )
     }
 
     // --- 6. Sarana & ruangan ---------------------------------------------
