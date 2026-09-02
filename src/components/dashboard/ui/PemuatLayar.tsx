@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { Loader2 } from 'lucide-react'
 
@@ -32,8 +32,17 @@ export default function PemuatLayar({
 }) {
     // Portal baru boleh dipasang setelah komponen hidup di browser: `document`
     // tidak ada saat dirender di server.
-    const [siap, setSiap] = useState(false)
-    useEffect(() => setSiap(true), [])
+    //
+    // `useSyncExternalStore` dipakai, bukan `useState` + `useEffect`: memanggil
+    // setState di dalam effect memicu render berantai (dan ditolak lint proyek
+    // ini). Bentuk di bawah adalah cara bakunya — snapshot server `false`,
+    // snapshot klien `true`, tanpa langganan apa pun karena nilainya tidak
+    // pernah berubah lagi setelah hidrasi.
+    const siap = useSyncExternalStore(
+        () => () => {},
+        () => true,
+        () => false,
+    )
     if (!siap) return null
 
     const isi = (
