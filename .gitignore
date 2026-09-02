@@ -54,3 +54,9 @@ media/*
 
 # claude
 CLAUDE.md
+.gstack/
+
+# Artefak Playwright MCP — kalau ikut di dalam repo, watcher Next dev
+# menganggapnya perubahan kode dan Server Action tidak pernah selesai.
+.playwright-mcp/
+.gstack/
