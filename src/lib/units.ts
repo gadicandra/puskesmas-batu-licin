@@ -18,3 +18,11 @@ export const unitOptions = [
 ] as const
 
 export type UnitValue = (typeof unitOptions)[number]['value']
+
+/** Ubah kode unit jadi label siap tampil. Mengembalikan `null` bila kosong, dan
+ *  mengembalikan kodenya apa adanya bila tak dikenali — supaya data lama tetap
+ *  tampil daripada hilang diam-diam saat daftar unit berubah. */
+export function labelUnit(kode: string | null | undefined): string | null {
+    if (!kode) return null
+    return unitOptions.find((u) => u.value === kode)?.label ?? kode
+}

@@ -1,6 +1,7 @@
 {
   "name": "puskesmas-batu-licin",
   "version": "0.1.0",
+  "packageManager": "pnpm@10.24.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,12 +9,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload"
+    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/index.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1123.0",
     "@payloadcms/db-postgres": "^3.72.0",
     "@payloadcms/next": "^3.72.0",
     "@payloadcms/richtext-lexical": "^3.72.0",
+    "@payloadcms/storage-s3": "^3.72.0",
     "@radix-ui/react-navigation-menu": "^1.2.14",
     "@tiptap/extension-image": "^3.30.6",
     "@tiptap/extension-link": "^3.30.6",

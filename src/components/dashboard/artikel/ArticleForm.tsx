@@ -13,6 +13,7 @@ import Field from '@/components/dashboard/ui/Field'
 import Input, { Textarea, Select } from '@/components/dashboard/ui/Input'
 import Card from '@/components/dashboard/ui/Card'
 import Badge from '@/components/dashboard/ui/Badge'
+import PemuatLayar from '@/components/dashboard/ui/PemuatLayar'
 
 export type ArtikelAwal = {
     id?: number
@@ -267,6 +268,8 @@ export default function ArticleForm({ awal }: { awal: ArtikelAwal }) {
             {awal.id && (
                 <HapusArtikel id={awal.id} judul={awal.title} />
             )}
+
+            {pending && <PemuatLayar umumkan label="Menyimpan artikel…" />}
         </form>
     )
 }

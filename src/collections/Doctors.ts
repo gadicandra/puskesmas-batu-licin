@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isSuperAdmin } from '../access'
 import { poliField } from '../fields/poli'
+import { HARI } from '../lib/hari'
 
 export const Doctors: CollectionConfig = {
     slug: 'doctors',
@@ -20,7 +21,47 @@ export const Doctors: CollectionConfig = {
         { name: 'nama', type: 'text', required: true },
         { name: 'spesialisasi', type: 'text', required: true },
         { name: 'foto', type: 'upload', relationTo: 'media' },
-        { name: 'jadwalPraktik', type: 'text', admin: { description: 'mis. Senin–Jumat, 08.00–11.00' } },
+        {
+            // Terstruktur, bukan teks bebas. Teks seperti "Senin–Jumat, 08.00–11.00"
+            // tidak bisa dirender jadi tabel jadwal, diurutkan, atau dipakai
+            // menjawab "dokter siapa yang praktik hari ini" — padahal justru itu
+            // yang dibutuhkan halaman dokter.
+            name: 'jadwalPraktik',
+            type: 'array',
+            label: 'Jadwal Praktik',
+            labels: { singular: 'Jadwal', plural: 'Jadwal Praktik' },
+            fields: [
+                { name: 'hari', type: 'select', required: true, options: [...HARI] },
+                {
+                    name: 'jamMulai',
+                    type: 'text',
+                    required: true,
+                    admin: { description: 'Format 24 jam, mis. 08.00' },
+                },
+                {
+                    name: 'jamSelesai',
+                    type: 'text',
+                    required: true,
+                    admin: { description: 'Format 24 jam, mis. 11.00' },
+                },
+            ],
+        },
+        {
+            name: 'pendidikan',
+            type: 'text',
+            admin: { description: 'Pendidikan terakhir, mis. S1 Kedokteran Universitas Lambung Mangkurat' },
+        },
+        {
+            name: 'nomorSTR',
+            type: 'text',
+            label: 'Nomor STR',
+            admin: { description: 'Surat Tanda Registrasi. Kosongkan bila belum tersedia.' },
+        },
+        {
+            name: 'deskripsi',
+            type: 'textarea',
+            admin: { description: 'Perkenalan singkat yang tampil di halaman profil dokter.' },
+        },
         { name: 'aktif', type: 'checkbox', defaultValue: true },
         poliField,
     ],

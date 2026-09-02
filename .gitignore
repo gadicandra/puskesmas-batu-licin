@@ -17,6 +17,14 @@
 
 # next.js
 /.next/
+# direktori build container Docker (lihat NEXT_DIST_DIR di docker-compose.yml)
+/.next-docker/
+# folder unggahan milik container (lihat MEDIA_DIR di docker-compose.yml)
+/media-docker/
+# store pnpm lokal (terbentuk saat install di dalam container)
+/.pnpm-store/
+# cadangan database sebelum migrasi — jangan ikut ter-commit
+/.backup/
 /out/
 
 # production
@@ -46,3 +54,9 @@ media/*
 
 # claude
 CLAUDE.md
+.gstack/
+
+# Artefak Playwright MCP — kalau ikut di dalam repo, watcher Next dev
+# menganggapnya perubahan kode dan Server Action tidak pernah selesai.
+.playwright-mcp/
+.gstack/

@@ -7,12 +7,15 @@ import Button from '@/components/dashboard/ui/Button'
 import Field from '@/components/dashboard/ui/Field'
 import Input from '@/components/dashboard/ui/Input'
 
-export default function LoginForm() {
+export default function LoginForm({ tujuan }: { tujuan?: string | null }) {
     const [state, formAction, pending] = useActionState<LoginState, FormData>(loginAction, {})
     const [lihatSandi, setLihatSandi] = useState(false)
 
     return (
         <form action={formAction} className="flex flex-col gap-5">
+            {/* Halaman yang tadi diminta sebelum dipantulkan ke sini. Sudah
+                divalidasi di server (`tujuanAman`) sebelum sampai ke sini. */}
+            {tujuan && <input type="hidden" name="lanjut" value={tujuan} />}
             {state.error && (
                 <p
                     role="alert"

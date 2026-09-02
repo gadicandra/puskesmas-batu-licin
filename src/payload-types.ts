@@ -75,6 +75,12 @@ export interface Config {
     certificates: Certificate;
     articles: Article;
     'page-views': PageView;
+    services: Service;
+    posyandu: Posyandu;
+    facilities: Facility;
+    complaints: Complaint;
+    'org-chart': OrgChart;
+    'service-statistics': ServiceStatistic;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +96,12 @@ export interface Config {
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'page-views': PageViewsSelect<false> | PageViewsSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    posyandu: PosyanduSelect<false> | PosyanduSelect<true>;
+    facilities: FacilitiesSelect<false> | FacilitiesSelect<true>;
+    complaints: ComplaintsSelect<false> | ComplaintsSelect<true>;
+    'org-chart': OrgChartSelect<false> | OrgChartSelect<true>;
+    'service-statistics': ServiceStatisticsSelect<false> | ServiceStatisticsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -102,10 +114,12 @@ export interface Config {
   globals: {
     'operational-hours': OperationalHour;
     'site-settings': SiteSetting;
+    profile: Profile;
   };
   globalsSelect: {
     'operational-hours': OperationalHoursSelect<false> | OperationalHoursSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    profile: ProfileSelect<false> | ProfileSelect<true>;
   };
   locale: null;
   user: User & {
@@ -224,10 +238,32 @@ export interface Doctor {
   nama: string;
   spesialisasi: string;
   foto?: (number | null) | Media;
+  jadwalPraktik?:
+    | {
+        hari: 'senin' | 'selasa' | 'rabu' | 'kamis' | 'jumat' | 'sabtu' | 'minggu';
+        /**
+         * Format 24 jam, mis. 08.00
+         */
+        jamMulai: string;
+        /**
+         * Format 24 jam, mis. 11.00
+         */
+        jamSelesai: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
-   * mis. Senin–Jumat, 08.00–11.00
+   * Pendidikan terakhir, mis. S1 Kedokteran Universitas Lambung Mangkurat
    */
-  jadwalPraktik?: string | null;
+  pendidikan?: string | null;
+  /**
+   * Surat Tanda Registrasi. Kosongkan bila belum tersedia.
+   */
+  nomorSTR?: string | null;
+  /**
+   * Perkenalan singkat yang tampil di halaman profil dokter.
+   */
+  deskripsi?: string | null;
   aktif?: boolean | null;
   /**
    * Poli/unit layanan terkait.
@@ -261,6 +297,10 @@ export interface MedicalStaff {
   id: number;
   nama: string;
   jabatan: 'dokter' | 'perawat' | 'bidan' | 'apoteker' | 'analis' | 'gizi' | 'sanitarian' | 'administrasi' | 'lainnya';
+  /**
+   * Mis. "Perawat Ahli Madya". Inilah yang tampil di situs.
+   */
+  jabatanLengkap?: string | null;
   foto?: (number | null) | Media;
   aktif?: boolean | null;
   /**
@@ -335,6 +375,7 @@ export interface Vaccine {
 export interface Certificate {
   id: number;
   judul: string;
+  jenis: 'akreditasi' | 'penghargaan';
   penerbit?: string | null;
   tanggal?: string | null;
   /**
@@ -378,6 +419,180 @@ export interface PageView {
   path: string;
   referrer?: string | null;
   uaHash?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  nama: string;
+  /**
+   * Dikosongkan = dibuat otomatis dari judul.
+   */
+  slug?: string | null;
+  /**
+   * Kosongkan bila ini layanan utama. Isi bila ini rincian dari layanan lain.
+   */
+  induk?: (number | null) | Service;
+  /**
+   * Mis. "Senin–Kamis 08.00–11.00", "24 jam", "Sesuai Jadwal", "Jika ada kasus".
+   */
+  jadwal?: string | null;
+  kategori: 'dalam-gedung' | 'luar-gedung' | 'posyandu';
+  /**
+   * Penjelasan singkat untuk warga. Hindari istilah medis yang tidak umum.
+   */
+  deskripsi?: string | null;
+  /**
+   * Mis. "Kartu BPJS", "KTP asli". Satu baris satu syarat.
+   */
+  persyaratan?:
+    | {
+        isi: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Angka lebih kecil tampil lebih dulu. Isi 0 bila tidak ingin diatur.
+   */
+  urutan?: number | null;
+  aktif?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posyandu".
+ */
+export interface Posyandu {
+  id: number;
+  nama: string;
+  alamat?: string | null;
+  /**
+   * Layanan yang tersedia di posyandu ini.
+   */
+  layanan?: (number | Service)[] | null;
+  jadwal?:
+    | {
+        hari: 'senin' | 'selasa' | 'rabu' | 'kamis' | 'jumat' | 'sabtu' | 'minggu';
+        /**
+         * Mis. "Minggu ke-2 setiap bulan, 08.00–11.00"
+         */
+        keterangan?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  penanggungJawab?: string | null;
+  /**
+   * Nomor telepon kader atau penanggung jawab. Boleh dikosongkan.
+   */
+  kontak?: string | null;
+  /**
+   * Angka lebih kecil tampil lebih dulu.
+   */
+  urutan?: number | null;
+  aktif?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "facilities".
+ */
+export interface Facility {
+  id: number;
+  nama: string;
+  kategori: 'ruang' | 'kantor' | 'alat' | 'kendaraan' | 'penunjang';
+  deskripsi?: string | null;
+  /**
+   * Banyaknya unit. Kosongkan bila tidak relevan.
+   */
+  jumlah?: number | null;
+  foto?: (number | null) | Media;
+  /**
+   * Angka lebih kecil tampil lebih dulu.
+   */
+  urutan?: number | null;
+  aktif?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "complaints".
+ */
+export interface Complaint {
+  id: number;
+  /**
+   * Satu kalimat pokok masalahnya.
+   */
+  ringkasan: string;
+  isi: string;
+  /**
+   * Boleh dikosongkan bila pengadu ingin anonim.
+   */
+  nama?: string | null;
+  /**
+   * Nomor HP atau email, untuk menyampaikan tanggapan.
+   */
+  kontak?: string | null;
+  kategori?: ('layanan' | 'petugas' | 'sarana' | 'saran' | 'lainnya') | null;
+  persetujuanPrivasi: boolean;
+  status: 'baru' | 'diproses' | 'selesai';
+  tanggapan?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "org-chart".
+ */
+export interface OrgChart {
+  id: number;
+  jabatan: string;
+  /**
+   * Nama pejabat. Kosongkan bila posisi sedang lowong.
+   */
+  nama?: string | null;
+  foto?: (number | null) | Media;
+  /**
+   * Jabatan di atasnya. Kosongkan untuk Kepala Puskesmas (puncak struktur).
+   */
+  atasan?: (number | null) | OrgChart;
+  /**
+   * Urutan di antara jabatan dengan atasan yang sama.
+   */
+  urutan?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-statistics".
+ */
+export interface ServiceStatistic {
+  id: number;
+  /**
+   * Mis. "2025". Satu periode = satu kumpulan angka.
+   */
+  periode: string;
+  kelompok: 'umur' | 'asuransi' | 'poli' | 'status-pulang';
+  /**
+   * Mis. "Balita (0-5 Tahun)", "BPJS Kesehatan".
+   */
+  label: string;
+  jumlah: number;
+  /**
+   * Urutan tampil dalam kelompoknya.
+   */
+  urutan?: number | null;
+  /**
+   * Dari mana angkanya diambil, mis. "e-Puskesmas, diakses 31 Januari 2026".
+   */
+  sumber?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -436,6 +651,30 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'page-views';
         value: number | PageView;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: number | Service;
+      } | null)
+    | ({
+        relationTo: 'posyandu';
+        value: number | Posyandu;
+      } | null)
+    | ({
+        relationTo: 'facilities';
+        value: number | Facility;
+      } | null)
+    | ({
+        relationTo: 'complaints';
+        value: number | Complaint;
+      } | null)
+    | ({
+        relationTo: 'org-chart';
+        value: number | OrgChart;
+      } | null)
+    | ({
+        relationTo: 'service-statistics';
+        value: number | ServiceStatistic;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -556,7 +795,17 @@ export interface DoctorsSelect<T extends boolean = true> {
   nama?: T;
   spesialisasi?: T;
   foto?: T;
-  jadwalPraktik?: T;
+  jadwalPraktik?:
+    | T
+    | {
+        hari?: T;
+        jamMulai?: T;
+        jamSelesai?: T;
+        id?: T;
+      };
+  pendidikan?: T;
+  nomorSTR?: T;
+  deskripsi?: T;
   aktif?: T;
   poli?: T;
   updatedAt?: T;
@@ -569,6 +818,7 @@ export interface DoctorsSelect<T extends boolean = true> {
 export interface MedicalStaffSelect<T extends boolean = true> {
   nama?: T;
   jabatan?: T;
+  jabatanLengkap?: T;
   foto?: T;
   aktif?: T;
   poli?: T;
@@ -595,6 +845,7 @@ export interface VaccinesSelect<T extends boolean = true> {
  */
 export interface CertificatesSelect<T extends boolean = true> {
   judul?: T;
+  jenis?: T;
   penerbit?: T;
   tanggal?: T;
   berkas?: T;
@@ -627,6 +878,108 @@ export interface PageViewsSelect<T extends boolean = true> {
   path?: T;
   referrer?: T;
   uaHash?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  nama?: T;
+  slug?: T;
+  induk?: T;
+  jadwal?: T;
+  kategori?: T;
+  deskripsi?: T;
+  persyaratan?:
+    | T
+    | {
+        isi?: T;
+        id?: T;
+      };
+  urutan?: T;
+  aktif?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posyandu_select".
+ */
+export interface PosyanduSelect<T extends boolean = true> {
+  nama?: T;
+  alamat?: T;
+  layanan?: T;
+  jadwal?:
+    | T
+    | {
+        hari?: T;
+        keterangan?: T;
+        id?: T;
+      };
+  penanggungJawab?: T;
+  kontak?: T;
+  urutan?: T;
+  aktif?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "facilities_select".
+ */
+export interface FacilitiesSelect<T extends boolean = true> {
+  nama?: T;
+  kategori?: T;
+  deskripsi?: T;
+  jumlah?: T;
+  foto?: T;
+  urutan?: T;
+  aktif?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "complaints_select".
+ */
+export interface ComplaintsSelect<T extends boolean = true> {
+  ringkasan?: T;
+  isi?: T;
+  nama?: T;
+  kontak?: T;
+  kategori?: T;
+  persetujuanPrivasi?: T;
+  status?: T;
+  tanggapan?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "org-chart_select".
+ */
+export interface OrgChartSelect<T extends boolean = true> {
+  jabatan?: T;
+  nama?: T;
+  foto?: T;
+  atasan?: T;
+  urutan?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-statistics_select".
+ */
+export interface ServiceStatisticsSelect<T extends boolean = true> {
+  periode?: T;
+  kelompok?: T;
+  label?: T;
+  jumlah?: T;
+  urutan?: T;
+  sumber?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -695,6 +1048,11 @@ export interface SiteSetting {
   alamat?: string | null;
   telepon?: string | null;
   email?: string | null;
+  /**
+   * Nomor gawat darurat / PSC 119, tampil terpisah dari telepon utama.
+   */
+  teleponDarurat?: string | null;
+  namaPetugasDarurat?: string | null;
   sosialMedia?:
     | {
         platform: string;
@@ -702,6 +1060,80 @@ export interface SiteSetting {
         id?: string | null;
       }[]
     | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "profile".
+ */
+export interface Profile {
+  id: number;
+  kodePuskesmas?: string | null;
+  kepalaPuskesmas?: string | null;
+  /**
+   * Mis. Perkotaan / Pedesaan
+   */
+  kategori?: string | null;
+  /**
+   * Mis. Puskesmas Non Perawatan
+   */
+  jenis?: string | null;
+  /**
+   * Mis. Ibu Kota Kab/Kota
+   */
+  letak?: string | null;
+  /**
+   * Mis. Perbatasan
+   */
+  topografi?: string | null;
+  /**
+   * Mis. 105,760 Km²
+   */
+  luasWilayah?: string | null;
+  /**
+   * Mis. 9 (7 Desa, 2 Kelurahan)
+   */
+  jumlahDesa?: string | null;
+  jumlahRT?: number | null;
+  jumlahPenduduk?: number | null;
+  jumlahKK?: number | null;
+  visi?: string | null;
+  /**
+   * Mis. "Visi pembangunan Kabupaten Tanah Bumbu, RPJMD 2025–2029"
+   */
+  sumberVisi?: string | null;
+  misi?:
+    | {
+        isi: string;
+        id?: string | null;
+      }[]
+    | null;
+  motto?: string | null;
+  maklumatPelayanan?: string | null;
+  budayaKerja?:
+    | {
+        /**
+         * Mis. "5S" atau "5R"
+         */
+        judul: string;
+        /**
+         * Mis. "Pelayanan kepada masyarakat"
+         */
+        keterangan?: string | null;
+        butir?:
+          | {
+              isi: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Riwayat singkat berdirinya Puskesmas. Boleh dikosongkan.
+   */
+  sejarah?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -731,6 +1163,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   alamat?: T;
   telepon?: T;
   email?: T;
+  teleponDarurat?: T;
+  namaPetugasDarurat?: T;
   sosialMedia?:
     | T
     | {
@@ -738,6 +1172,50 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         url?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "profile_select".
+ */
+export interface ProfileSelect<T extends boolean = true> {
+  kodePuskesmas?: T;
+  kepalaPuskesmas?: T;
+  kategori?: T;
+  jenis?: T;
+  letak?: T;
+  topografi?: T;
+  luasWilayah?: T;
+  jumlahDesa?: T;
+  jumlahRT?: T;
+  jumlahPenduduk?: T;
+  jumlahKK?: T;
+  visi?: T;
+  sumberVisi?: T;
+  misi?:
+    | T
+    | {
+        isi?: T;
+        id?: T;
+      };
+  motto?: T;
+  maklumatPelayanan?: T;
+  budayaKerja?:
+    | T
+    | {
+        judul?: T;
+        keterangan?: T;
+        butir?:
+          | T
+          | {
+              isi?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  sejarah?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

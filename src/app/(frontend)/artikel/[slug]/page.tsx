@@ -1,41 +1,29 @@
-import { getPayload } from "payload";
-import config from "@payload-config";
 import { notFound } from "next/navigation";
 import Breadcrumb from "@/components/common/Breadcrumb";
-import { bersihkanHtml, waktuBaca } from "@/lib/dashboard/html";
 import Container from "@/components/layout/Container/Container";
+import { ambilArtikel } from "@/lib/konten/artikel";
 
-export const dynamic = "force-dynamic";
+// Tanpa `force-dynamic`: datanya di-cache dan hanya diambil ulang saat admin
+// menyimpan perubahan. Lihat docs/KONTRAK-DATA.md.
 
 const formatTanggal = (iso?: string | null) =>
     iso
         ? new Date(iso).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
         : "";
 
-async function getArticle(slug: string) {
-    const payload = await getPayload({ config });
-    const { docs } = await payload.find({
-        collection: "articles",
-        where: { slug: { equals: slug }, _status: { equals: "published" } },
-        depth: 1,
-        limit: 1,
-    });
-    return docs[0] ?? null;
-}
-
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const a = await getArticle(slug);
+    const a = await ambilArtikel(slug);
     if (!a) return { title: "Artikel tidak ditemukan" };
-    return { title: `${a.title} | Puskesmas Batu Licin`, description: a.excerpt ?? undefined };
+    return { title: `${a.judul} | Puskesmas Batu Licin`, description: a.ringkasan ?? undefined };
 }
 
 export default async function ArtikelDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const a = await getArticle(slug);
+    const a = await ambilArtikel(slug);
     if (!a) notFound();
 
-    const cover = typeof a.cover === "object" && a.cover ? a.cover : null;
+    const cover = a.sampul;
 
     return (
         <div className="bg-base min-h-screen">
@@ -44,48 +32,48 @@ export default async function ArtikelDetailPage({ params }: { params: Promise<{ 
                 items={[
                     { label: "Beranda", href: "/" },
                     { label: "Artikel", href: "/artikel" },
-                    { label: a.title, href: `/artikel/${a.slug}` },
+                    { label: a.judul, href: `/artikel/${a.slug}` },
                 ]}
             />
 
             <Container sectionClassName="py-8 md:py-12">
                 <article className="mx-auto max-w-3xl">
                     <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-secondary">
-                        <span>{a.category}</span>
+                        <span>{a.labelKategori}</span>
                         <span className="text-tertiary/50">•</span>
                         <span className="font-medium normal-case text-tertiary">
-                            {formatTanggal(a.publishedDate)}
+                            {formatTanggal(a.tanggal)}
                         </span>
-                        {a.content && (
+                        {a.isiHtml && (
                             <>
                                 <span className="text-tertiary/50">•</span>
                                 <span className="font-medium normal-case text-tertiary">
-                                    {waktuBaca(a.content)} menit baca
+                                    {a.menitBaca} menit baca
                                 </span>
                             </>
                         )}
                     </div>
                     <h1 className="mt-3 text-3xl md:text-4xl font-black leading-tight text-primary">
-                        {a.title}
+                        {a.judul}
                     </h1>
-                    {a.excerpt && (
-                        <p className="mt-4 text-lg leading-relaxed text-tertiary">{a.excerpt}</p>
+                    {a.ringkasan && (
+                        <p className="mt-4 text-lg leading-relaxed text-tertiary">{a.ringkasan}</p>
                     )}
 
-                    {cover?.url && (
+                    {cover && (
                         <div className="mt-8 overflow-hidden rounded-2xl">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={cover.url} alt={cover.alt || a.title} className="w-full object-cover" />
+                            <img src={cover.src} alt={cover.alt} className="w-full object-cover" />
                         </div>
                     )}
 
-                    {a.content && (
-                        // Isi artikel disanitasi lagi saat render — HTML dari editor
-                        // tidak pernah dianggap tepercaya, sekalipun sudah dibersihkan
-                        // waktu disimpan.
+                    {a.isiHtml && (
+                        // `isiHtml` sudah disanitasi di lapisan konten — HTML dari
+                        // editor tidak pernah dianggap tepercaya, dan dibersihkan dua
+                        // kali: saat disimpan dan saat dibaca dari database.
                         <div
                             className="prose-artikel mt-8"
-                            dangerouslySetInnerHTML={{ __html: bersihkanHtml(a.content) }}
+                            dangerouslySetInnerHTML={{ __html: a.isiHtml }}
                         />
                     )}
                 </article>

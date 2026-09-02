@@ -1,36 +1,268 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Website UPTD Puskesmas Batulicin
 
-## Getting Started
+Situs publik + dashboard pengelolaan isi. Next.js 15 (App Router) + React 19,
+dengan Payload CMS 3 di atas Postgres sebagai backend (skema, auth, access
+control, upload, Local API). Admin UI bawaan Payload sudah diganti dashboard
+buatan sendiri di `/dashboard`.
 
-First, run the development server:
+---
+
+## Mulai cepat (Docker — disarankan)
+
+Tidak perlu memasang Node, pnpm, atau Postgres.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <url-repo>
+cd puskesmas-batu-licin
+docker compose up         # .env opsional — lihat catatan di bawah
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tunggu sampai muncul `✓ Ready`, lalu buka **http://localhost:3000**.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Database kosong? Isi data awalnya dan buat akun admin pertama:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+docker compose --profile seed up seed
+```
 
-## Learn More
+Aman diulang berapa kali pun: setiap bagian memeriksa dulu apakah datanya sudah
+ada. Yang terisi:
 
-To learn more about Next.js, take a look at the following resources:
+| Isi | Jumlah |
+| --- | --- |
+| Layanan (termasuk sub-layanan) | 93 |
+| Sarana & ruangan | 68 |
+| Tenaga kesehatan | 68 |
+| Dokter | 6 |
+| Jabatan struktur organisasi | 32 |
+| Angka pelayanan 2025 | 24 |
+| Jam pelayanan (SK), identitas, profil | 3 global |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Akun awal: `admin@puskesmas.local` / `puskesmas123`
+(ubah lewat `SEED_ADMIN_EMAIL` dan `SEED_ADMIN_PASSWORD` di `.env`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+> **Sertifikat & penghargaan butuh satu syarat tambahan.** Sembilan foto
+> piagamnya berukuran 8,4 MB dan sengaja tidak ikut di repo, tapi salinannya
+> sudah ada di bucket R2. Seed mencarinya berurutan:
+>
+> 1. folder `data/Sertifikat/` di komputer Anda, kalau ada;
+> 2. **bucket R2**, kalau `.env` sudah mengisi keempat `R2_*` — foto diunduh
+>    sendiri, Anda tidak perlu meminta folder apa pun;
+> 3. kalau dua-duanya tidak ada, bagian ini dilewati dengan pesan yang
+>    menyebutkan kedua jalan keluarnya. Sepuluh bagian seed lainnya tetap jalan.
+>
+> Jadi: isi `R2_*` di `.env` (lihat bagian "Penyimpanan berkas") dan sertifikat
+> ikut terisi otomatis.
 
-## Deploy on Vercel
+Masuk lewat **http://localhost:3000/dashboard**. Kalau belum ada akun sama
+sekali, `/dashboard/setup` akan memandu membuat Super Admin pertama.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Port 3000 sudah dipakai? `APP_PORT=3100 docker compose up`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Semua variabel lingkungan sudah punya default yang aman untuk pengembangan, jadi
+`docker compose up` jalan tanpa `.env`. Ingin mengubah salah satunya (mis.
+mengaktifkan login Google)? `cp docs/env-contoh.txt .env` lalu sunting.
+
+### Perintah Docker sehari-hari
+
+```bash
+docker compose up                       # nyalakan db + app
+docker compose down                     # matikan (data tetap tersimpan)
+docker compose logs -f app              # lihat log aplikasi
+docker compose --profile seed up seed   # isi data awal (aman diulang)
+docker compose down -v                  # HAPUS database beserta isinya
+```
+
+---
+
+## Mulai cepat (tanpa Docker)
+
+Butuh Node 22+, pnpm 10.24, dan Postgres 16.
+
+```bash
+docker compose up -d db     # atau pakai Postgres yang sudah ada
+cp docs/env-contoh.txt .env # sesuaikan DATABASE_URL
+pnpm install
+pnpm payload migrate
+pnpm seed
+pnpm dev
+```
+
+---
+
+## Perintah
+
+```bash
+pnpm dev                     # server pengembangan
+pnpm build                   # build produksi
+pnpm start                   # jalankan hasil build
+pnpm lint                    # ESLint
+pnpm seed                    # isi data awal (idempoten)
+pnpm payload migrate         # terapkan migrasi database
+pnpm payload migrate:create  # buat migrasi setelah mengubah koleksi
+pnpm payload generate:types  # regenerasi src/payload-types.ts
+```
+
+**Setelah mengubah berkas di `src/collections/` atau `src/globals/`**, jalankan
+`pnpm payload migrate:create <nama>` lalu `pnpm payload generate:types`.
+`src/payload-types.ts` dan `src/migrations/` ikut ter-commit; jangan disunting
+manual.
+
+---
+
+## Skema database: migrasi vs auto-push
+
+Payload bisa mencocokkan tabel dengan definisi koleksi secara otomatis
+(`push`). Enak untuk iterasi, tapi saat perubahannya ambigu ia **bertanya lewat
+prompt interaktif**. Tanpa TTY — di dalam container, di CI, di produksi — prompt
+itu menggantung dan push berhenti separuh jalan tanpa pesan galat, meninggalkan
+skema yang basi diam-diam.
+
+Karena itu:
+
+| Lingkungan | Perilaku |
+| --- | --- |
+| `pnpm dev` langsung di komputer | `push` aktif (ada TTY untuk menjawab) |
+| Docker & produksi | `push` mati, memakai `pnpm payload migrate` |
+
+Dikendalikan lewat `PAYLOAD_DB_PUSH` di `.env`.
+
+---
+
+## Penyimpanan berkas (gambar & PDF)
+
+Berkas yang diunggah staf lewat Galeri Gambar bisa disimpan di dua tempat.
+Pilihannya otomatis dari isi `.env` — tidak ada saklar di kode.
+
+| Kondisi | Tempat simpan |
+| --- | --- |
+| Variabel `R2_*` kosong | Disk lokal `<project>/media` |
+| Keempat `R2_*` terisi | Cloudflare R2 |
+
+URL publiknya **sama di kedua mode** (`/api/media/<berkas>`), jadi berpindah
+penyimpanan tidak merusak tautan gambar yang sudah tersimpan di artikel.
+
+### Kapan wajib memakai R2
+
+**Deploy di VPS / server Dinas Kesehatan → disk lokal sudah cukup dan gratis.**
+`docker-compose.yml` sudah memasang volume `puskesmas_media`, jadi berkas
+selamat saat container dibuat ulang. Yang perlu ditambahkan hanya backup rutin.
+
+**Deploy di Vercel atau sejenisnya → R2 wajib.** Disk di sana bersifat sementara:
+berkas yang diunggah staf hilang pada deploy berikutnya, **tanpa pesan galat**.
+Gejalanya baru terlihat berminggu-minggu kemudian saat gambar artikel lama
+mendadak kosong.
+
+### Kenapa R2, bukan S3
+
+Gratis 10 GB, dan **biaya keluar (egress) nol**. Situs publik menyajikan gambar
+yang sama berulang kali ke ribuan pengunjung; penyedia lain menagih per GB
+keluar, dan itu komponen biaya yang paling mudah membengkak tanpa disadari.
+Kebutuhan situs ini realistis di bawah 1 GB, jadi 10 GB tidak akan tersentuh
+batasnya. R2 juga S3-compatible sehingga memakai adapter resmi Payload.
+
+### Cara menyiapkan (± 10 menit)
+
+1. Buat akun di [dash.cloudflare.com](https://dash.cloudflare.com) — tier gratis
+   R2 tidak meminta kartu kredit.
+2. Menu **R2 Object Storage** → **Create bucket**. Nama bebas, mis.
+   `puskesmas-batulicin`. Lokasi: **Asia-Pacific (APAC)**.
+3. Di halaman R2, catat **Account ID** (ada di kanan). Endpoint-nya berbentuk:
+   `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`
+4. **Manage R2 API Tokens** → **Create API token**:
+   - Permission: **Object Read & Write**
+   - Specify bucket: pilih bucket yang tadi dibuat — jangan beri akses ke
+     seluruh akun
+   - Salin **Access Key ID** dan **Secret Access Key**. Secret hanya
+     ditampilkan sekali.
+5. Isi `.env` — bentuknya seperti ini (nilai di bawah hanya contoh):
+
+   ```bash
+   R2_BUCKET=puskesmas-batulicin
+   R2_ENDPOINT=https://8f3c1d0e5a7b492c1a6d4e2f9b0c3a15.r2.cloudflarestorage.com
+   R2_ACCESS_KEY_ID=1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d
+   R2_SECRET_ACCESS_KEY=9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c5b4a39281706f5e4d3c2b1a0
+   ```
+
+   | Variabel | Bentuk | Dari mana |
+   | --- | --- | --- |
+   | `R2_BUCKET` | Nama bucket apa adanya | Yang Anda ketik di langkah 2 |
+   | `R2_ENDPOINT` | `https://` + Account ID (32 karakter) + `.r2.cloudflarestorage.com` | Account ID di kanan halaman R2 |
+   | `R2_ACCESS_KEY_ID` | 32 huruf/angka | Muncul saat token dibuat |
+   | `R2_SECRET_ACCESS_KEY` | 64 huruf/angka | Muncul **sekali** saat token dibuat |
+
+   ⚠️ **`R2_ENDPOINT` tidak boleh memuat nama bucket.** Halaman bucket
+   Cloudflare menampilkan alamat "S3 API" berbentuk
+   `https://<ACCOUNT_ID>.r2.cloudflarestorage.com/puskesmas-batulicin` — kalau
+   itu yang disalin, AWS SDK menambahkan nama bucket sekali lagi dan semua
+   unggahan gagal. Aplikasi menolaknya saat menyala dan menyebutkan bagian mana
+   yang harus dibuang, jadi kesalahan ini tidak akan lolos diam-diam.
+
+6. Jalankan ulang aplikasi, lalu unggah satu gambar lewat `/dashboard/media`.
+   Berkasnya harus muncul di bucket R2 dan **tidak** muncul di folder `media/`.
+
+**Bucket tidak perlu dibuat publik.** Berkas dilayani lewat route Payload
+`/api/media/...`, jadi kredensial R2 tidak pernah sampai ke browser.
+
+### Memindahkan berkas lama ke R2
+
+Berkas yang terlanjur ada di `media/` tidak ikut pindah sendiri. Salin sekali
+dengan `rclone` atau AWS CLI sebelum mengaktifkan R2, atau unggah ulang lewat
+dashboard bila jumlahnya sedikit.
+
+---
+
+## Variabel lingkungan
+
+| Variabel | Wajib | Keterangan |
+| --- | --- | --- |
+| `DATABASE_URL` | ya | Koneksi Postgres. Di dalam Docker memakai host `db`, bukan `localhost` |
+| `PAYLOAD_SECRET` | ya | Kunci penandatanganan sesi. **Ganti dengan nilai acak di produksi** |
+| `APP_URL` | produksi | Alamat publik, dipakai menyusun redirect URI Google |
+| `GOOGLE_CLIENT_ID` | tidak | Login Google. Kosong = tombolnya disembunyikan |
+| `GOOGLE_CLIENT_SECRET` | tidak | Pasangan `GOOGLE_CLIENT_ID` |
+| `PAYLOAD_DB_PUSH` | tidak | `false` untuk memaksa memakai migrasi |
+| `R2_BUCKET` / `R2_ENDPOINT` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | produksi serverless | Cloudflare R2. Kosong = disk lokal. Keempatnya harus terisi |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | tidak | Akun pertama yang dibuat seed |
+| `APP_PORT` / `DB_PORT` | tidak | Ganti port bila bentrok |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | tidak | Hanya dibaca `docker-compose.yml`. Kalau diubah, `DATABASE_URL` harus ikut disesuaikan |
+
+`MEDIA_DIR` dan `NEXT_DIST_DIR` diatur sendiri oleh `docker-compose.yml` supaya
+folder milik container tidak bertabrakan dengan milik komputer — jangan diisi di
+`.env`.
+
+---
+
+## Dokumentasi
+
+| Berkas | Isi |
+| --- | --- |
+| **`docs/KONTRAK-DATA.md`** | **Cara mengambil data untuk halaman publik — baca ini sebelum membuat halaman** |
+| `docs/DASHBOARD.md` | Acuan dashboard: aturan binding, prinsip UI, daftar halaman, login Google, penjaga rute, paginasi |
+| `public/openapi.yaml` | Kontrak REST lengkap (lihat di bawah) |
+| `docs/PROJECT_PLAN.md` | Rencana tim, jadwal mingguan, daftar utang teknis |
+| `docs/RENCANA-BERIKUTNYA.md` | Sisa pekerjaan yang sudah ditelusuri, siap dilanjutkan |
+| `PRODUCT.md` | Brief produk & desain |
+| `CLAUDE.md` | Panduan arsitektur untuk asisten AI |
+
+### Kontrak API (Swagger)
+
+Jalankan `pnpm dev` lalu buka **http://localhost:3000/api-docs.html** — Swagger UI
+membaca `public/openapi.yaml`. Isinya seluruh endpoint REST Payload: daftar,
+ambil satu, tambah, ubah, hapus, beserta bentuk payload dan **semua kode balasan
+termasuk yang galat** (400 validasi, 401 login gagal, 403 tanpa hak, 404).
+
+Tiga hal yang paling sering menjebak dan sudah diuji, bukan dugaan:
+
+1. **Mengubah data memakai `PATCH`, bukan `PUT`** — `PUT` menjawab
+   `404 Route not found`.
+2. `GET` daftar mengembalikan objek `{ docs, totalDocs, page, … }`, bukan array.
+3. Relasi berupa angka saat `depth=0` dan objek saat `depth >= 1` (bawaan 1).
+
+**Halaman publik situs ini tidak memakai REST API.** Halaman server membaca
+lewat `src/lib/konten/` supaya isinya berubah seketika saat admin menyimpan —
+lihat `docs/KONTRAK-DATA.md`. Kontrak REST dipakai untuk aplikasi lain, skrip,
+integrasi, dan formulir yang benar-benar mengirim dari browser.
+
+Seluruh teks antarmuka, label field, dan komentar kode ditulis dalam bahasa
+Indonesia. Mohon dipertahankan.

@@ -388,3 +388,99 @@ html {
   height: 0;
   pointer-events: none;
 }
+
+/* ---------------------------------------------------------------------------
+   Kursor tombol
+   ---------------------------------------------------------------------------
+   Preflight Tailwind v3 dulu memberi `cursor: pointer` pada <button>. Preflight
+   v4 MENGHAPUS aturan itu, sehingga tombol memakai `cursor: default` bawaan
+   browser dan terasa seperti tidak bisa diklik — keluhan yang wajar dari staf
+   yang tidak terbiasa.
+
+   Diperbaiki sekali di sini, bukan dengan menempelkan `cursor-pointer` di tiap
+   komponen: kalau ditempel satu per satu, tombol berikutnya yang dibuat orang
+   lain pasti terlewat lagi.
+
+   Tombol yang disabled sengaja dikecualikan — kursor panah adalah petunjuk
+   yang benar bahwa tombolnya memang sedang tidak bisa ditekan. */
+@layer base {
+    button:not(:disabled),
+    [role='button']:not([aria-disabled='true']),
+    label[for],
+    summary,
+    select:not(:disabled),
+    input[type='checkbox']:not(:disabled),
+    input[type='radio']:not(:disabled),
+    input[type='file']:not(:disabled)::file-selector-button {
+        cursor: pointer;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Kerangka pemuatan (skeleton)
+   ---------------------------------------------------------------------------
+   Kilau bergerak dari kiri ke kanan. Dipakai `components/dashboard/ui/Skeleton`.
+
+   Memakai `background-position`, bukan `opacity` berkedip: kedipan pada blok
+   besar mengganggu dan bisa memicu masalah bagi pengguna yang sensitif
+   terhadap kilatan. */
+@keyframes kilauSkeleton {
+    from {
+        background-position: 200% 0;
+    }
+    to {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton {
+    background-image: linear-gradient(
+        90deg,
+        color-mix(in oklab, var(--color-primary) 6%, transparent) 0%,
+        color-mix(in oklab, var(--color-primary) 12%, transparent) 50%,
+        color-mix(in oklab, var(--color-primary) 6%, transparent) 100%
+    );
+    background-size: 200% 100%;
+    animation: kilauSkeleton 1.6s ease-in-out infinite;
+}
+
+/* Hormati pengaturan sistem "kurangi animasi": kilau dihentikan, blok abu tetap
+   tampil sebagai penanda bahwa isinya sedang dimuat. */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton {
+        animation: none;
+        background-image: none;
+        background-color: color-mix(in oklab, var(--color-primary) 8%, transparent);
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Pemuat di tengah layar
+   ---------------------------------------------------------------------------
+   Dipakai `components/dashboard/ui/PemuatLayar`.
+
+   Tertunda 150 ms lalu memudar masuk. Penundaannya yang penting: perpindahan
+   yang selesai seketika tidak sempat memunculkan kotak ini, jadi tidak ada
+   kedipan — tapi jangan terlalu panjang, atau justru tidak pernah terlihat pada
+   halaman yang memang perlu menunggu sebentar. `both` menahan keadaan awal
+   (opacity 0) selama penundaan berlangsung. */
+@keyframes munculPemuat {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pemuat-layar {
+    animation: munculPemuat 160ms ease-out 150ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pemuat-layar {
+        animation: munculPemuat 1ms linear 150ms both;
+    }
+}

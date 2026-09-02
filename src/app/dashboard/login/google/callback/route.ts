@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import {
+    COOKIE_LANJUT,
     COOKIE_STATE,
     COOKIE_VERIFIER,
     ambilProfil,
@@ -12,6 +13,7 @@ import {
 } from '@/lib/dashboard/google'
 import { bolehLoginGoogle } from '@/lib/dashboard/metode-login'
 import { cookieSesi, terbitkanSesi } from '@/lib/dashboard/sesi'
+import { tujuanAman } from '@/lib/dashboard/akses'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,6 +28,7 @@ function kembaliDenganGalat(req: NextRequest, kode: string) {
 function bersihkanCookieSementara(res: NextResponse) {
     res.cookies.delete({ name: COOKIE_STATE, path: PATH_COOKIE })
     res.cookies.delete({ name: COOKIE_VERIFIER, path: PATH_COOKIE })
+    res.cookies.delete({ name: COOKIE_LANJUT, path: PATH_COOKIE })
 }
 
 /** Langkah 2 "Masuk dengan Google": Google mengembalikan pengguna ke sini.
@@ -104,7 +107,12 @@ export async function GET(req: NextRequest) {
         return kembaliDenganGalat(req, 'gagal')
     }
 
-    const res = NextResponse.redirect(new URL('/dashboard', req.url))
+    // Diperiksa lagi meski sudah diperiksa saat dipasang: cookie ada di sisi
+    // pengguna dan bisa diubah.
+    const lanjut = req.cookies.get(COOKIE_LANJUT)?.value
+    const tujuan = tujuanAman(lanjut) ? (lanjut as string) : '/dashboard'
+
+    const res = NextResponse.redirect(new URL(tujuan, req.url))
     const { name, value, ...opsi } = cookieSesi(payload, token)
     res.cookies.set(name, value, opsi)
     bersihkanCookieSementara(res)

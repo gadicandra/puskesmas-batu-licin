@@ -9,6 +9,10 @@ const URL_TOKEN = 'https://oauth2.googleapis.com/token'
 
 export const COOKIE_STATE = 'pkm_google_state'
 export const COOKIE_VERIFIER = 'pkm_google_verifier'
+/** Halaman yang tadi diminta sebelum dipantulkan ke login. Dititipkan di cookie
+ *  karena alur OAuth berpindah ke domain Google dan kembali lewat alamat tetap
+ *  (`redirect_uri`) — tidak ada tempat lain untuk membawanya. */
+export const COOKIE_LANJUT = 'pkm_google_lanjut'
 /** Cukup untuk menyelesaikan satu kali login; sengaja pendek. */
 export const UMUR_COOKIE_DETIK = 10 * 60
 /** Cookie sementara dibatasi ke halaman login saja, dan path ini harus dipakai

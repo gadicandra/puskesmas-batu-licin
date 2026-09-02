@@ -1,0 +1,82 @@
+# Contoh isi berkas .env — salin dengan:
+#     cp docs/env-contoh.txt .env
+#
+# Untuk `docker compose up`, berkas ini SEBENARNYA OPSIONAL: semua nilai di
+# docker-compose.yml sudah punya default yang aman untuk pengembangan. Salin
+# hanya bila ingin mengubah salah satunya, atau bila menjalankan tanpa Docker.
+
+# --- Wajib (bila menjalankan tanpa Docker) -------------------------------
+# Dari komputer host: localhost:5434. Di dalam Docker, service `app` memakai
+# host `db` — sudah diatur otomatis di docker-compose.yml.
+DATABASE_URL=postgres://postgres:postgres@localhost:5434/puskesmas
+
+# Kunci penandatanganan sesi. GANTI dengan nilai acak panjang di produksi:
+#     openssl rand -hex 32
+PAYLOAD_SECRET=rahasia-pengembangan-jangan-dipakai-di-produksi
+
+# --- Masuk dengan Google (opsional) --------------------------------------
+# Kosongkan bila belum dipakai: tombol "Masuk dengan Google" otomatis
+# disembunyikan dan login email + kata sandi tetap berjalan seperti biasa.
+# Panduan lengkap: docs/DASHBOARD.md §6.
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# Alamat publik aplikasi, dipakai menyusun redirect URI Google. Boleh kosong
+# saat dev; WAJIB diisi di produksi yang berada di balik proxy/kontainer.
+APP_URL=
+
+# --- Skema database ------------------------------------------------------
+# Kosongkan untuk perilaku default: auto-push saat `pnpm dev` di komputer,
+# migrasi di Docker & produksi. Isi `false` untuk selalu memakai migrasi.
+# Lihat README bagian "Skema database: migrasi vs auto-push".
+PAYLOAD_DB_PUSH=
+
+# --- Penyimpanan berkas: Cloudflare R2 (opsional) ------------------------
+# Kosongkan untuk memakai disk lokal `<project>/media`. Itu sudah benar untuk
+# pengembangan dan untuk produksi di VPS/server sendiri yang disknya permanen.
+#
+# WAJIB diisi bila dideploy ke platform yang disknya sementara (Vercel dan
+# sejenisnya): di sana berkas yang diunggah staf HILANG pada deploy berikutnya,
+# tanpa pesan galat apa pun.
+#
+# Cara memperolehnya ada di README bagian "Penyimpanan berkas".
+# Keempatnya harus terisi; kalau ada satu yang kosong, R2 tidak diaktifkan.
+#
+# Bentuk nilainya (contoh, BUKAN nilai sungguhan):
+#
+#   R2_BUCKET=puskesmas-batulicin
+#     Nama bucket apa adanya. Huruf kecil, angka, dan tanda hubung.
+#
+#   R2_ENDPOINT=https://8f3c1d0e5a7b492c1a6d4e2f9b0c3a15.r2.cloudflarestorage.com
+#     https:// + Account ID (32 huruf/angka) + .r2.cloudflarestorage.com
+#     JANGAN sertakan nama bucket di belakangnya. Halaman bucket Cloudflare
+#     menampilkan alamat "S3 API" yang sudah memuat nama bucket — kalau itu
+#     yang disalin, setiap unggahan gagal. Aplikasi akan menolaknya saat
+#     menyala dan menyebutkan bagian mana yang harus dibuang.
+#
+#   R2_ACCESS_KEY_ID=1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d
+#     32 huruf/angka. Muncul saat token dibuat.
+#
+#   R2_SECRET_ACCESS_KEY=9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c5b4a39281706f5e4d3c2b1a0
+#     64 huruf/angka. HANYA ditampilkan sekali saat token dibuat —
+#     kalau hilang, buat token baru. Jangan pernah di-commit.
+R2_BUCKET=
+R2_ENDPOINT=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+
+# --- Akun pertama yang dibuat `pnpm seed` --------------------------------
+SEED_ADMIN_EMAIL=admin@puskesmas.local
+SEED_ADMIN_PASSWORD=puskesmas123
+
+# --- Port (isi bila bentrok dengan aplikasi lain) ------------------------
+APP_PORT=3000
+DB_PORT=5434
+
+# --- Kredensial Postgres di dalam Docker (opsional) ----------------------
+# Hanya dibaca docker-compose.yml, bukan oleh aplikasi. Biarkan kosong untuk
+# memakai nilai bawaan di bawah. Kalau diubah, DATABASE_URL di atas harus ikut
+# disesuaikan.
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=puskesmas
