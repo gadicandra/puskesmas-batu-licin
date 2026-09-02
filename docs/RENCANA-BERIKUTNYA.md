@@ -85,7 +85,7 @@ desain yang sedang digarap.
 | C | 2 export mati: `formatTanggalWaktu()` di `lib/dashboard/format.ts`, `type UnitValue` di `lib/units.ts` |
 | D | 14 impor tak terpakai (peringatan lint) |
 | E | 3 aset publik tak dirujuk: `backgroundFooter.webp` (164 KB), `layananPuskesmas.webp`, `posyandu.webp` |
-| F1 | `package-lock.json` (456 KB) berdampingan dengan `pnpm-lock.yaml` — bisa membuat CI memilih manajer yang salah |
+| ~~F1~~ | ~~`package-lock.json` berdampingan dengan `pnpm-lock.yaml`~~ — **sudah dihapus** (2 September 2026) |
 | F2 | ~~CLAUDE.md basi soal `tailwind.config.ts`~~ — sudah diperbaiki |
 
 ---
