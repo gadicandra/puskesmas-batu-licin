@@ -47,6 +47,82 @@ export const skemaSertifikat = z.object({
     keterangan: z.string().trim().optional(),
 })
 
+/** Isian bertipe daftar dikirim form sebagai satu string JSON — lihat
+ *  `DaftarBaris` dan `PilihanBanyak`. JSON yang rusak hanya mungkin terjadi
+ *  kalau form-nya sendiri bermasalah, jadi diperlakukan sebagai daftar kosong;
+ *  isi yang salah bentuk tetap ditangkap oleh skema tiap barisnya. */
+function uraiDaftar(nilai: string | undefined): unknown[] {
+    if (!nilai) return []
+    try {
+        const hasil: unknown = JSON.parse(nilai)
+        return Array.isArray(hasil) ? hasil : []
+    } catch {
+        return []
+    }
+}
+
+function daftarJson<T extends z.ZodType>(baris: T) {
+    return z.string().optional().transform(uraiDaftar).pipe(z.array(baris))
+}
+
+/** Relasi ke satu dokumen. `null` berarti sengaja dikosongkan. */
+const relasiOpsional = z.coerce.number().int().positive().nullable().optional()
+
+export const skemaFasilitas = z.object({
+    nama: z.string().trim().min(1, 'Nama fasilitas belum diisi.'),
+    kategori: z.enum(['ruang', 'kantor', 'alat', 'kendaraan', 'penunjang']),
+    deskripsi: z.string().trim().nullish(),
+    jumlah: z.coerce.number().int().min(0, 'Jumlah tidak boleh kurang dari 0.').nullable().optional(),
+    foto: relasiOpsional,
+    urutan: z.coerce.number().int().min(0, 'Urutan tidak boleh kurang dari 0.').optional(),
+    aktif: z.boolean().optional(),
+})
+
+export const skemaLayanan = z.object({
+    nama: z.string().trim().min(1, 'Nama layanan belum diisi.'),
+    slug: z.string().trim().optional(),
+    induk: relasiOpsional,
+    jadwal: z.string().trim().nullish(),
+    kategori: z.enum(['dalam-gedung', 'luar-gedung', 'posyandu']),
+    deskripsi: z.string().trim().nullish(),
+    persyaratan: daftarJson(
+        z.object({ isi: z.string().trim().min(1, 'Ada baris syarat yang masih kosong. Isi atau hapus barisnya.') }),
+    ),
+    urutan: z.coerce.number().int().min(0, 'Urutan tidak boleh kurang dari 0.').optional(),
+    aktif: z.boolean().optional(),
+})
+
+export const skemaPosyandu = z.object({
+    nama: z.string().trim().min(1, 'Nama posyandu belum diisi.'),
+    alamat: z.string().trim().nullish(),
+    layanan: daftarJson(z.coerce.number().int().positive()),
+    jadwal: daftarJson(
+        z.object({
+            hari: z.enum(['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'], {
+                message: 'Ada baris jadwal yang harinya belum dipilih. Pilih hari atau hapus barisnya.',
+            }),
+            keterangan: z.string().trim().optional(),
+        }),
+    ),
+    penanggungJawab: z.string().trim().nullish(),
+    kontak: z.string().trim().nullish(),
+    urutan: z.coerce.number().int().min(0, 'Urutan tidak boleh kurang dari 0.').optional(),
+    aktif: z.boolean().optional(),
+})
+
+export const skemaJabatan = z.object({
+    jabatan: z.string().trim().min(1, 'Nama jabatan belum diisi.'),
+    nama: z.string().trim().nullish(),
+    foto: relasiOpsional,
+    atasan: relasiOpsional,
+    urutan: z.coerce.number().int().min(0, 'Urutan tidak boleh kurang dari 0.').optional(),
+})
+
+export const skemaTanggapanPengaduan = z.object({
+    status: z.enum(['baru', 'diproses', 'selesai']),
+    tanggapan: z.string().trim().nullish(),
+})
+
 export const skemaPengguna = z.object({
     name: z.string().trim().min(1, 'Nama belum diisi.'),
     email: z.string().trim().email('Format email belum benar. Contoh: nama@puskesmas.go.id'),

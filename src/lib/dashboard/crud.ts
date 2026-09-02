@@ -23,6 +23,7 @@ export function buatAksiCrud<S extends z.ZodType>({
     skema,
     pathRevalidate = [],
     tagRevalidate = [],
+    kosongkanJadiNull = [],
     labelData,
 }: {
     collection: CollectionSlug
@@ -34,6 +35,11 @@ export function buatAksiCrud<S extends z.ZodType>({
      *  data tersimpan tapi situs tetap menampilkan yang lama sampai
      *  `UMUR_CACHE_DETIK` habis. Lihat docs/KONTRAK-DATA.md. */
     tagRevalidate?: NamaTag[]
+    /** Field yang isian kosongnya berarti "kosongkan", bukan "biarkan seperti
+     *  semula". Tanpa daftar ini isian kosong dibuang sebelum dikirim, sehingga
+     *  relasi atau foto yang sudah terisi tidak pernah bisa dilepas lagi —
+     *  gagal tanpa pesan galat: tombol Simpan sukses, nilainya tetap. */
+    kosongkanJadiNull?: string[]
     labelData: string
 }) {
     const segarkan = () => {
@@ -49,7 +55,10 @@ export function buatAksiCrud<S extends z.ZodType>({
         const mentah: Record<string, unknown> = {}
         formData.forEach((nilai, kunci) => {
             if (kunci === 'id') return
-            if (nilai === '') return
+            if (nilai === '') {
+                if (kosongkanJadiNull.includes(kunci)) mentah[kunci] = null
+                return
+            }
             mentah[kunci] = nilai
         })
         // Checkbox tidak terkirim saat tidak dicentang — jadikan boolean eksplisit.
