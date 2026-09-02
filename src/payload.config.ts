@@ -15,6 +15,10 @@ import { Articles } from './collections/Articles'
 import { PageViews } from './collections/PageViews'
 import { OperationalHours } from './globals/OperationalHours'
 import { SiteSettings } from './globals/SiteSettings'
+import { AlurPengaduanStep } from './collections/AlurPengaduanStep'
+import { KritikSaran } from './collections/KritikSaran'
+import { Pengaduan } from './collections/Pengaduan'
+import { seedAlurPengaduan } from './lib/seedAlurPengaduan'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -37,7 +41,11 @@ export default buildConfig({
     Certificates,
     Articles,
     PageViews,
+    AlurPengaduanStep,
+    Pengaduan,
+    KritikSaran,
   ],
+  onInit: seedAlurPengaduan,
   globals: [OperationalHours, SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

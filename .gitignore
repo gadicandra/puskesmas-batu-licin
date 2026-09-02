@@ -35,6 +35,16 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local agent notes and design references
+/AGENT.md
+/AGENTmd
+/fe.md
+/be.md
+/design.md
+/brand.md
+/log.md
+/design/
+
 # vercel
 .vercel
 

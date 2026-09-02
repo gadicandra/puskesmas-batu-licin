@@ -97,6 +97,15 @@
   /* Background & Foreground */
   --background: var(--color-base);
   --foreground: var(--color-primary);
+
+  /* Pengaduan & Feedback */
+  --color-pengaduan-dark: #1F2E1A;
+  --color-pengaduan-pill: #2F4A24;
+  --color-pengaduan-accent: #6B9D32;
+  --color-pengaduan-light: #58743E;
+  --color-pengaduan-lime: #86B94A;
+  --color-pengaduan-neutral: #D9DDD5;
+  --color-pengaduan-copy: #243117;
 }
 
 /* ========================================
@@ -151,6 +160,15 @@
   --color-tertiary-800: rgb(61, 66, 74);
   --color-tertiary-900: rgb(54, 58, 64);
   --color-tertiary-950: rgb(36, 38, 42);
+
+  /* Pengaduan & Feedback */
+  --color-pengaduan-dark: rgb(31, 46, 26);
+  --color-pengaduan-pill: rgb(47, 74, 36);
+  --color-pengaduan-accent: rgb(107, 157, 50);
+  --color-pengaduan-light: rgb(88, 116, 62);
+  --color-pengaduan-lime: rgb(134, 185, 74);
+  --color-pengaduan-neutral: rgb(217, 221, 213);
+  --color-pengaduan-copy: rgb(36, 49, 23);
 
   /* Typography */
   --font-sans: 'Avenir', var(--font-geist-sans), system-ui, -apple-system, sans-serif;

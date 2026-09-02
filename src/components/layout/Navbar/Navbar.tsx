@@ -137,6 +137,17 @@ export default function Navbar() {
                           </Link>
                         </NavigationMenuLink>
                       </NavigationMenuItem>
+                      <NavigationMenuItem>
+                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                          <Link
+                            href="/pengaduan"
+                            className={`cursor-pointer hover:text-white transition-all duration-300 ease-out hover:bg-white/20 hover:scale-105 hover:shadow-md active:scale-95 ${pathname === "/pengaduan" ? "text-white bg-white/20 scale-105" : ""
+                              }`}
+                          >
+                            <p className="text-base">Pengaduan</p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
                     </NavigationMenuList>
                   </AnimatePresence>
                 </div>
@@ -271,10 +282,22 @@ export default function Navbar() {
               <div key="artikel-wrapper">
                 <Link href="/artikel" onClick={closeMobileMenu}>
                   <div
-                    className={`font-avenir-regular w-full p-2 hover:text-secondary transition-colors ${pathname === "/artikel" ? "font-semibold text-secondary" : ""
+                    className={`font-avenir-regular w-full p-2 hover:text-secondary transition-colors ${pathname.startsWith("/artikel") ? "font-semibold text-secondary" : ""
                       }`}
                   >
                     Artikel
+                  </div>
+                </Link>
+              </div>
+
+              {/* Pengaduan */}
+              <div key="pengaduan-wrapper">
+                <Link href="/pengaduan" onClick={closeMobileMenu}>
+                  <div
+                    className={`font-avenir-regular w-full p-2 hover:text-secondary transition-colors ${pathname === "/pengaduan" ? "font-semibold text-secondary" : ""
+                      }`}
+                  >
+                    Pengaduan
                   </div>
                 </Link>
               </div>
