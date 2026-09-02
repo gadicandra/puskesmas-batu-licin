@@ -20,7 +20,7 @@ const MAKS_UKURAN = 5_000_000 // sesuai batas upload di payload.config.ts
 const TIPE_DIIZINKAN = /^(image\/|application\/pdf$)/
 
 /** Daftar berkas untuk galeri & pemilih gambar. */
-export async function daftarMedia(cari?: string, halaman = 1) {
+export async function daftarMedia(cari?: string, halaman = 1, perHalaman = 5) {
     await requireUser()
     const payload = await getPayload({ config })
 
@@ -32,7 +32,7 @@ export async function daftarMedia(cari?: string, halaman = 1) {
         collection: 'media',
         where,
         sort: '-createdAt',
-        limit: 24,
+        limit: perHalaman,
         page: halaman,
         depth: 0,
     })

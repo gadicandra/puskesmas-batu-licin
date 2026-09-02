@@ -2,6 +2,7 @@ import { requireUser } from '@/lib/dashboard/auth'
 import { daftarMedia } from './actions'
 import PageHeader from '@/components/dashboard/ui/PageHeader'
 import GaleriMedia from '@/components/dashboard/media/GaleriMedia'
+import { bacaJumlah, batasBaris } from '@/lib/dashboard/paginasi'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Galeri Gambar | Dashboard' }
@@ -9,12 +10,13 @@ export const metadata = { title: 'Galeri Gambar | Dashboard' }
 export default async function MediaPage({
     searchParams,
 }: {
-    searchParams: Promise<{ cari?: string; page?: string }>
+    searchParams: Promise<{ cari?: string; page?: string; per?: string }>
 }) {
-    const { cari, page } = await searchParams
+    const { cari, page, per } = await searchParams
     await requireUser()
     const halaman = Math.max(1, Number.parseInt(page ?? '1', 10) || 1)
-    const hasil = await daftarMedia(cari, halaman)
+    const jumlah = bacaJumlah(per)
+    const hasil = await daftarMedia(cari, halaman, batasBaris(jumlah))
 
     return (
         <>
@@ -27,6 +29,8 @@ export default async function MediaPage({
                 cari={cari ?? ''}
                 halaman={hasil.page}
                 totalHalaman={hasil.totalPages}
+                total={hasil.totalDocs}
+                jumlah={jumlah}
             />
         </>
     )

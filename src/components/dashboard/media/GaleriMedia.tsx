@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import Link from 'next/link'
 import { Upload, Search, Trash2, Copy, Check } from 'lucide-react'
 import { unggahMedia, hapusMedia, type MediaRingkas } from '@/app/dashboard/(app)/media/actions'
 import { formatTanggal, formatUkuran } from '@/lib/dashboard/format'
@@ -10,6 +9,8 @@ import Input from '@/components/dashboard/ui/Input'
 import Field from '@/components/dashboard/ui/Field'
 import Card from '@/components/dashboard/ui/Card'
 import EmptyState from '@/components/dashboard/ui/EmptyState'
+import { PaginasiUrl } from '@/components/dashboard/ui/Paginasi'
+import type { JumlahBaris } from '@/lib/dashboard/paginasi'
 
 const MAKS_UKURAN = 5_000_000
 
@@ -18,11 +19,15 @@ export default function GaleriMedia({
     cari,
     halaman,
     totalHalaman,
+    total,
+    jumlah,
 }: {
     awal: MediaRingkas[]
     cari: string
     halaman: number
     totalHalaman: number
+    total: number
+    jumlah: JumlahBaris
 }) {
     const [pesan, setPesan] = useState<{ tipe: 'ok' | 'salah'; teks: string } | null>(null)
     const [terpilih, setTerpilih] = useState<MediaRingkas | null>(null)
@@ -134,21 +139,13 @@ export default function GaleriMedia({
                 </ul>
             )}
 
-            {totalHalaman > 1 && (
-                <nav aria-label="Navigasi halaman" className="flex items-center justify-center gap-3">
-                    {halaman > 1 && (
-                        <Link href={`/dashboard/media?page=${halaman - 1}`}>
-                            <Button varian="secondary" ukuran="sm">Sebelumnya</Button>
-                        </Link>
-                    )}
-                    <span className="text-sm text-tertiary">Halaman {halaman} dari {totalHalaman}</span>
-                    {halaman < totalHalaman && (
-                        <Link href={`/dashboard/media?page=${halaman + 1}`}>
-                            <Button varian="secondary" ukuran="sm">Berikutnya</Button>
-                        </Link>
-                    )}
-                </nav>
-            )}
+            <PaginasiUrl
+                total={total}
+                halaman={halaman}
+                totalHalaman={totalHalaman}
+                jumlah={jumlah}
+                labelData="gambar"
+            />
 
             {/* Panel detail */}
             {terpilih && (
