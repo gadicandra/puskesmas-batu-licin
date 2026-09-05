@@ -13,7 +13,8 @@
 # testing
 /coverage
 
-
+GEMINI.md
+GRAPHIFY_SETUP.md
 
 # next.js
 /.next/
