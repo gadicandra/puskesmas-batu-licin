@@ -15,7 +15,7 @@
 
 GEMINI.md
 GRAPHIFY_SETUP.md
-
+/venv
 # next.js
 /.next/
 # direktori build container Docker (lihat NEXT_DIST_DIR di docker-compose.yml)
@@ -69,3 +69,9 @@ CLAUDE.md
 # menganggapnya perubahan kode dan Server Action tidak pernah selesai.
 .playwright-mcp/
 .gstack/
+
+# python
+venv/
+
+# graphify
+graphify-out/
