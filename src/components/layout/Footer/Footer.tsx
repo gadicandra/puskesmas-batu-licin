@@ -20,6 +20,7 @@ const Nav = [
     { name: 'Profil Puskesmas', href: '/profil-puskesmas' },
     { name: 'Struktur Organisasi', href: '/struktur-organisasi' },
     { name: 'Informasi Layanan dan Mutu', href: '/informasi-layanan-mutu' },
+    { name: 'Dokter', href: '/dokter' },
     { name: 'Artikel', href: '/artikel' },
     { name: 'Lokasi Puskesmas', href: '/lokasi-puskesmas' },
 ]

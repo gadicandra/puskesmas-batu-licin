@@ -4,10 +4,11 @@ import config from '@payload-config'
 import { ringkasGambar, type GambarPublik } from './media'
 import { TAG, UMUR_CACHE_DETIK } from './tags'
 
-export type KategoriFasilitas = 'ruang' | 'alat' | 'kendaraan' | 'penunjang'
+export type KategoriFasilitas = 'ruang' | 'kantor' | 'alat' | 'kendaraan' | 'penunjang'
 
 export const LABEL_KATEGORI_FASILITAS: Record<KategoriFasilitas, string> = {
-    ruang: 'Ruang & Bangunan',
+    ruang: 'Ruang Pelayanan',
+    kantor: 'Ruang Kantor',
     alat: 'Alat Kesehatan',
     kendaraan: 'Kendaraan',
     penunjang: 'Sarana Penunjang',
