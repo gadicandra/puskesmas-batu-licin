@@ -33,6 +33,9 @@
 # misc
 .DS_Store
 *.pem
+*.key
+*.p12
+*.pfx
 
 # debug
 npm-debug.log*
@@ -45,6 +48,16 @@ yarn-error.log*
 # Kecuali templatnya — README menyuruh `cp .env.example .env`, jadi berkas
 # ini justru wajib ikut. Tanpa baris ini pola di atas menelannya.
 !.env.example
+
+# local agent notes and design references
+/AGENT.md
+/AGENTmd
+/fe.md
+/be.md
+/design.md
+/brand.md
+/log.md
+/design/
 
 # vercel
 .vercel

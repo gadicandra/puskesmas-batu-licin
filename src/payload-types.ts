@@ -75,6 +75,9 @@ export interface Config {
     certificates: Certificate;
     articles: Article;
     'page-views': PageView;
+    'alur-pengaduan-steps': AlurPengaduanStep;
+    pengaduan: Pengaduan;
+    'kritik-saran': KritikSaran;
     services: Service;
     posyandu: Posyandu;
     facilities: Facility;
@@ -96,6 +99,9 @@ export interface Config {
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'page-views': PageViewsSelect<false> | PageViewsSelect<true>;
+    'alur-pengaduan-steps': AlurPengaduanStepsSelect<false> | AlurPengaduanStepsSelect<true>;
+    pengaduan: PengaduanSelect<false> | PengaduanSelect<true>;
+    'kritik-saran': KritikSaranSelect<false> | KritikSaranSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     posyandu: PosyanduSelect<false> | PosyanduSelect<true>;
     facilities: FacilitiesSelect<false> | FacilitiesSelect<true>;
@@ -473,6 +479,53 @@ export interface PageView {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "alur-pengaduan-steps".
+ */
+export interface AlurPengaduanStep {
+  id: number;
+  order: number;
+  title: string;
+  description: string;
+  details?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pengaduan".
+ */
+export interface Pengaduan {
+  id: number;
+  name: string;
+  contact: string;
+  subject: string;
+  message: string;
+  status: 'baru' | 'diproses' | 'selesai';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kritik-saran".
+ */
+export interface KritikSaran {
+  id: number;
+  name: string;
+  contact: string;
+  subject: string;
+  message: string;
+  status: 'baru' | 'diproses' | 'selesai';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posyandu".
  */
 export interface Posyandu {
@@ -659,6 +712,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'page-views';
         value: number | PageView;
+      } | null)
+    | ({
+        relationTo: 'alur-pengaduan-steps';
+        value: number | AlurPengaduanStep;
+      } | null)
+    | ({
+        relationTo: 'pengaduan';
+        value: number | Pengaduan;
+      } | null)
+    | ({
+        relationTo: 'kritik-saran';
+        value: number | KritikSaran;
       } | null)
     | ({
         relationTo: 'services';
@@ -887,6 +952,50 @@ export interface PageViewsSelect<T extends boolean = true> {
   path?: T;
   referrer?: T;
   uaHash?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "alur-pengaduan-steps_select".
+ */
+export interface AlurPengaduanStepsSelect<T extends boolean = true> {
+  order?: T;
+  title?: T;
+  description?: T;
+  details?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pengaduan_select".
+ */
+export interface PengaduanSelect<T extends boolean = true> {
+  name?: T;
+  contact?: T;
+  subject?: T;
+  message?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kritik-saran_select".
+ */
+export interface KritikSaranSelect<T extends boolean = true> {
+  name?: T;
+  contact?: T;
+  subject?: T;
+  message?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

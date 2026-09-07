@@ -22,11 +22,37 @@ import { OrgChart } from './collections/OrgChart'
 import { ServiceStatistics } from './collections/ServiceStatistics'
 import { OperationalHours } from './globals/OperationalHours'
 import { SiteSettings } from './globals/SiteSettings'
+import { AlurPengaduanStep } from './collections/AlurPengaduanStep'
+import { KritikSaran } from './collections/KritikSaran'
+import { Pengaduan } from './collections/Pengaduan'
+import { seedAlurPengaduan } from './lib/seedAlurPengaduan'
 import { Profile } from './globals/Profile'
 import { r2Aktif, konfigurasiR2, namaBucketR2 } from './lib/penyimpanan'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+function validateProductionEnvironment() {
+  if (process.env.NODE_ENV !== 'production') return
+
+  const required = ['DATABASE_URL', 'PAYLOAD_SECRET']
+  const missing = required.filter((name) => !process.env[name])
+  if (missing.length > 0) {
+    throw new Error(`Environment production belum lengkap: ${missing.join(', ')}`)
+  }
+
+  if (process.env.PAYLOAD_SECRET === 'rahasia-pengembangan-jangan-dipakai-di-produksi') {
+    throw new Error('PAYLOAD_SECRET harus diganti dengan nilai acak di production.')
+  }
+
+  if ((process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_SECRET) && !process.env.APP_URL) {
+    throw new Error('APP_URL wajib diisi ketika Google OAuth diaktifkan.')
+  }
+
+  if (!process.env.RESEND_API_KEY && !process.env.FEEDBACK_WEBHOOK_URL) {
+    throw new Error('RESEND_API_KEY atau FEEDBACK_WEBHOOK_URL wajib dikonfigurasi di production.')
+  }
+}
 
 export default buildConfig({
   // UI admin bawaan Payload (/admin) sudah DIHAPUS — digantikan dashboard custom
@@ -46,6 +72,9 @@ export default buildConfig({
     Certificates,
     Articles,
     PageViews,
+    AlurPengaduanStep,
+    Pengaduan,
+    KritikSaran,
     Services,
     Posyandu,
     Facilities,
@@ -53,6 +82,10 @@ export default buildConfig({
     OrgChart,
     ServiceStatistics,
   ],
+  onInit: async (payload) => {
+    validateProductionEnvironment()
+    await seedAlurPengaduan(payload)
+  },
   globals: [OperationalHours, SiteSettings, Profile],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

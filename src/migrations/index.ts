@@ -3,6 +3,7 @@ import * as migration_20260901_105349_tambah_jabatan_lengkap from './20260901_10
 import * as migration_20260901_110835_data_kelembagaan_dan_fasilitas from './20260901_110835_data_kelembagaan_dan_fasilitas';
 import * as migration_20260901_112706_layanan_berjenjang_dan_angka_pelayanan from './20260901_112706_layanan_berjenjang_dan_angka_pelayanan';
 import * as migration_20260902_084016_layanan_gambar_dan_relasi_dokter from './20260902_084016_layanan_gambar_dan_relasi_dokter';
+import * as migration_20260906_121306_pengaduan_dan_kritik_saran from './20260906_121306_pengaduan_dan_kritik_saran';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20260902_084016_layanan_gambar_dan_relasi_dokter.up,
     down: migration_20260902_084016_layanan_gambar_dan_relasi_dokter.down,
-    name: '20260902_084016_layanan_gambar_dan_relasi_dokter'
+    name: '20260902_084016_layanan_gambar_dan_relasi_dokter',
+  },
+  {
+    up: migration_20260906_121306_pengaduan_dan_kritik_saran.up,
+    down: migration_20260906_121306_pengaduan_dan_kritik_saran.down,
+    name: '20260906_121306_pengaduan_dan_kritik_saran'
   },
 ];
