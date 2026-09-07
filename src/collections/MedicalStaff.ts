@@ -7,7 +7,7 @@ export const MedicalStaff: CollectionConfig = {
     labels: { singular: 'Tenaga Medis', plural: 'Tenaga Medis' },
     admin: {
         useAsTitle: 'nama',
-        defaultColumns: ['nama', 'jabatan', 'poli', 'aktif'],
+        defaultColumns: ['nama', 'jabatanLengkap', 'jabatan', 'aktif'],
         group: 'Layanan',
     },
     access: {
@@ -33,6 +33,17 @@ export const MedicalStaff: CollectionConfig = {
                 { label: 'Tenaga Administrasi', value: 'administrasi' },
                 { label: 'Lainnya', value: 'lainnya' },
             ],
+        },
+        {
+            // Jabatan fungsional lengkap seperti tertulis di dokumen kepegawaian,
+            // mis. "Perawat Ahli Madya". `jabatan` di atas hanya kategori kasar
+            // untuk mengelompokkan & menyaring; jenjangnya ada di sini. Tanpa
+            // field ini, "Pranata Lab. Kes. Penyelia" menyusut jadi "analis"
+            // dan jenjang yang jadi identitas profesionalnya hilang.
+            name: 'jabatanLengkap',
+            type: 'text',
+            label: 'Jabatan Fungsional Lengkap',
+            admin: { description: 'Mis. "Perawat Ahli Madya". Inilah yang tampil di situs.' },
         },
         { name: 'foto', type: 'upload', relationTo: 'media' },
         { name: 'aktif', type: 'checkbox', defaultValue: true },

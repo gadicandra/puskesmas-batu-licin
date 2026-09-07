@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/dashboard/auth'
 import { googleAktif } from '@/lib/dashboard/google'
+import { tujuanAman } from '@/lib/dashboard/akses'
 import LoginForm from './LoginForm'
 import TombolGoogle from './TombolGoogle'
 
@@ -32,13 +33,17 @@ const PESAN_GALAT: Record<string, string> = {
 export default async function LoginPage({
     searchParams,
 }: {
-    searchParams: Promise<{ galat?: string }>
+    searchParams: Promise<{ galat?: string; lanjut?: string }>
 }) {
-    // Sudah login? Langsung ke beranda dashboard.
-    const user = await getCurrentUser()
-    if (user) redirect('/dashboard')
+    const { galat, lanjut } = await searchParams
+    // `lanjut` datang dari alamat, jadi tidak boleh dipercaya apa adanya —
+    // lihat `tujuanAman()`. Yang tidak lolos diperlakukan seperti tidak ada.
+    const tujuan = tujuanAman(lanjut) ? (lanjut as string) : null
 
-    const { galat } = await searchParams
+    // Sudah login? Langsung ke tujuan, atau beranda dashboard.
+    const user = await getCurrentUser()
+    if (user) redirect(tujuan ?? '/dashboard')
+
     const pesanGalat = galat ? PESAN_GALAT[galat] : undefined
     const pakaiGoogle = googleAktif()
 
@@ -71,7 +76,7 @@ export default async function LoginPage({
 
                     {pakaiGoogle && (
                         <>
-                            <TombolGoogle />
+                            <TombolGoogle tujuan={tujuan} />
                             <div className="my-6 flex items-center gap-3">
                                 <span className="h-px flex-1 bg-primary/10" />
                                 <span className="text-xs font-semibold uppercase tracking-wide text-tertiary">
@@ -82,7 +87,7 @@ export default async function LoginPage({
                         </>
                     )}
 
-                    <LoginForm />
+                    <LoginForm tujuan={tujuan} />
                 </div>
 
                 <p className="mt-6 text-center text-sm text-tertiary">

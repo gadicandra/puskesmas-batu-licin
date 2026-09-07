@@ -16,6 +16,17 @@ export const SiteSettings: GlobalConfig = {
         { name: 'telepon', type: 'text' },
         { name: 'email', type: 'email' },
         {
+            name: 'teleponDarurat',
+            type: 'text',
+            label: 'Nomor Darurat',
+            admin: { description: 'Nomor gawat darurat / PSC 119, tampil terpisah dari telepon utama.' },
+        },
+        {
+            name: 'namaPetugasDarurat',
+            type: 'text',
+            label: 'Penanggung Jawab Nomor Darurat',
+        },
+        {
             name: 'sosialMedia',
             type: 'array',
             labels: { singular: 'Akun', plural: 'Sosial Media' },

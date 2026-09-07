@@ -1,6 +1,7 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
+import { TAG } from '@/lib/konten/tags'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { requireSuperAdmin } from '@/lib/dashboard/auth'
@@ -25,6 +26,7 @@ export async function simpanJamOperasional(_prev: FormState, formData: FormData)
         }
         revalidatePath('/dashboard/pengaturan')
         revalidatePath('/')
+        revalidateTag(TAG.jamPelayanan)
         return { sukses: 'Jadwal dikembalikan sesuai SK.' }
     }
 
@@ -53,6 +55,7 @@ export async function simpanJamOperasional(_prev: FormState, formData: FormData)
 
     revalidatePath('/dashboard/pengaturan')
     revalidatePath('/')
+    revalidateTag(TAG.jamPelayanan)
     return { sukses: 'Jam operasional tersimpan dan sudah diperbarui di situs.' }
 }
 
@@ -85,5 +88,6 @@ export async function simpanPengaturanSitus(_prev: FormState, formData: FormData
 
     revalidatePath('/dashboard/pengaturan')
     revalidatePath('/')
+    revalidateTag(TAG.pengaturanSitus)
     return { sukses: 'Pengaturan situs tersimpan.' }
 }

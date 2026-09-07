@@ -16,40 +16,8 @@ type Props = {
 	moreHref?: string
 }
 
-const DEFAULT_ITEMS: LayananItem[] = [
-	{
-		title: "Imunisasi",
-		subtitle: "Program vaksinasi untuk bayi, anak, dan dewasa",
-		image: "/imunisasi_2x.webp",
-		href: "/layanan/imunisasi"
-	},
-	{
-		title: "Poli Gigi",
-		subtitle: "Program pelayanan untuk bayi, anak, dan dewasa",
-		image: "/poligigi_2x.webp",
-		href: "/layanan/poligigi"
-	},
-	{
-		title: "Poli Umum",
-		subtitle: "Program vaksinasi untuk bayi, anak, dan dewasa",
-		image: "/poliumum_2x.webp",
-		href: "/layanan/poliumum"
-	},
-	{
-		title: "Poli Anak",
-		subtitle: "Program vaksinasi untuk bayi, anak, dan dewasa",
-		image: "/polianak_2x.webp",
-		href: "/layanan/polianak"
-	},
-	{
-		title: "Laboratorium",
-		subtitle: "Program pelayanan untuk bayi, anak, dan dewasa",
-		image: "/laboratorium_2x.webp",
-		href: "/layanan/laboratorium"
-	},
-]
 
-export default function Layanan({ items = DEFAULT_ITEMS, moreHref = "/layanan" }: Props) {
+export default function Layanan({ items = [], moreHref = "/layanan" }: Props) {
 	const scrollContainerRef = useRef<HTMLDivElement>(null)
 
 	const scrollNext = () => {
@@ -82,11 +50,16 @@ export default function Layanan({ items = DEFAULT_ITEMS, moreHref = "/layanan" }
 							className="block rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
 						>
 							<div className="relative h-32 bg-gray-200">
-								<img
-									src={item.image}
-									alt={item.title}
-									className="w-full h-full object-cover"
-								/>
+								{item.image ? (
+									// eslint-disable-next-line @next/next/no-img-element
+									<img
+										src={item.image}
+										alt={item.title}
+										className="w-full h-full object-cover"
+									/>
+								) : (
+									<div className="h-full w-full bg-primary" />
+								)}
 								<div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
 								<div className="absolute bottom-0 left-0 right-0 p-3">
 									<h3 className="text-white font-semibold text-sm leading-tight">
@@ -112,11 +85,16 @@ export default function Layanan({ items = DEFAULT_ITEMS, moreHref = "/layanan" }
 								className="block rounded-lg overflow-hidden shadow-sm"
 							>
 								<div className="relative h-32 bg-gray-200">
-									<img
-										src={item.image}
-										alt={item.title}
-										className="w-full h-full object-cover"
-									/>
+									{item.image ? (
+										// eslint-disable-next-line @next/next/no-img-element
+										<img
+											src={item.image}
+											alt={item.title}
+											className="w-full h-full object-cover"
+										/>
+									) : (
+										<div className="h-full w-full bg-primary" />
+									)}
 									<div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
 									<div className="absolute bottom-0 left-0 right-0 p-3">
 										<h3 className="text-white font-semibold text-sm leading-tight">
@@ -185,11 +163,16 @@ export default function Layanan({ items = DEFAULT_ITEMS, moreHref = "/layanan" }
 									style={{ width: 'calc((100vw - 8rem) / 4.5)' }}
 								>
 									<div className="relative h-70 bg-gray-200">
-										<img
-											src={item.image}
-											alt={item.title}
-											className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-										/>
+										{item.image ? (
+											// eslint-disable-next-line @next/next/no-img-element
+											<img
+												src={item.image}
+												alt={item.title}
+												className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+											/>
+										) : (
+											<div className="h-full w-full bg-primary" />
+										)}
 										<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
 										{/* Blur overlay on last card */}

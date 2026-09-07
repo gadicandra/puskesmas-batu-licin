@@ -17,6 +17,14 @@
 
 # next.js
 /.next/
+# direktori build container Docker (lihat NEXT_DIST_DIR di docker-compose.yml)
+/.next-docker/
+# folder unggahan milik container (lihat MEDIA_DIR di docker-compose.yml)
+/media-docker/
+# store pnpm lokal (terbentuk saat install di dalam container)
+/.pnpm-store/
+# cadangan database sebelum migrasi — jangan ikut ter-commit
+/.backup/
 /out/
 
 # production
@@ -25,6 +33,9 @@
 # misc
 .DS_Store
 *.pem
+*.key
+*.p12
+*.pfx
 
 # debug
 npm-debug.log*
@@ -34,6 +45,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# Kecuali templatnya — README menyuruh `cp .env.example .env`, jadi berkas
+# ini justru wajib ikut. Tanpa baris ini pola di atas menelannya.
+!.env.example
 
 # local agent notes and design references
 /AGENT.md
@@ -54,5 +68,16 @@ next-env.d.ts
 
 media/*
 
+# Gambar sumber layanan — tempat kerja `pnpm gambar-layanan`. Isinya sementara:
+# begitu terunggah, berkasnya hidup di koleksi `media` (R2) dan disajikan dari
+# sana, jadi tidak perlu ada salinan kedua di repo.
+data/layanan-gambar/
+
 # claude
 CLAUDE.md
+.gstack/
+
+# Artefak Playwright MCP — kalau ikut di dalam repo, watcher Next dev
+# menganggapnya perubahan kode dan Server Action tidak pernah selesai.
+.playwright-mcp/
+.gstack/

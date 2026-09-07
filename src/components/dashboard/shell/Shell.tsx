@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useLinkStatus } from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Menu, X, ExternalLink, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import PemuatLayar from '@/components/dashboard/ui/PemuatLayar'
 import { menuUntuk, JUDUL_GRUP, type MenuItem } from './menu'
 
 type UserRingkas = { nama: string; email: string; role: string; lokasi?: string | null }
@@ -13,6 +15,25 @@ type UserRingkas = { nama: string; email: string; role: string; lokasi?: string 
 function aktifkah(pathname: string, href: string): boolean {
     if (href === '/dashboard') return pathname === '/dashboard'
     return pathname === href || pathname.startsWith(`${href}/`)
+}
+
+/** Popup "sedang dibuka" saat menu diklik.
+ *
+ *  `loading.tsx` baru muncul setelah navigasinya dimulai; jeda sebelum itu —
+ *  saat Next masih mengambil kode halaman — terasa seperti klik tidak terbaca.
+ *  `useLinkStatus` (Next 15.3+) mengisi jeda itu, dan HARUS dipanggil dari
+ *  komponen di dalam <Link> karena ia membaca status link terdekat. Karena itu
+ *  komponen sekecil ini ada: ia dipasang di setiap baris menu.
+ *
+ *  Popup besar di tengah layar, bukan ikon berputar di baris menunya: ikon 18px
+ *  di pinggir kiri terlalu mudah terlewat, apalagi oleh staf yang matanya
+ *  sedang tertuju ke area isi. Bersambung mulus dengan popup dari
+ *  `KerangkaHalaman` yang mengambil alih begitu `loading.tsx` tampil, jadi dari
+ *  klik sampai halaman siap tidak ada jeda tanpa penanda. */
+function PenandaPindah({ label }: { label: string }) {
+    const { pending } = useLinkStatus()
+    if (!pending) return null
+    return <PemuatLayar label={`Membuka ${label}`} keterangan="Mohon tunggu sebentar." />
 }
 
 function DaftarMenu({ menu, pathname, onKlik }: { menu: MenuItem[]; pathname: string; onKlik?: () => void }) {
@@ -30,7 +51,6 @@ function DaftarMenu({ menu, pathname, onKlik }: { menu: MenuItem[]; pathname: st
                         </p>
                         {isi.map((m) => {
                             const aktif = aktifkah(pathname, m.href)
-                            const Ikon = m.ikon
                             return (
                                 <Link
                                     key={m.href}
@@ -44,8 +64,9 @@ function DaftarMenu({ menu, pathname, onKlik }: { menu: MenuItem[]; pathname: st
                                             : 'text-white/70 hover:bg-white/10 hover:text-white'
                                     )}
                                 >
-                                    <Ikon size={18} className="shrink-0" />
+                                    <m.ikon size={18} className="shrink-0" aria-hidden />
                                     {m.label}
+                                    <PenandaPindah label={m.label} />
                                 </Link>
                             )
                         })}

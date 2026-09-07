@@ -1,4 +1,4 @@
-import { isValidContact, sendCompanyNotification } from '../lib/feedbackSubmission'
+import { enforceFeedbackRateLimit, isValidContact, sendCompanyNotification } from '../lib/feedbackSubmission'
 import type { CollectionConfig } from 'payload'
 
 export const KritikSaran: CollectionConfig = {
@@ -15,8 +15,9 @@ export const KritikSaran: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      async ({ data, operation }) => {
+      async ({ data, operation, req }) => {
         if (operation === 'create') {
+          enforceFeedbackRateLimit(req)
           await sendCompanyNotification('kritik-saran', {
             name: String(data.name),
             contact: String(data.contact),

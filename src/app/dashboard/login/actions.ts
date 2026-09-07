@@ -5,6 +5,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { bolehLoginSandi } from '@/lib/dashboard/metode-login'
 import { pasangCookieSesi, hapusCookieSesi } from '@/lib/dashboard/sesi'
+import { tujuanAman } from '@/lib/dashboard/akses'
 
 export type LoginState = { error?: string }
 
@@ -56,7 +57,12 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
     }
 
     await pasangCookieSesi(payload, token)
-    redirect('/dashboard')
+
+    // Kembali ke halaman yang tadi diminta. Diperiksa ulang di sini, bukan
+    // hanya saat dirender: isian tersembunyi di form bisa diubah siapa saja
+    // sebelum dikirim.
+    const lanjut = String(formData.get('lanjut') || '')
+    redirect(tujuanAman(lanjut) ? lanjut : '/dashboard')
 }
 
 /** Keluar dari dashboard: hapus cookie sesi. */

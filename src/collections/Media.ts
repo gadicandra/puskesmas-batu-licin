@@ -5,9 +5,15 @@ import type { CollectionConfig } from 'payload'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-/** Berkas unggahan (gambar & PDF). Disimpan di disk lokal `<project>/media`.
- *  CATATAN PRODUKSI: disk lokal tidak persist di container — perlu storage
- *  adapter (S3/R2) sebelum go-live. */
+/** Berkas unggahan (gambar & PDF).
+ *
+ *  Tempat penyimpanannya dipilih otomatis di `src/payload.config.ts`:
+ *  - Variabel `R2_*` kosong → disk lokal `<project>/media` (`staticDir` di bawah).
+ *  - Variabel `R2_*` terisi → Cloudflare R2, dan `staticDir` diabaikan.
+ *
+ *  Lihat `src/lib/penyimpanan.ts` dan README bagian "Penyimpanan berkas".
+ *  URL publiknya tetap `/api/media/<berkas>` di kedua mode, jadi tautan yang
+ *  sudah tersimpan di artikel tidak berubah saat berpindah penyimpanan. */
 export const Media: CollectionConfig = {
   slug: 'media',
   labels: { singular: 'Berkas', plural: 'Media' },
@@ -18,7 +24,11 @@ export const Media: CollectionConfig = {
     read: () => true, // file (gambar/PDF) harus bisa dibaca publik untuk tampil di web
   },
   upload: {
-    staticDir: path.resolve(dirname, '../../media'), // <project>/media
+    // Container Docker memakai folder sendiri (`MEDIA_DIR=media-docker` di
+    // docker-compose.yml). Tanpa pemisahan ini, Docker membuat `media/` di host
+    // sebagai titik mount milik root, dan `pnpm dev` di komputer langsung gagal
+    // mengunggah dengan `EACCES` yang penyebabnya tidak jelas.
+    staticDir: path.resolve(dirname, '../../', process.env.MEDIA_DIR || 'media'),
     mimeTypes: ['image/*', 'application/pdf'],
     imageSizes: [
       {

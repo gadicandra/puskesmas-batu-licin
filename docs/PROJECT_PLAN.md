@@ -156,7 +156,7 @@ tidak berhenti menunggu.
 
 | # | Konten | Untuk | Tenggat | Cadangan bila terlambat |
 | --- | --- | --- | --- | --- |
-| C1 | Deskripsi 14 jenis layanan + syarat pendaftaran | Layanan Kesehatan | **4 Sep** | Nama layanan dari SK tanpa deskripsi |
+| C1 | Deskripsi 14 jenis layanan + syarat pendaftaran | Layanan Kesehatan | **4 Sep** | **Sudah terpasang:** keterangan umum sementara di `src/seed/data/layanan-informasi.ts` (bukan isi SK). Teks resmi dari Puskesmas menimpanya lewat /dashboard/layanan; seed tidak menyentuh yang sudah disunting |
 | C2 | SOP penanganan pengaduan (alur, lama proses, penanggung jawab) | Pengaduan | **4 Sep** | Alur generik 3 langkah |
 | C3 | Persetujuan penyimpanan data pengadu (privasi) | Pengaduan | **4 Sep** | **Tidak ada — wajib** |
 | C4 | Sertifikat akreditasi (PDF), status, masa berlaku | Akreditasi | **11 Sep** | Halaman tampil dengan keadaan kosong |
@@ -172,6 +172,20 @@ tidak berhenti menunggu.
 Data yang **sudah** terverifikasi dan dipakai (`data/puskesmas.md`): alamat resmi,
 telepon/WhatsApp `0811 4881 2882`, email, darurat PSC 119 `0852 4931 2786`, nama Kepala
 Puskesmas, dan jam pelayanan sesuai SK B/445.61/003/PKM.Btl-Adm/I/2023.
+
+### Percanggahan data yang sudah ter-seed — perlu dikonfirmasi P4
+
+Berbeda dari C1–C12 di atas: datanya **sudah masuk database apa adanya**, dengan
+penanda di komentar kode. Yang dibutuhkan bukan konten baru, melainkan
+kepastian mana yang benar. Perbaiki lewat `/dashboard` setelah dipastikan.
+
+| # | Temuan | Di mana |
+| --- | --- | --- |
+| D1 | **Alamat berbeda antara dua dokumen resmi.** Kop SK: "Jln. Pemerintahan No.19 RT.05 RW.01, Kode Pos 72200". `data/puskesmas.md`: "No.071 Rt.005 RW.001". Yang ter-seed versi `puskesmas.md` | `site-settings` |
+| D2 | **Penomoran misi meloncat** (1, 2, 4, 7 di dokumen asli). Empat butir dimasukkan berurutan — perlu dipastikan tidak ada yang terlewat | `profile.misi` |
+| D3 | **Nama ganda:** "Anggi Ernia Rahmanita, AM.Keb" tercatat 2× dengan jabatan berbeda. Diambil jenjang lebih tinggi (Bidan Ahli Madya) | `medical-staff` |
+| D4 | **Tiga nama di bagan tidak ada di daftar nakes:** drg. Lukman Noor Hakim (Gigi & Mulut), Debora Silitonga S.Ak (Keuangan), Siti Nur Halizah A.Md.Kes (Rehab Medik). Daftar nakes justru memuat drg. Selvi Lesmawati | `org-chart` |
+| D5 | **Data Posyandu belum ada** di berkas sumber mana pun — koleksi `posyandu` masih kosong | — |
 
 **Domain `.go.id`** perlu diurus P4 mulai **sekarang** — birokrasinya bisa lama dan
 dibutuhkan di Minggu 4.
@@ -235,7 +249,64 @@ Permintaan baru di tengah jalan masuk daftar ini dulu, dibahas Jumat, baru diput
 | 2026-08-31 | Notifikasi pengaduan v1 = badge dashboard, bukan email | Menghindari ketergantungan SMTP di rilis pertama |
 | 2026-08-31 | Menu Fasilitas & Dokter dihapus dari navbar | Halamannya tidak ada dan di luar ruang lingkup 8 halaman |
 | 2026-08-31 | `docs/PAYLOAD_PLAN.md` dihapus, `CUSTOM_DASHBOARD_PLAN.md` diringkas jadi `DASHBOARD.md` | Fase backend & pembangunan dashboard sudah selesai; riwayatnya ada di git. Menyisakan dua dokumen hidup saja |
+| 2026-09-02 | `docs/RENCANA-BERIKUTNYA.md` dipensiunkan; isinya yang masih berlaku pindah ke §5 (D1–D5), §10 (utang teknis) dan §11 (jebakan) | Dokumen serah-terima sesi jadi basi begitu pekerjaannya selesai — bagian F-nya masih menyebut `/layanan` sebagai tautan mati. Temuannya justru berumur panjang, jadi dipindah ke dokumen hidup |
 | 2026-08-31 | Setiap task diberi tenggat satu minggu (Jumat) | Permintaan user: selesai secepatnya, deploy 3 minggu lagi |
+
+---
+
+## 10. Utang teknis
+
+Diverifikasi ulang **2 September 2026** — daftar sebelumnya sempat memuat satu
+klaim yang sudah tidak berlaku, jadi angka di bawah hasil pemeriksaan, bukan
+salinan.
+
+| Grup | Isi | Status |
+| --- | --- | --- |
+| A | 3 berkas mati: `module/landingPage/statistik.tsx` (181 baris, digantikan `pengunjung.tsx`), `components/profil/MottoCard.tsx`, `components/common/index.ts` | 0 pemakai — aman dihapus |
+| B | 2 dependensi tak terpakai: `framer-motion` (0 impor — semuanya memakai `motion/react`), `dotenv` (0 rujukan) | aman |
+| C | `type UnitValue` di `lib/units.ts` | 0 pemakai — aman |
+| D | 14 impor tak terpakai (peringatan lint) | aman |
+| E | **8 aset publik yatim** (±348 KB): `backgroundFooter.webp`, `layananPuskesmas.webp`, `posyandu.webp`, dan lima `*_2x.webp` (imunisasi, laboratorium, polianak, poligigi, poliumum) | lima yang terakhir menjadi yatim setelah `DEFAULT_ITEMS` dibuang dari `landingPage/layanan.tsx`; footer memakai `/11.webp`, bukan `backgroundFooter.webp` |
+| ~~C lama~~ | ~~`formatTanggalWaktu()` di `lib/dashboard/format.ts`~~ | **tidak berlaku** — dipakai `dashboard/(app)/pengaduan/page.tsx` |
+
+Belum dieksekusi karena menunggu kepastian bahwa aset di grup E tidak dipakai
+desain yang sedang digarap.
+
+Utang lain yang sudah tercatat di tempatnya masing-masing: `statistik.ts` masih
+menghitung **page view, bukan pengunjung unik**, dan memuat sampai 20 ribu baris
+sekaligus; jam pelayanan di Footer, `waktuPelayanan.tsx`, dan `Hero.tsx` masih
+hardcode dan belum tersambung ke global `operational-hours` (butir D1 di
+`docs/DASHBOARD.md` §4).
+
+---
+
+## 11. Jebakan yang gagal tanpa pesan galat
+
+Semuanya pernah terjadi di proyek ini dan **tidak satu pun memunculkan error**,
+jadi mudah terulang oleh orang berikutnya.
+
+1. **Auto-push skema di container menggantung.** Tanpa TTY, pertanyaan "kolom ini
+   dibuat atau diganti nama?" tidak bisa dijawab dan push berhenti separuh jalan,
+   meninggalkan skema basi. Container memakai migrasi (`PAYLOAD_DB_PUSH=false`).
+   Hal yang sama terjadi pada `pnpm payload migrate` di komputer yang skemanya
+   pernah di-push: perintahnya menunggu konfirmasi "data loss will occur".
+2. **`payload run` keluar sebelum promise selesai.** Skrip seed HARUS memakai
+   top-level await, bukan `seed().then()`. Gejalanya: exit code 0, database kosong.
+3. **`findGlobal` mengembalikan `defaultValue`** walau barisnya belum pernah ada,
+   dan `db.findGlobal` mengembalikan `{}` yang tetap truthy. Penanda "sudah
+   tersimpan" yang benar adalah `updatedAt`.
+4. **Folder host vs container berebut.** Sudah dipisahkan lewat `NEXT_DIST_DIR`
+   dan `MEDIA_DIR`; jangan mengisi keduanya di `.env`.
+5. **Dua `pnpm build` beruntun saling merusak** karena berebut `.next`. Selalu
+   `rm -rf .next` di antaranya, atau jalankan satu per satu.
+6. **`docker compose down -v` menghapus volume `puskesmas_media`** beserta berkas
+   unggahan lokal. Setelah R2 aktif ini tidak lagi berbahaya.
+7. **`text-base` di proyek ini adalah warna, bukan 16px** — lihat
+   `docs/DASHBOARD.md`. Teks yang memakainya menjadi putih di atas putih.
+8. **`gh` terpasang lewat snap tidak bisa membaca `/media`**, sehingga
+   `gh pr create` gagal dengan pesan menyesatkan "not a git repository".
+   Perbaiki sekali dengan `sudo snap connect gh:removable-media`, atau buat PR
+   lewat browser. Token GitHub MCP juga tidak punya izin membuat PR (403).
 
 ---
 
@@ -249,3 +320,17 @@ Permintaan baru di tengah jalan masuk daftar ini dulu, dibahas Jumat, baru diput
   `DASHBOARD.md` (acuan + sisa pekerjaan).
 - [2026-08-31] **PR #8** terbuka ke `main` — 28 commit, 119 file.
   **Langkah berikutnya: merge (T1.1), lalu semua orang membuat branch baru dari `main`.**
+- [2026-09-02] **Halaman publik Layanan selesai** — `/layanan` (statis) dan
+  `/layanan/[slug]` (SSG, 19 halaman): hero berfoto, daftar centang "Layanan yang
+  Tersedia", dan karusel Tim Dokter dengan jadwal praktik mingguan. Relasi baru
+  `doctors.layanan` + field `services.gambar` (migrasi
+  `20260902_084016_layanan_gambar_dan_relasi_dokter`).
+- [2026-09-02] **19 layanan bergambar & unggahan otomatis jadi WebP.**
+  `keWebp()` (`src/lib/gambar.ts`) mengubah gambar sebelum diserahkan ke Payload —
+  bukan lewat `upload.formatOptions`, karena koleksi `media` dipakai bersama
+  pindaian sertifikat yang harus tetap format aslinya. Kontrak konten kini
+  mengekspos `srcKartu`/`srcMini`, memangkas `/layanan` dari 3.478 KB jadi 863 KB
+  dan beranda dari ±1,6 MB jadi 70 KB.
+- [2026-09-02] Berkas sumber di `data/` (41 MB: gambar layanan + `Sertifikat/`)
+  dihapus setelah keberadaannya di R2 diverifikasi satu per satu; seed sudah bisa
+  menariknya dari bucket. `docs/env-contoh.txt` menjadi `.env.example`.

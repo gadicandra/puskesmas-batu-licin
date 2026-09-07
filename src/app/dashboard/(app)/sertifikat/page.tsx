@@ -12,7 +12,7 @@ const FIELDS: SpesifikasiField[] = [
     { nama: 'judul', label: 'Judul sertifikat', tipe: 'teks', wajib: true, diTabel: true },
     { nama: 'penerbit', label: 'Diterbitkan oleh', tipe: 'teks', diTabel: true, contoh: 'Kementerian Kesehatan RI' },
     { nama: 'tanggal', label: 'Tanggal terbit', tipe: 'tanggal', diTabel: true },
-    { nama: 'berkas', label: 'Berkas dokumen (PDF)', tipe: 'berkas', keterangan: 'Unggah dulu di Galeri Gambar bila belum ada.' },
+    { nama: 'berkas', label: 'Berkas dokumen (PDF)', tipe: 'berkas', pertahankanAsli: true, keterangan: 'Unggah dulu di Galeri Gambar bila belum ada. Berkas sertifikat disimpan apa adanya, tidak diperkecil.' },
     { nama: 'keterangan', label: 'Keterangan', tipe: 'panjang' },
 ]
 

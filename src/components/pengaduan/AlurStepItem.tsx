@@ -30,18 +30,18 @@ export default function AlurStepItem({
       </div>
 
       <div className="flex min-w-0 flex-col justify-center py-1 sm:py-2">
-        <h3 className="text-lg font-black leading-tight text-pengaduan-dark sm:text-2xl">
+        <h3 className="text-xl font-black leading-tight text-pengaduan-dark sm:text-2xl">
           {title}
         </h3>
         <p
-          className="mt-1 max-w-prose text-sm font-medium leading-relaxed sm:text-base"
+          className="mt-1 max-w-prose text-base font-medium leading-[1.6]"
           style={{ color: "var(--color-pengaduan-dark)" }}
         >
           {description}
         </p>
         {details && details.length > 0 && (
           <ul
-            className="mt-1 max-w-prose space-y-1 text-sm font-medium leading-relaxed sm:text-base"
+            className="mt-1 max-w-prose space-y-1 text-base font-medium leading-[1.6]"
             style={{ color: "var(--color-pengaduan-dark)" }}
           >
             {details.map((detail) => (

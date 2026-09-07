@@ -1,6 +1,7 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
+import { TAG } from '@/lib/konten/tags'
 import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
@@ -101,6 +102,7 @@ export async function simpanArtikel(
 
     revalidatePath('/dashboard/artikel')
     revalidatePath('/artikel')
+    revalidateTag(TAG.artikel)
     revalidatePath('/')
 
     if (!id && idBaru) redirect(`/dashboard/artikel/${idBaru}?tersimpan=1`)
@@ -126,5 +128,6 @@ export async function hapusArtikel(formData: FormData): Promise<void> {
 
     revalidatePath('/dashboard/artikel')
     revalidatePath('/artikel')
+    revalidateTag(TAG.artikel)
     redirect('/dashboard/artikel')
 }

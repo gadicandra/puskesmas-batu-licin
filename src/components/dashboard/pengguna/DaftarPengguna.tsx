@@ -13,6 +13,8 @@ import Button from '@/components/dashboard/ui/Button'
 import Field from '@/components/dashboard/ui/Field'
 import Input, { Select } from '@/components/dashboard/ui/Input'
 import Badge from '@/components/dashboard/ui/Badge'
+import PemuatLayar from '@/components/dashboard/ui/PemuatLayar'
+import { usePaginasi } from '@/components/dashboard/ui/Paginasi'
 
 export type PenggunaBaris = {
     id: number
@@ -35,12 +37,13 @@ export default function DaftarPengguna({
     googleAktif: boolean
 }) {
     const [stateSimpan, aksiSimpan, sedangSimpan] = useActionState<FormState, FormData>(simpanPengguna, {})
-    const [stateHapus, aksiHapus] = useActionState<FormState, FormData>(hapusPengguna, {})
-    const [statePutus, aksiPutus] = useActionState<FormState, FormData>(putuskanTautanGoogle, {})
+    const [stateHapus, aksiHapus, sedangHapus] = useActionState<FormState, FormData>(hapusPengguna, {})
+    const [statePutus, aksiPutus, sedangPutus] = useActionState<FormState, FormData>(putuskanTautanGoogle, {})
     const [formTerbuka, setFormTerbuka] = useState(false)
     const [ubah, setUbah] = useState<PenggunaBaris | null>(null)
     const [role, setRole] = useState('admin')
     const [metode, setMetode] = useState<MetodeLogin>('sandi')
+    const { potongan, kendali } = usePaginasi(data, 'pengguna')
 
     const buka = (p: PenggunaBaris | null) => {
         setUbah(p)
@@ -163,7 +166,7 @@ export default function DaftarPengguna({
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-primary/10">
-                        {data.map((p) => (
+                        {potongan.map((p) => (
                             <tr key={p.id} className="transition hover:bg-base/40">
                                 <td className="px-5 py-3">
                                     <span className="font-semibold text-primary">{p.name || '-'}</span>
@@ -229,6 +232,15 @@ export default function DaftarPengguna({
                     </tbody>
                 </table>
             </div>
+
+            {kendali}
+
+            {(sedangSimpan || sedangHapus || sedangPutus) && (
+                <PemuatLayar
+                    umumkan
+                    label={sedangHapus ? 'Menghapus pengguna…' : sedangPutus ? 'Memutus tautan Google…' : 'Menyimpan pengguna…'}
+                />
+            )}
         </div>
     )
 }

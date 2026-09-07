@@ -8,6 +8,7 @@ import Button from '@/components/dashboard/ui/Button'
 import Card from '@/components/dashboard/ui/Card'
 import Input from '@/components/dashboard/ui/Input'
 import Field from '@/components/dashboard/ui/Field'
+import PemuatLayar from '@/components/dashboard/ui/PemuatLayar'
 
 type Baris = { hari: string; jam: string }
 
@@ -119,6 +120,7 @@ export default function FormJamOperasional({
                     </Button>
                 </div>
             </form>
+            {pending && <PemuatLayar umumkan label="Menyimpan jam pelayanan…" />}
         </Card>
     )
 }

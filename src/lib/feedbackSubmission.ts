@@ -14,6 +14,37 @@ type FeedbackErrors = Partial<Record<keyof FeedbackPayload, string>>;
 const defaultCompanyEmail = "puskesmasbatulicin@yahoo.com";
 const defaultCompanyPhone = "(0518) 123-456";
 
+// Batas sederhana untuk endpoint feedback publik. Ini melindungi satu
+// instance aplikasi dari pengiriman berulang tanpa menambah dependensi eksternal.
+const FEEDBACK_LIMIT = 5;
+const FEEDBACK_WINDOW_MS = 10 * 60_000;
+const feedbackRequests = new Map<string, { count: number; reset: number }>();
+
+export function enforceFeedbackRateLimit(request: { headers: Headers }) {
+  const forwarded = request.headers.get("x-forwarded-for");
+  const ip = forwarded?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+  const now = Date.now();
+  const current = feedbackRequests.get(ip);
+
+  if (!current || now >= current.reset) {
+    feedbackRequests.set(ip, { count: 1, reset: now + FEEDBACK_WINDOW_MS });
+    return;
+  }
+
+  current.count += 1;
+  if (current.count > FEEDBACK_LIMIT) {
+    const error = new Error("Terlalu banyak pengiriman. Silakan coba lagi beberapa menit lagi.");
+    Object.assign(error, { status: 429 });
+    throw error;
+  }
+
+  if (feedbackRequests.size > 5_000) {
+    for (const [key, value] of feedbackRequests) {
+      if (now >= value.reset) feedbackRequests.delete(key);
+    }
+  }
+}
+
 export async function handleFeedbackSubmission(request: Request, kind: FeedbackKind) {
   let payload: Partial<FeedbackPayload>;
 

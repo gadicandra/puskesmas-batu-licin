@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import {
+    COOKIE_LANJUT,
     COOKIE_STATE,
     COOKIE_VERIFIER,
     UMUR_COOKIE_DETIK,
@@ -10,6 +11,7 @@ import {
     redirectUri,
     urlOtorisasi,
 } from '@/lib/dashboard/google'
+import { tujuanAman } from '@/lib/dashboard/akses'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,6 +38,9 @@ export async function GET(req: NextRequest) {
     }
     res.cookies.set(COOKIE_STATE, state, opsi)
     res.cookies.set(COOKIE_VERIFIER, verifier, opsi)
+
+    const lanjut = req.nextUrl.searchParams.get('lanjut')
+    if (tujuanAman(lanjut)) res.cookies.set(COOKIE_LANJUT, lanjut as string, opsi)
 
     return res
 }

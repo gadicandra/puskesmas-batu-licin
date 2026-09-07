@@ -8,6 +8,7 @@ import Button from '@/components/dashboard/ui/Button'
 import Card from '@/components/dashboard/ui/Card'
 import Input, { Textarea } from '@/components/dashboard/ui/Input'
 import Field from '@/components/dashboard/ui/Field'
+import PemuatLayar from '@/components/dashboard/ui/PemuatLayar'
 
 type Sosial = { platform: string; url: string }
 
@@ -114,6 +115,7 @@ export default function FormSitus({
                     <Button type="submit" loading={pending}>Simpan Pengaturan</Button>
                 </div>
             </form>
+            {pending && <PemuatLayar umumkan label="Menyimpan pengaturan…" />}
         </Card>
     )
 }

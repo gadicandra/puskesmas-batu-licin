@@ -9,10 +9,10 @@ import Button from '@/components/dashboard/ui/Button'
 import Badge from '@/components/dashboard/ui/Badge'
 import EmptyState from '@/components/dashboard/ui/EmptyState'
 import Input, { Select } from '@/components/dashboard/ui/Input'
+import { PaginasiUrl } from '@/components/dashboard/ui/Paginasi'
+import { bacaJumlah, batasBaris } from '@/lib/dashboard/paginasi'
 
 export const dynamic = 'force-dynamic'
-
-const PER_HALAMAN = 20
 
 const KATEGORI: Record<string, string> = {
     berita: 'Berita',
@@ -24,11 +24,12 @@ const KATEGORI: Record<string, string> = {
 export default async function DaftarArtikelPage({
     searchParams,
 }: {
-    searchParams: Promise<{ cari?: string; kategori?: string; status?: string; page?: string }>
+    searchParams: Promise<{ cari?: string; kategori?: string; status?: string; page?: string; per?: string }>
 }) {
-    const { cari, kategori, status, page } = await searchParams
+    const { cari, kategori, status, page, per } = await searchParams
     const user = await requireUser()
     const halaman = Math.max(1, Number.parseInt(page ?? '1', 10) || 1)
+    const jumlah = bacaJumlah(per)
 
     const syarat: Where[] = []
     if (cari?.trim()) syarat.push({ title: { like: cari.trim() } })
@@ -42,7 +43,7 @@ export default async function DaftarArtikelPage({
         collection: 'articles',
         where: syarat.length ? { and: syarat } : {},
         sort: '-updatedAt',
-        limit: PER_HALAMAN,
+        limit: batasBaris(jumlah),
         page: halaman,
         depth: 1,
         user,
@@ -158,23 +159,15 @@ export default async function DaftarArtikelPage({
                         ))}
                     </ul>
 
-                    {hasil.totalPages > 1 && (
-                        <nav aria-label="Navigasi halaman" className="mt-6 flex items-center justify-center gap-3">
-                            {hasil.hasPrevPage && (
-                                <Link href={`/dashboard/artikel?page=${halaman - 1}`}>
-                                    <Button varian="secondary" ukuran="sm">Sebelumnya</Button>
-                                </Link>
-                            )}
-                            <span className="text-sm text-tertiary">
-                                Halaman {halaman} dari {hasil.totalPages}
-                            </span>
-                            {hasil.hasNextPage && (
-                                <Link href={`/dashboard/artikel?page=${halaman + 1}`}>
-                                    <Button varian="secondary" ukuran="sm">Berikutnya</Button>
-                                </Link>
-                            )}
-                        </nav>
-                    )}
+                    <div className="mt-6">
+                        <PaginasiUrl
+                            total={hasil.totalDocs}
+                            halaman={hasil.page ?? 1}
+                            totalHalaman={hasil.totalPages}
+                            jumlah={jumlah}
+                            labelData="artikel"
+                        />
+                    </div>
                 </>
             )}
         </>

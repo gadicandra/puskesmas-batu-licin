@@ -1,5 +1,6 @@
 "use client";
 
+import type { JamPelayanan } from "@/lib/konten/jam-pelayanan";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,7 +24,7 @@ const Nav = [
     { name: 'Lokasi Puskesmas', href: '/lokasi-puskesmas' },
 ]
 
-const Footer = () => {
+const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
     return (
         <footer className="relative w-full text-white overflow-hidden ">
             {/* Background Image & Overlay */}
@@ -116,10 +117,15 @@ const Footer = () => {
                             <li className="flex items-start gap-3">
                                 <FaClock className="mt-1 text-green-400 flex-shrink-0" size={16} />
                                 <span>
-                                    Senin&ndash;Kamis: 08.00&ndash;11.00<br />
-                                    Jumat: 07.30&ndash;10.30<br />
-                                    Sabtu: 08.00&ndash;11.00<br />
-                                    <span className="text-green-400">UGD &amp; UGD Kebidanan: 24 jam</span>
+                                    {jamPelayanan.jadwal.map((baris) => (
+                                        <span key={baris.hari}>
+                                            {baris.hari}: {baris.jam}
+                                            <br />
+                                        </span>
+                                    ))}
+                                    {jamPelayanan.catatan && (
+                                        <span className="text-green-400">{jamPelayanan.catatan}</span>
+                                    )}
                                 </span>
                             </li>
                         </ul>

@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
+import { butuhSuperAdmin } from '@/lib/dashboard/akses'
 import {
     LayoutDashboard,
     Newspaper,
@@ -8,6 +9,10 @@ import {
     Users2,
     Syringe,
     Award,
+    ClipboardList,
+    Baby,
+    Building2,
+    Network,
     MessageSquareWarning,
     Settings,
     UserCog,
@@ -18,8 +23,6 @@ export type MenuItem = {
     label: string
     href: string
     ikon: LucideIcon
-    /** true = hanya superadmin yang melihat menu ini */
-    khususSuperAdmin?: boolean
     grup: 'utama' | 'data' | 'sistem'
 }
 
@@ -31,14 +34,18 @@ export const MENU: MenuItem[] = [
     { label: 'Galeri Gambar', href: '/dashboard/media', ikon: Images, grup: 'utama' },
     { label: 'Statistik', href: '/dashboard/statistik', ikon: BarChart3, grup: 'utama' },
 
-    { label: 'Pengaduan', href: '/dashboard/pengaduan', ikon: MessageSquareWarning, khususSuperAdmin: true, grup: 'data' },
-    { label: 'Dokter', href: '/dashboard/dokter', ikon: Stethoscope, khususSuperAdmin: true, grup: 'data' },
-    { label: 'Tenaga Medis', href: '/dashboard/tenaga-medis', ikon: Users2, khususSuperAdmin: true, grup: 'data' },
-    { label: 'Vaksin', href: '/dashboard/vaksin', ikon: Syringe, khususSuperAdmin: true, grup: 'data' },
-    { label: 'Sertifikat', href: '/dashboard/sertifikat', ikon: Award, khususSuperAdmin: true, grup: 'data' },
+    { label: 'Pengaduan', href: '/dashboard/pengaduan', ikon: MessageSquareWarning, grup: 'data' },
+    { label: 'Dokter', href: '/dashboard/dokter', ikon: Stethoscope, grup: 'data' },
+    { label: 'Tenaga Medis', href: '/dashboard/tenaga-medis', ikon: Users2, grup: 'data' },
+    { label: 'Vaksin', href: '/dashboard/vaksin', ikon: Syringe, grup: 'data' },
+    { label: 'Sertifikat', href: '/dashboard/sertifikat', ikon: Award, grup: 'data' },
+    { label: 'Layanan', href: '/dashboard/layanan', ikon: ClipboardList, grup: 'data' },
+    { label: 'Posyandu', href: '/dashboard/posyandu', ikon: Baby, grup: 'data' },
+    { label: 'Fasilitas', href: '/dashboard/fasilitas', ikon: Building2, grup: 'data' },
+    { label: 'Struktur Organisasi', href: '/dashboard/struktur-organisasi', ikon: Network, grup: 'data' },
 
-    { label: 'Pengaturan', href: '/dashboard/pengaturan', ikon: Settings, khususSuperAdmin: true, grup: 'sistem' },
-    { label: 'Pengguna', href: '/dashboard/pengguna', ikon: UserCog, khususSuperAdmin: true, grup: 'sistem' },
+    { label: 'Pengaturan', href: '/dashboard/pengaturan', ikon: Settings, grup: 'sistem' },
+    { label: 'Pengguna', href: '/dashboard/pengguna', ikon: UserCog, grup: 'sistem' },
     { label: 'Akun Saya', href: '/dashboard/akun', ikon: CircleUser, grup: 'sistem' },
 ]
 
@@ -48,7 +55,14 @@ export const JUDUL_GRUP: Record<MenuItem['grup'], string> = {
     sistem: 'Sistem',
 }
 
+/** Menu yang boleh dilihat sebuah peran.
+ *
+ *  Peran tiap rute TIDAK ditulis ulang di sini — dibaca dari
+ *  `lib/dashboard/akses.ts`, daftar yang sama yang dipakai penjaga rute di
+ *  `dashboard/(app)/layout.tsx`. Dulu keduanya terpisah, dan menu yang
+ *  disembunyikan tanpa rute yang dijaga adalah pengaman semu: alamatnya masih
+ *  bisa diketik sendiri. */
 export function menuUntuk(role: string | null | undefined): MenuItem[] {
     if (role === 'superadmin') return MENU
-    return MENU.filter((m) => !m.khususSuperAdmin)
+    return MENU.filter((m) => !butuhSuperAdmin(m.href))
 }

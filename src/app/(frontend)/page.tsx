@@ -1,5 +1,7 @@
-"use client";
-
+// Server Component: halaman ini tidak memakai satu pun hook — setiap bagian
+// yang interaktif (Section, Hero, Berita, dst.) sudah menandai dirinya sendiri
+// dengan "use client". Menjadikannya server-side yang memungkinkan daftar
+// layanan dibaca lewat kontrak konten, bukan di-hardcode.
 import Container from "@/components/layout/Container/Container";
 import Button from "@/components/elements/Button";
 import Section from "@/components/common/Section";
@@ -12,6 +14,7 @@ import Layanan from "@/module/landingPage/layanan";
 import StatistikModule from "@/module/landingPage/pengunjung";
 import Hero from "@/module/landingPage/Hero";
 import Image from "next/image";
+import { ambilLayanan } from "@/lib/konten/layanan";
 
 const sectionLabels: Record<string, string> = {
     hero: "Beranda",
@@ -19,7 +22,16 @@ const sectionLabels: Record<string, string> = {
     info: "Informasi",
 };
 
-export default function Home() {
+export default async function Home() {
+    const layanan = await ambilLayanan();
+    const kartuLayanan = layanan.slice(0, 8).map((l) => ({
+        title: l.nama,
+        subtitle: l.deskripsi ?? undefined,
+        // Petak di beranda pendek dan mendatar — turunan 400×300 sudah cukup.
+        image: l.gambar?.srcMini ?? l.gambar?.src,
+        href: `/layanan/${l.slug}`,
+    }));
+
     return (
         <SectionProvider>
             <div className="flex min-h-screen flex-col bg-base">
@@ -86,7 +98,7 @@ export default function Home() {
 
                 <Section id="layanan">
                     <Container color="base" className="">
-                        <Layanan />
+                        <Layanan items={kartuLayanan} />
                     </Container>
                 </Section>
 

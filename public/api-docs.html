@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Kontrak API — UPTD Puskesmas Batulicin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui.css" />
+    <style>
+        body { margin: 0; background: #fafafa; }
+        .catatan {
+            margin: 0; padding: 14px 20px; background: #1f3b25; color: #fff;
+            font: 14px/1.5 system-ui, sans-serif;
+        }
+        .catatan b { color: #ffd479; }
+        .catatan a { color: #cfe6d3; }
+    </style>
+</head>
+<body>
+    <p class="catatan">
+        Kontrak ini menggambarkan REST API Payload. <b>Halaman publik situs ini tidak
+        memakainya</b> — halaman server membaca lewat <code>src/lib/konten/</code>
+        (lihat <code>docs/KONTRAK-DATA.md</code>). Untuk mengubah data:
+        <b>PATCH, bukan PUT</b>.
+    </p>
+    <div id="swagger"></div>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui-bundle.js" crossorigin></script>
+    <script>
+        window.onload = () => {
+            window.SwaggerUIBundle({
+                url: '/openapi.yaml',
+                dom_id: '#swagger',
+                deepLinking: true,
+                docExpansion: 'none',
+                filter: true,
+                tryItOutEnabled: true,
+                persistAuthorization: true,
+            })
+        }
+    </script>
+</body>
+</html>

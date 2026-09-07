@@ -1,9 +1,5 @@
 # Data Website UPTD Puskesmas Batulicin
 
-> Catatan: bagian yang ditandai ⚠️ berisi link Google Drive/Sheets/Maps —
-> ini tidak bisa dibaca langsung oleh coding agent. Perlu diunduh/export
-> jadi teks, gambar, atau PDF dulu sebelum dipakai sebagai referensi.
-
 ---
 
 ## 1. Profil Puskesmas
@@ -27,10 +23,6 @@
 | Jumlah KK | 5.999 |
 
 **Emergency Call:** 0852-4931-2786 (Syaiful Fahrin, PSC 119)
-
-⚠️ **Foto Kepala Puskesmas** — ada di [Google Drive](https://drive.google.com/drive/folders/1_z8R45F4rB2sCt98NYlyCFB4pDt73Pe2), perlu diunduh & taruh di `public/images/kepala-puskesmas.jpg`.
-
-⚠️ **Maps Lokasi Puskesmas** — [Google Maps](https://maps.app.goo.gl/JPY1Ak3dbLrtmEBe7), untuk embed peta ambil koordinat/embed link dari sini.
 
 ---
 
@@ -65,31 +57,12 @@
 > sesuai peraturan perundang-undangan yang berlaku."
 
 ### Struktur Organisasi
-⚠️ Belum ada file/gambar terlampir di sumber ini — perlu diminta terpisah (biasanya berupa bagan/PDF), lalu diexport jadi PNG untuk dipakai `image-to-code-skill`.
+Gambarnya terlampir di data/StrukturOrganisasiMaster.png
 
 ---
 
 ## 3. Ketenagaan Puskesmas (Data Nakes)
-
-⚠️ Rekap ringkas di bawah ini diambil dari tabel sumber. Untuk data detail per nama tenaga medis, lihat: [Spreadsheet Data Nakes](https://docs.google.com/spreadsheets/d/1R3WGVFANOuLSFutsVLoECdju8FYH0TU8) — perlu diexport ke CSV/JSON dulu kalau mau ditampilkan sebagai daftar dokter di web.
-
-| Jenis Tenaga | S2 | S1 | D3 | D1/SMK | Total |
-|---|---|---|---|---|---|
-| Dokter | 1 | 4 | 0 | 0 | 5 |
-| Dokter Gigi | 0 | 1 | 0 | 0 | 1 |
-| Bidan | 0 | 2 | 30 | 0 | 32 |
-| Perawat | 1 | 12 | 8 | 0 | 21 |
-| Perawat Gigi | 0 | 0 | 2 | 0 | 2 |
-| Sanitarian | 0 | 0 | 1 | 0 | 1 |
-| Tenaga Gizi | 0 | 2 | 1 | 0 | 3 |
-| Analis Kesehatan | 0 | 0 | 2 | 0 | 2 |
-| Tenaga Farmasi | 0 | 2 | 2 | 0 | 4 |
-| Tenaga Promkes | 0 | 3 | 0 | 0 | 3 |
-| Nakes Lainnya | 0 | 0 | 2 | 0 | 2 |
-| Non Nakes | 0 | 2 | 0 | 5 | 7 |
-| **Total** | **2** | **28** | **48** | **6** | **~84 (termasuk D1/SMK)** |
-
-*(Total keseluruhan di sumber: 2 + 28 + 48 + 6 SMK = sekitar 84 orang; sudah termasuk status PNS/PPPK/PTT/Kontrak/TKS.)*
+Datanya terlampir di data/Data Nakes.xlsx
 
 ### Ketersediaan Utilitas
 - **Air bersih**: Tersedia sepanjang tahun, sumber dari PDAM.
@@ -98,16 +71,7 @@
 ---
 
 ## 4. Layanan & Jam Operasional
-
-⚠️ Detail lengkap ada di file terpisah, belum berupa teks di sini:
-- [Jenis Layanan Dalam & Luar Gedung](https://drive.google.com/file/d/11soQSIS3QQYXxlG1WVe9AsDOnQPt9OOu/view) — perlu diketik ulang jadi list di markdown ini.
-- [Jam Layanan](https://drive.google.com/file/d/1zdohzCACu21jAhRnksEjqVNSVccaA-X7/view) — sama, perlu ditranskrip (Rawat Jalan, Laboratorium, UGD, PONED).
-- [Data Layanan (detail per ruang/poli)](https://drive.google.com/file/d/1wOl8_w7JOJO9_UwTgsqxmqGAko5z8Mcr/view)
-
-> **Rekomendasi**: buka ketiga file ini, salin isinya jadi teks biasa,
-> lalu tempel di bawah heading ini sebagai list per layanan + jam buka.
-> Setelah itu baru section "Layanan" siap dikerjakan agent.
-
+Sudah lengkap tersedia di data/SK JENIS PELAYANAN PKM BTL.pdf
 ---
 
 ## 5. Sarana & Ruangan Pelayanan
@@ -193,29 +157,6 @@
 ---
 
 ## 6. Sertifikat & Pencapaian
-
-⚠️ **Belum lengkap** (ditandai di sumber). Ada folder [Piagam Penghargaan Puskesmas](https://drive.google.com/drive/folders/1_HRDTfjDUWj_OdwAN1EJSKGkyveevL6p) — perlu diunduh isi foldernya, dan follow-up ke pihak Puskesmas untuk melengkapi data yang kurang sebelum section ini dikerjakan.
-
----
-
-## 7. Data Belum Tersedia (Perlu Follow-up)
-
-Masih menunggu dari pihak terkait (per catatan di sumber):
-- [ ] List Posyandu — lokasi & jam buka (menunggu data via aplikasi e-PPGBM, PIC: Loly)
-- [ ] Jenis vaksin & jumlah stok (PIC: Ka Mey)
-- [ ] Maps lokasi Poskesdes
-- [ ] Struktur organisasi (bagan/file belum dilampirkan)
-- [ ] Data lengkap sertifikat & pencapaian
+Sertifikat ada di folder data/Sertifikat
 
 ---
-
-## Prioritas Pemakaian untuk Prompt Codex
-
-| Section | Status Data | Siap untuk Agent? |
-|---|---|---|
-| Profil | Lengkap kecuali foto & maps (perlu diunduh manual) | ✅ Ya |
-| Tentang Kami (Visi/Misi/Motto/Budaya Kerja/Maklumat) | Lengkap teks, struktur organisasi belum ada gambar | ✅ Ya (minus struktur organisasi) |
-| Ketenagaan/Data Dokter | Rekap angka ada, detail nama perlu export spreadsheet | ⚠️ Perlu 1 langkah lagi |
-| Layanan & Jam Operasional | Baru berupa link, belum ditranskrip | ❌ Belum siap |
-| Sarana/Ruangan | Lengkap | ✅ Ya |
-| Sertifikat & Pencapaian | Belum lengkap | ❌ Belum siap |
