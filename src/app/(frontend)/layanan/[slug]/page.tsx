@@ -37,7 +37,7 @@ export default async function DetailLayananPage({ params }: Props) {
         layanan.persyaratan.length > 0;
 
     return (
-        <div className="min-h-screen bg-base">
+        <div className="min-h-screen bg-latar">
             <HeroLayanan layanan={layanan} />
 
             <Breadcrumb

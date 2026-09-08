@@ -108,7 +108,7 @@ export default function ArticleForm({ awal }: { awal: ArtikelAwal }) {
                         label="Alamat halaman"
                         keterangan="Bagian akhir alamat artikel ini di internet. Dibuat otomatis dari judul."
                     >
-                        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-primary/10 bg-base px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-primary/10 bg-latar px-4 py-3">
                             <span className="text-sm text-tertiary">/artikel/</span>
                             {ubahSlug ? (
                                 <input

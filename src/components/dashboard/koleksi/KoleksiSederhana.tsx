@@ -187,7 +187,7 @@ export default function KoleksiSederhana({
                             type="button"
                             onClick={() => setFormTerbuka(false)}
                             aria-label="Tutup form"
-                            className="rounded-lg p-2 text-tertiary hover:bg-base hover:text-primary"
+                            className="rounded-lg p-2 text-tertiary hover:bg-latar hover:text-primary"
                         >
                             <X size={20} />
                         </button>
@@ -333,7 +333,7 @@ export default function KoleksiSederhana({
             ) : (
                 <div className="overflow-x-auto rounded-2xl border border-primary/10 bg-white">
                     <table className="w-full text-left text-sm">
-                        <thead className="border-b border-primary/10 bg-base/50">
+                        <thead className="border-b border-primary/10 bg-latar/50">
                             <tr className="text-xs uppercase tracking-wide text-tertiary">
                                 {kolomTabel.map((k) => (
                                     <th key={k.nama} className="px-5 py-3 font-bold">{k.label}</th>
@@ -343,7 +343,7 @@ export default function KoleksiSederhana({
                         </thead>
                         <tbody className="divide-y divide-primary/10">
                             {potongan.map((baris) => (
-                                <tr key={baris.id} className="transition hover:bg-base/40">
+                                <tr key={baris.id} className="transition hover:bg-latar/40">
                                     {kolomTabel.map((k, i) => {
                                         const nilai = baris[k.nama]
                                         // Kolom pertama adalah kolom identitas

@@ -42,11 +42,11 @@ export default function PencarianLayanan({ layanan }: { layanan: LayananPublik[]
                         value={kata}
                         onChange={(e) => setKata(e.target.value)}
                         placeholder="Cari layanan kesehatan..."
-                        // 16px ditulis eksplisit, bukan lewat `text-base`: proyek ini
-                        // mendefinisikan `--color-base` di @theme, sehingga `text-base`
-                        // menjadi utilitas WARNA dan ukuran fontnya tidak pernah ikut
-                        // berubah. Di bawah 16px, iOS memperbesar halaman begitu kolom
-                        // ini disentuh.
+                        // 16px ditulis eksplisit supaya iOS tidak memperbesar halaman
+                        // begitu kolom ini disentuh. Dulu `text-base` memang tidak bisa
+                        // dipakai di sini karena tabrakan token `--color-base`; token
+                        // itu sudah berganti nama jadi `--color-latar`, jadi sekarang
+                        // `text-base` pun aman.
                         className="h-12 w-full rounded-full border border-primary/15 bg-white pl-12 pr-4 text-[16px] text-primary placeholder:text-tertiary/60 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/30"
                     />
                 </div>

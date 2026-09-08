@@ -8,7 +8,7 @@ type Ukuran = 'sm' | 'md'
 const VARIAN: Record<Varian, string> = {
     primary: 'bg-secondary text-white hover:bg-secondary/90 border-transparent',
     secondary: 'bg-white text-primary border-primary/15 hover:border-secondary hover:text-secondary',
-    ghost: 'bg-transparent text-tertiary border-transparent hover:bg-base hover:text-primary',
+    ghost: 'bg-transparent text-tertiary border-transparent hover:bg-latar hover:text-primary',
     danger: 'bg-white text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300',
 }
 

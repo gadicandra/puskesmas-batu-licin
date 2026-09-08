@@ -62,7 +62,7 @@ export function SkeletonTabel({ baris = 6, kolom = 4 }: { baris?: number; kolom?
             aria-hidden
             className="overflow-hidden rounded-2xl border border-primary/10 bg-white"
         >
-            <div className="flex items-center gap-4 border-b border-primary/10 bg-base/50 px-5 py-3">
+            <div className="flex items-center gap-4 border-b border-primary/10 bg-latar/50 px-5 py-3">
                 {Array.from({ length: kolom }).map((_, i) => (
                     <Skeleton key={i} className={cn('h-3', i === 0 ? 'w-40' : 'w-24')} />
                 ))}

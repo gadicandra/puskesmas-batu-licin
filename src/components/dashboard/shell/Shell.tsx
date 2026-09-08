@@ -93,7 +93,7 @@ export default function Shell({
     const labelRole = user.role === 'superadmin' ? 'Super Admin' : 'Admin'
 
     return (
-        <div className="flex min-h-screen bg-base">
+        <div className="flex min-h-screen bg-latar">
             {/* Sidebar desktop */}
             <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col overflow-y-auto bg-primary px-4 py-6 lg:flex">
                 <Link href="/dashboard" className="mb-8 flex items-center gap-3 px-2">
@@ -147,7 +147,7 @@ export default function Shell({
                     <button
                         onClick={() => setMenuPonselTerbuka(true)}
                         aria-label="Buka menu"
-                        className="rounded-lg p-2 text-primary hover:bg-base lg:hidden"
+                        className="rounded-lg p-2 text-primary hover:bg-latar lg:hidden"
                     >
                         <Menu size={24} />
                     </button>

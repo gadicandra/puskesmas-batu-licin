@@ -129,7 +129,7 @@ export default function GaleriMedia({
                                 onClick={() => { setTerpilih(m); setTersalin(false) }}
                                 className="group w-full overflow-hidden rounded-2xl border border-primary/10 bg-white text-left transition hover:border-secondary"
                             >
-                                <span className="block aspect-[4/3] overflow-hidden bg-base">
+                                <span className="block aspect-[4/3] overflow-hidden bg-latar">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={m.thumbnailUrl} alt={m.alt} className="h-full w-full object-cover transition group-hover:scale-105" />
                                 </span>
@@ -156,7 +156,7 @@ export default function GaleriMedia({
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true">
                     <button aria-label="Tutup" onClick={() => setTerpilih(null)} className="absolute inset-0 bg-black/50" />
                     <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white">
-                        <div className="aspect-video overflow-hidden bg-base">
+                        <div className="aspect-video overflow-hidden bg-latar">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={terpilih.url} alt={terpilih.alt} className="h-full w-full object-contain" />
                         </div>

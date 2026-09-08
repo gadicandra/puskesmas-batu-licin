@@ -10,7 +10,7 @@ export const metadata = {
 
 export default function InformasiLayananMutuPage() {
     return (
-        <div className="bg-base min-h-screen">
+        <div className="bg-latar min-h-screen">
             <PageHeader
                 image="/batulicin.webp"
                 title="Informasi Layanan dan Mutu"

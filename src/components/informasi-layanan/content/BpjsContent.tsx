@@ -116,7 +116,7 @@ export default function BpjsContent() {
                             return (
                                 <div
                                     key={s.label}
-                                    className="group flex items-center gap-3 rounded-2xl bg-base/70 px-4 py-3 transition-colors hover:bg-secondary/10"
+                                    className="group flex items-center gap-3 rounded-2xl bg-latar/70 px-4 py-3 transition-colors hover:bg-secondary/10"
                                 >
                                     <Icon className="h-5 w-5 shrink-0 text-secondary" strokeWidth={2} />
                                     <span className="text-sm font-bold text-primary">{s.label}</span>

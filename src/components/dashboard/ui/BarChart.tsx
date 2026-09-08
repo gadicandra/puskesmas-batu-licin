@@ -11,7 +11,7 @@ export default function BarChart({ data, tinggi = 120 }: { data: Bar[]; tinggi?:
                 <div key={i} className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
                     <span className="text-[11px] font-bold text-primary">{b.count}</span>
                     <div
-                        className="flex w-full items-end overflow-hidden rounded-md bg-base"
+                        className="flex w-full items-end overflow-hidden rounded-md bg-latar"
                         style={{ height: tinggi }}
                     >
                         <div

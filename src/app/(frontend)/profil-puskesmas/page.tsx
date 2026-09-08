@@ -4,7 +4,7 @@ import ProfilLayout from "@/components/profil/ProfilLayout";
 
 export default function profil() {
   return (
-    <div className="bg-base min-h-screen">
+    <div className="bg-latar min-h-screen">
       <PageHeader
         image="/batulicin.webp"
         title="Profil Puskesmas"

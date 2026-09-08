@@ -50,7 +50,7 @@ export default function LoginForm({ tujuan }: { tujuan?: string | null }) {
                         type="button"
                         onClick={() => setLihatSandi((v) => !v)}
                         aria-label={lihatSandi ? 'Sembunyikan kata sandi' : 'Perlihatkan kata sandi'}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-tertiary transition hover:bg-base hover:text-primary"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-tertiary transition hover:bg-latar hover:text-primary"
                     >
                         {lihatSandi ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>

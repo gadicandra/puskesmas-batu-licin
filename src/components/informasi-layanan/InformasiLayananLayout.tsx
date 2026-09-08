@@ -73,7 +73,7 @@ const InformasiLayananLayout = () => {
                                         {isActive && (
                                             <motion.span
                                                 layoutId="activeCategoryPill"
-                                                className="absolute inset-0 rounded-2xl bg-base shadow-lg"
+                                                className="absolute inset-0 rounded-2xl bg-latar shadow-lg"
                                                 transition={{ type: "spring", stiffness: 380, damping: 32 }}
                                             />
                                         )}

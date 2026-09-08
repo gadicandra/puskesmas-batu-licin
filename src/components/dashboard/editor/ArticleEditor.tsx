@@ -39,7 +39,7 @@ function TombolToolbar({
                 'inline-flex h-10 min-w-[40px] items-center justify-center rounded-lg px-2 transition',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary',
                 'disabled:cursor-not-allowed disabled:opacity-40',
-                aktif ? 'bg-secondary text-white' : 'text-tertiary hover:bg-base hover:text-primary'
+                aktif ? 'bg-secondary text-white' : 'text-tertiary hover:bg-latar hover:text-primary'
             )}
         >
             {children}

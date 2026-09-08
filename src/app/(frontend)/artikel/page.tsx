@@ -30,7 +30,7 @@ export default async function ArtikelPage({
         await ambilDaftarArtikel(halaman);
 
     return (
-        <div className="bg-base min-h-screen">
+        <div className="bg-latar min-h-screen">
             <PageHeader image="/batulicin.webp" title="Artikel" subtitle="Berita & informasi kesehatan" />
             <Breadcrumb
                 items={[
@@ -57,7 +57,7 @@ export default async function ArtikelPage({
                                     href={`/artikel/${a.slug}`}
                                     className="group flex flex-col overflow-hidden rounded-2xl border border-primary/10 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-secondary/40 hover:shadow-[0_18px_40px_-24px_rgba(35,49,21,0.35)]"
                                 >
-                                    <div className="aspect-[16/10] w-full overflow-hidden bg-base">
+                                    <div className="aspect-[16/10] w-full overflow-hidden bg-latar">
                                         {cover ? (
                                             // eslint-disable-next-line @next/next/no-img-element
                                             <img

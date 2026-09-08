@@ -50,7 +50,7 @@
    ======================================== */
 :root {
   /* Base Colors */
-  --color-base: #EFF1EB;
+  --color-latar: #EFF1EB;
   --color-primary: #233115;
   --color-secondary: #697644;
   --color-tertiary: #6B7584;
@@ -95,7 +95,7 @@
   --color-tertiary-950: #24262a;
 
   /* Background & Foreground */
-  --background: var(--color-base);
+  --background: var(--color-latar);
   --foreground: var(--color-primary);
 
   /* Pengaduan & Feedback */
@@ -117,7 +117,7 @@
   --color-foreground: var(--foreground);
 
   /* Base Colors (using rgb() format for opacity modifier support) */
-  --color-base: rgb(239, 241, 235);
+  --color-latar: rgb(239, 241, 235);
   --color-primary: rgb(35, 49, 21);
   --color-secondary: rgb(105, 118, 68);
   --color-tertiary: rgb(107, 117, 132);
@@ -309,6 +309,11 @@ body {
 
 html {
   scroll-behavior: smooth;
+  /* Situs ini hanya punya satu tema (terang) — tidak ada satu pun varian
+     `dark:` di src/. Deklarasi ini menutup pintu bagi browser dengan
+     auto-dark-mode (flag Chrome, sebagian browser Android) untuk
+     meng-invert warna sendiri. */
+  color-scheme: only light;
 }
 /* ---------------------------------------------------------------
    Tipografi isi artikel (HTML dari editor WYSIWYG dashboard).

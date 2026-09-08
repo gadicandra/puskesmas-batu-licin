@@ -15,7 +15,7 @@ export default function PengaduanSuccessState({
 }: PengaduanSuccessStateProps) {
   return (
     <div
-      className="flex min-h-[360px] flex-col items-center justify-center rounded-[20px] bg-base/95 px-6 py-10 text-center text-pengaduan-dark"
+      className="flex min-h-[360px] flex-col items-center justify-center rounded-[20px] bg-latar/95 px-6 py-10 text-center text-pengaduan-dark"
       aria-live="polite"
     >
       <CheckCircle2 className="h-14 w-14 text-pengaduan-accent" aria-hidden="true" />

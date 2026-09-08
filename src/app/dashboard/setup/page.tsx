@@ -14,7 +14,7 @@ export default async function SetupPage() {
     if (totalDocs > 0) redirect('/dashboard/login')
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-base px-4 py-12">
+        <main className="flex min-h-screen items-center justify-center bg-latar px-4 py-12">
             <div className="w-full max-w-md">
                 <div className="mb-8 text-center">
                     <h1 className="text-2xl font-bold text-primary">Pengaturan Awal</h1>

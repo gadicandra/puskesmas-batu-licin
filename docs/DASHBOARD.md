@@ -78,12 +78,16 @@ Judul, Sub-judul, daftar berpoin, daftar bernomor, kutipan, tautan, gambar, undo
 Sisip gambar membuka pemilih galeri, bukan isian URL. Konten disimpan sebagai HTML dan
 **disanitasi dua kali** — saat simpan dan saat render di halaman publik.
 
-**Jebakan `text-base`:** proyek ini mendefinisikan `--color-base` di `@theme inline`
-(`globals.css`), sehingga Tailwind memperlakukan `text-base` sebagai utilitas **warna**,
-bukan ukuran font 16px. Menulis `text-base` pada teks berarti mewarnainya dengan warna
-latar — teks putih di atas putih — dan ukuran fontnya tidak ikut berubah. Tulis
-`text-[16px]` bila yang dimaksud ukuran, termasuk pada input (16px mencegah iOS
-memperbesar halaman saat kolom disentuh).
+**Jebakan `text-base` — sudah diperbaiki, jangan diulang.** Token warna latar dulu
+bernama `base`, dan `--color-base` di `@theme inline` membuat Tailwind mendaftarkan
+`base` sebagai nama **warna** — sehingga `text-base` menjadi utilitas warna, bukan
+ukuran font 16px. Akibatnya teks berwarna warna latar di atas kartu putih (tidak
+terlihat) dan ukuran fontnya tidak pernah ikut berubah, termasuk pada breakpoint
+`sm:text-base`. Tokennya kini bernama `latar` (`bg-latar`), jadi `text-base` sudah
+kembali berarti 16px. **Jangan pernah menamai token warna sama dengan namespace
+utilitas Tailwind** (`text-*`, `bg-*`, `border-*`, `font-*`, `shadow-*` berbagi satu
+namespace per prefiks). Pada input, 16px tetap wajib supaya iOS tidak memperbesar
+halaman saat kolom disentuh.
 
 **Unggahan gambar otomatis jadi WebP.** `unggahMedia` memanggil `keWebp()`
 (`src/lib/gambar.ts`) sebelum berkasnya diserahkan ke Payload, jadi foto layanan, foto

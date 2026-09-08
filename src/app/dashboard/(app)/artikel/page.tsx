@@ -108,7 +108,7 @@ export default async function DaftarArtikelPage({
                     {/* Tabel di layar lebar */}
                     <div className="hidden overflow-hidden rounded-2xl border border-primary/10 bg-white md:block">
                         <table className="w-full text-left text-sm">
-                            <thead className="border-b border-primary/10 bg-base/50">
+                            <thead className="border-b border-primary/10 bg-latar/50">
                                 <tr className="text-xs uppercase tracking-wide text-tertiary">
                                     <th className="px-5 py-3 font-bold">Judul</th>
                                     <th className="px-5 py-3 font-bold">Kategori</th>
@@ -118,7 +118,7 @@ export default async function DaftarArtikelPage({
                             </thead>
                             <tbody className="divide-y divide-primary/10">
                                 {hasil.docs.map((a) => (
-                                    <tr key={a.id} className="transition hover:bg-base/40">
+                                    <tr key={a.id} className="transition hover:bg-latar/40">
                                         <td className="px-5 py-3">
                                             <Link href={`/dashboard/artikel/${a.id}`} className="font-semibold text-primary hover:text-secondary">
                                                 {a.title}

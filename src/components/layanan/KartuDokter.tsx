@@ -8,7 +8,7 @@ import type { DokterPublik } from "@/lib/konten/dokter";
 export default function KartuDokter({ dokter }: { dokter: DokterPublik }) {
     return (
         <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-primary/10 bg-white">
-            <div className="aspect-[4/3] w-full overflow-hidden bg-base">
+            <div className="aspect-[4/3] w-full overflow-hidden bg-latar">
                 {dokter.foto ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -31,7 +31,7 @@ export default function KartuDokter({ dokter }: { dokter: DokterPublik }) {
                 <p className="mt-0.5 text-sm font-semibold text-secondary">{dokter.spesialisasi}</p>
 
                 <div className="mt-4 overflow-hidden rounded-xl border border-primary/10">
-                    <div className="flex items-center gap-2 bg-base px-3 py-2.5">
+                    <div className="flex items-center gap-2 bg-latar px-3 py-2.5">
                         <Clock aria-hidden className="h-4 w-4 text-secondary" />
                         <span className="text-sm font-semibold text-primary">
                             Jadwal Praktik Mingguan

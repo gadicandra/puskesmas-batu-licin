@@ -5,7 +5,7 @@ import StrukturOrganisasiContent from "@/components/struktur-organisasi/Struktur
 
 export default function StrukturOrganisasiPage() {
     return (
-        <div className="bg-base min-h-screen">
+        <div className="bg-latar min-h-screen">
             <PageHeader
                 image="/batulicin.webp"
                 title="Struktur Organisasi"

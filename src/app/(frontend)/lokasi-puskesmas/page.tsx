@@ -4,7 +4,7 @@ import LokasiContent from "@/components/lokasi/LokasiContent";
 
 export default function LokasiPuskesmasPage() {
     return (
-        <div className="bg-base min-h-screen">
+        <div className="bg-latar min-h-screen">
             <PageHeader
                 image="/batulicin.webp"
                 title="Lokasi Puskesmas"

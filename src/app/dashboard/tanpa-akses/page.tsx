@@ -5,7 +5,7 @@ export const metadata = { title: 'Tanpa Akses | Dashboard' }
 
 export default function TanpaAksesPage() {
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center bg-base px-4 text-center">
+        <main className="flex min-h-screen flex-col items-center justify-center bg-latar px-4 text-center">
             <ShieldAlert size={48} className="text-tertiary" />
             <h1 className="mt-4 text-2xl font-bold text-primary">Anda tidak punya akses ke halaman ini</h1>
             <p className="mt-2 max-w-md text-sm leading-relaxed text-tertiary">

@@ -15,7 +15,7 @@ export default async function PengaduanPage({ searchParams }: PengaduanPageProps
   const initialTab = normalizeTabParam(resolvedSearchParams?.tab);
 
   return (
-    <div className="min-h-screen bg-base">
+    <div className="min-h-screen bg-latar">
       <PageHeader
         image="/PengaduandanFeedback.webp"
         title="Pengaduan dan Feedback"

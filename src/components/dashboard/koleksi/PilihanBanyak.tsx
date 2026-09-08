@@ -64,7 +64,7 @@ export default function PilihanBanyak({
                 {tersaring.map((p) => (
                     <label
                         key={p.value}
-                        className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-lg px-3 text-sm text-primary hover:bg-base"
+                        className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-lg px-3 text-sm text-primary hover:bg-latar"
                     >
                         <input
                             type="checkbox"

@@ -77,7 +77,7 @@ export default function DaftarPengguna({
                 <form action={aksiSimpan} className="rounded-2xl border border-primary/10 bg-white p-5">
                     <div className="mb-4 flex items-center justify-between">
                         <h2 className="text-base font-bold text-primary">{ubah ? 'Ubah Akun' : 'Tambah Akun'}</h2>
-                        <button type="button" onClick={() => setFormTerbuka(false)} aria-label="Tutup form" className="rounded-lg p-2 text-tertiary hover:bg-base">
+                        <button type="button" onClick={() => setFormTerbuka(false)} aria-label="Tutup form" className="rounded-lg p-2 text-tertiary hover:bg-latar">
                             <X size={20} />
                         </button>
                     </div>
@@ -156,7 +156,7 @@ export default function DaftarPengguna({
 
             <div className="overflow-hidden rounded-2xl border border-primary/10 bg-white">
                 <table className="w-full text-left text-sm">
-                    <thead className="border-b border-primary/10 bg-base/50">
+                    <thead className="border-b border-primary/10 bg-latar/50">
                         <tr className="text-xs uppercase tracking-wide text-tertiary">
                             <th className="px-5 py-3 font-bold">Nama</th>
                             <th className="px-5 py-3 font-bold">Email</th>
@@ -167,7 +167,7 @@ export default function DaftarPengguna({
                     </thead>
                     <tbody className="divide-y divide-primary/10">
                         {potongan.map((p) => (
-                            <tr key={p.id} className="transition hover:bg-base/40">
+                            <tr key={p.id} className="transition hover:bg-latar/40">
                                 <td className="px-5 py-3">
                                     <span className="font-semibold text-primary">{p.name || '-'}</span>
                                     {p.id === idSaya && <span className="ml-2 text-xs text-tertiary">(Anda)</span>}

@@ -73,7 +73,7 @@ export default function MediaPicker({
                     <button
                         onClick={onTutup}
                         aria-label="Tutup"
-                        className="rounded-lg p-2 text-tertiary hover:bg-base hover:text-primary"
+                        className="rounded-lg p-2 text-tertiary hover:bg-latar hover:text-primary"
                     >
                         <X size={20} />
                     </button>
@@ -102,7 +102,7 @@ export default function MediaPicker({
                 )}
 
                 {modeUnggah && (
-                    <form action={unggah} className="flex flex-col gap-4 border-b border-primary/10 bg-base/50 px-5 py-4">
+                    <form action={unggah} className="flex flex-col gap-4 border-b border-primary/10 bg-latar/50 px-5 py-4">
                         <Field label="Pilih berkas" htmlFor="picker-file" wajib>
                             <input
                                 id="picker-file"
@@ -144,7 +144,7 @@ export default function MediaPicker({
                                         onClick={() => onPilih(m)}
                                         className="group w-full overflow-hidden rounded-xl border border-primary/10 text-left transition hover:border-secondary"
                                     >
-                                        <span className="block aspect-[4/3] overflow-hidden bg-base">
+                                        <span className="block aspect-[4/3] overflow-hidden bg-latar">
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img
                                                 src={m.thumbnailUrl}

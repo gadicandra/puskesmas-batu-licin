@@ -17,7 +17,7 @@ export default async function LayananPage() {
     const layanan = await ambilLayanan();
 
     return (
-        <div className="min-h-screen bg-base">
+        <div className="min-h-screen bg-latar">
             <Breadcrumb
                 items={[
                     { label: "Beranda", href: "/" },

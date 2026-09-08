@@ -26,7 +26,7 @@ export default async function ArtikelDetailPage({ params }: { params: Promise<{ 
     const cover = a.sampul;
 
     return (
-        <div className="bg-base min-h-screen">
+        <div className="bg-latar min-h-screen">
             <div className="h-16" />
             <Breadcrumb
                 items={[

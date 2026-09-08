@@ -69,7 +69,7 @@ export default function PenjelajahBagan({
                     type="button"
                     onClick={() => setFokus(null)}
                     disabled={fokusKini === null}
-                    className="rounded-lg px-2 py-1 font-semibold text-tertiary transition hover:bg-base hover:text-primary disabled:cursor-default disabled:font-bold disabled:text-primary disabled:hover:bg-transparent"
+                    className="rounded-lg px-2 py-1 font-semibold text-tertiary transition hover:bg-latar hover:text-primary disabled:cursor-default disabled:font-bold disabled:text-primary disabled:hover:bg-transparent"
                 >
                     Seluruh bagan
                 </button>
@@ -83,7 +83,7 @@ export default function PenjelajahBagan({
                                 onClick={() => setFokus(simpul.id)}
                                 disabled={terakhir}
                                 aria-current={terakhir ? 'page' : undefined}
-                                className="rounded-lg px-2 py-1 font-semibold text-tertiary transition hover:bg-base hover:text-primary disabled:cursor-default disabled:font-bold disabled:text-primary disabled:hover:bg-transparent"
+                                className="rounded-lg px-2 py-1 font-semibold text-tertiary transition hover:bg-latar hover:text-primary disabled:cursor-default disabled:font-bold disabled:text-primary disabled:hover:bg-transparent"
                             >
                                 {simpul.jabatan}
                             </button>

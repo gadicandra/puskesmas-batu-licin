@@ -56,7 +56,7 @@ export default function TarifContent() {
                         {tarif.map((row) => (
                             <li
                                 key={row.name}
-                                className="flex items-center justify-between gap-4 rounded-2xl px-5 py-4 transition-colors hover:bg-base/60"
+                                className="flex items-center justify-between gap-4 rounded-2xl px-5 py-4 transition-colors hover:bg-latar/60"
                             >
                                 <div className="min-w-0">
                                     <p className="truncate text-base font-bold text-primary">
