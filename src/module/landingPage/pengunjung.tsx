@@ -75,7 +75,7 @@ const PengunjungModule = () => {
     };
 
     return (
-        <div className="relative w-full min-h-screen overflow-hidden">
+        <div className="relative w-full overflow-hidden">
             {/* Background Image dengan Overlay */}
             <div className="absolute inset-0 w-full h-full">
                 <Image
@@ -91,7 +91,7 @@ const PengunjungModule = () => {
             </div>
 
             {/* Content */}
-            <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+            <div className="relative z-10 px-[20px] md:px-[60px] py-12 sm:py-16 lg:py-20">
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
@@ -100,16 +100,16 @@ const PengunjungModule = () => {
                     viewport={{ once: true }}
                     className="text-center mb-10 sm:mb-14 lg:mb-16"
                 >
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 sm:mb-3">
+                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3 drop-shadow-lg">
                         Statistik Pengunjung Website
                     </h2>
-                    <p className="text-xs sm:text-sm lg:text-base text-gray-600">
+                    <p className="text-xs sm:text-sm lg:text-base text-white/90 drop-shadow">
                         Terima kasih telah mengunjungi website kami
                     </p>
                 </motion.div>
 
                 {/* Statistics Cards Grid */}
-                <div className="max-w-6xl mx-auto">
+                <div className="max-w-[1600px] mx-auto">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
                         {statistics.map((stat, index) => (
                             <motion.div
@@ -129,14 +129,14 @@ const PengunjungModule = () => {
                                     <motion.div
                                         whileHover={{ rotate: 360, scale: 1.1 }}
                                         transition={{ duration: 0.6 }}
-                                        className="text-green-500 mb-4 sm:mb-5"
+                                        className="text-secondary mb-4 sm:mb-5"
                                     >
                                         {stat.icon}
                                     </motion.div>
 
                                     {/* Value */}
                                     <div className="mb-2 sm:mb-3">
-                                        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
+                                        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800">
                                             {formatNumber(displayValues[stat.id] || 0)}
                                             {stat.suffix && (
                                                 <span className="ml-1">{stat.suffix}</span>
@@ -145,12 +145,12 @@ const PengunjungModule = () => {
                                     </div>
 
                                     {/* Label */}
-                                    <p className="text-xs sm:text-sm lg:text-base text-gray-600 font-medium leading-snug">
+                                    <p className="text-xs sm:text-sm lg:text-base text-slate-600 font-medium leading-snug">
                                         {stat.label}
                                     </p>
 
                                     {/* Bottom border accent */}
-                                    <div className="w-0 group-hover:w-full h-1 bg-green-500 rounded-full mt-4 transition-all duration-500"></div>
+                                    <div className="w-0 group-hover:w-full h-1 bg-secondary rounded-full mt-4 transition-all duration-500"></div>
                                 </div>
                             </motion.div>
                         ))}

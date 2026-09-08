@@ -158,15 +158,15 @@ export default function BeritaSection() {
     };
 
     return (
-        <section className="bg-white py-8 md:py-12">
-            <div className="mx-automax-w-7xl">
+        <section className="bg-white py-8 md:py-12 px-[20px] md:px-[60px]">
+            <div className="mx-auto max-w-[1600px]">
                 {/* Section Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 mb-8 md:mb-10">
                     <div className="max-w-xl">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 md:mb-4">
                             Berita & Artikel Terbaru
                         </h2>
-                        <p className="text-slate-900 text-sm sm:text-slate-900 md:text-lg lg:text-slate-900 leading-relaxed">
+                        <p className="text-sm md:text-lg text-slate-600 leading-relaxed">
                             Informasi terkini seputar kegiatan dan edukasi kesehatan dari Puskesmas Batulicin
                         </p>
                     </div>

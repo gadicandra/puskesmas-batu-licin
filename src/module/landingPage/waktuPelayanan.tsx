@@ -63,7 +63,7 @@ export default function WaktuPelayanan() {
 	const open = isOpenBySchedule(now)
 
 	return (
-		<section className="max-w-8xl mx-auto py-12">
+		<section className="w-full py-12 px-[20px] md:px-[60px]">
 			<div className="text-center mb-6">
 				<h2 className="text-3xl md:text-4xl font-semibold text-slate-800">Waktu Pelayanan</h2>
 				<p className="text-sm md:text-lg text-slate-500 mt-2">Informasi jam operasional untuk setiap jenis pelayanan di Puskesmas kami.</p>
@@ -75,7 +75,7 @@ export default function WaktuPelayanan() {
 				</div>
 			</div>
 
-			<div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+			<div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
 				<article
 					className="border md:border-slate-200 hover:border-slate-600 transition-colors rounded-3xl p-4 bg-white"
 					style={{

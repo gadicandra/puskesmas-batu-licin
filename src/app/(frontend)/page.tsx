@@ -34,7 +34,7 @@ export default async function Home() {
 
     return (
         <SectionProvider>
-            <div className="flex min-h-screen flex-col bg-base">
+            <div className="flex min-h-screen flex-col bg-latar">
                 {/* Scroll Indicator */}
                 <ScrollIndicator labels={sectionLabels} />
 
@@ -42,7 +42,7 @@ export default async function Home() {
                 <Section id="hero" isFirst>
 
 
-                    <Container color="primary" className="py-16 md:py-22">
+                    <Container color="base" className="py-16 md:py-22">
                         <div className="absolute inset-0 h-7/7 md:h-7/7">
                             <Image
                                 src="/batulicin.webp"
@@ -59,7 +59,12 @@ export default async function Home() {
 
 
                     </Container>
-                    <div className="hidden lg:block relative z-10 w-full bg-white py-8 md:py-10 rounded-b-[5rem] md:rounded-b-[5rem] mt-auto shadow-2xl ">
+                    <div className="hidden lg:block relative w-full mt-auto">
+                        {/* Lapisan putih di belakang: menutup celah di kiri-kanan sudut
+                            lengkung, digambar sebelum kartu sehingga bayangan lengkungnya
+                            tetap jatuh di atasnya dan lekuknya masih terbaca. */}
+                        <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white" />
+                        <div className="relative z-10 w-full bg-white py-8 md:py-10 rounded-b-[5rem] md:rounded-b-[5rem] shadow-2xl">
                         <div className="container mx-auto px-4 ">
                             <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16 lg:gap-24">
 
@@ -93,32 +98,32 @@ export default async function Home() {
                                 </div>
                             </div>
                         </div>
+                        </div>
                     </div>
                 </Section>
 
                 <Section id="layanan">
-                    <Container color="base" className="">
+                    <Container color="base" fullWidth>
                         <Layanan items={kartuLayanan} />
                     </Container>
                 </Section>
 
                 {/* Layanan Section */}
                 <Section id="waktulayanan">
-                    <Container color="base" className="">
+                    <Container color="base" fullWidth>
                         <WaktuPelayanan />
                     </Container>
                 </Section>
 
-                {/* Statistik Section 
+                {/* Statistik Section */}
                 <Section id="statistik">
-                    <Container color="base" >
+                    <Container color="base" fullWidth>
                         <StatistikModule />
                     </Container>
                 </Section>
-                */}
 
                 <Section id="berita" isLast>
-                    <Container color="base" >
+                    <Container color="base" fullWidth>
                         <Berita />
                     </Container>
 

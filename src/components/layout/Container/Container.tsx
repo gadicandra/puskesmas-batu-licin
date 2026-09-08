@@ -6,12 +6,13 @@ interface ContainerProps {
     className?: string;
     sectionClassName?: string;
     color?: "base" | "primary" | "secondary";
+    fullWidth?: boolean;
 }
 
-const Container = ({ children, className, sectionClassName, color }: ContainerProps) => {
+const Container = ({ children, className, sectionClassName, color, fullWidth = false }: ContainerProps) => {
     const bgColor =
         color === "base"
-            ? "bg-base"
+            ? "bg-latar"
             : color === "primary"
                 ? "bg-primary"
                 : color === "secondary"
@@ -20,9 +21,14 @@ const Container = ({ children, className, sectionClassName, color }: ContainerPr
 
     return (
         <section
-            className={cn(`relative mx-auto flex w-full flex-col gap-4 px-[20px] md:px-[60px] py-10 md:py-0`, bgColor, sectionClassName)}
+            className={cn(`relative flex w-full flex-col`, bgColor, sectionClassName)}
         >
-            <div className={cn("mx-auto h-full w-full max-w-[2160px]", className)}>{children}</div>
+            <div className={cn(
+                fullWidth
+                    ? "w-full"
+                    : "mx-auto h-full w-full max-w-[2160px] px-[20px] md:px-[60px] py-10 md:py-0 flex flex-col gap-4",
+                className
+            )}>{children}</div>
         </section>
     );
 };
