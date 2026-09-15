@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-16T05:35:00+07:00",
+  "title": "Design System: Puskesmas Batulicin",
+  "extensions": {
+    "breakpoints": [{ "name": "md", "value": "768px" }],
+    "motion": [],
+    "shadows": []
+  },
+  "components": [
+    {
+      "name": "Tautan dokumen",
+      "kind": "button",
+      "description": "Akses dokumen asli dengan fokus keyboard yang terlihat.",
+      "html": "<a class=\"ds-document-link\" href=\"#dokumen\">Lihat Piagam</a>",
+      "css": ".ds-document-link{display:inline-flex;align-items:center;min-height:48px;font-weight:700;color:inherit;text-decoration:underline;text-underline-offset:6px}.ds-document-link:hover{text-decoration-thickness:2px}.ds-document-link:focus-visible{outline:3px solid currentColor;outline-offset:5px}"
+    }
+  ],
+  "narrative": {
+    "overview": "Mempertahankan identitas website dan referensi Figma yang ditentukan pengguna.",
+    "keyCharacteristics": ["Avenir lokal", "Palet hijau", "Dokumen asli", "Responsif"],
+    "dos": ["Hitung ringkasan dari data yang ditampilkan."],
+    "donts": ["Jangan menyalin skor, masa berlaku, atau status contoh Figma sebagai fakta."]
+  }
+}

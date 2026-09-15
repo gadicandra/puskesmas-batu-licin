@@ -22,7 +22,13 @@ import {
 } from "./navigation-menu";
 
 /** Rute di bawah dropdown "Profil" — dipakai untuk menandai menu aktif. */
-const PROFIL_PATHS = ["/profil-puskesmas", "/struktur-organisasi", "/lokasi-puskesmas", "/fasilitas"];
+const PROFIL_PATHS = [
+  "/profil-puskesmas",
+  "/struktur-organisasi",
+  "/lokasi-puskesmas",
+  "/fasilitas",
+  "/sertifikat-penghargaan",
+];
 
 /** Nomor darurat PSC 119 (sumber: data/puskesmas.md). */
 const EMERGENCY_TEL = "tel:085249312786";
@@ -111,6 +117,7 @@ export default function Navbar() {
                             <ListItem href="/struktur-organisasi" title="Struktur Organisasi" />
                             <ListItem href="/lokasi-puskesmas" title="Lokasi Puskesmas" />
                             <ListItem href="/fasilitas" title="Fasilitas" />
+                            <ListItem href="/sertifikat-penghargaan" title="Sertifikat dan Penghargaan" />
                           </div>
                         </NavigationMenuContent>
                       </NavigationMenuItem>
@@ -255,6 +262,11 @@ export default function Navbar() {
                       <Link href="/fasilitas" onClick={closeMobileMenu}>
                         <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
                           <span className="font-avenir font-medium">Fasilitas</span>
+                        </div>
+                      </Link>
+                      <Link href="/sertifikat-penghargaan" onClick={closeMobileMenu}>
+                        <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
+                          <span className="font-avenir font-medium">Sertifikat dan Penghargaan</span>
                         </div>
                       </Link>
                     </motion.div>
