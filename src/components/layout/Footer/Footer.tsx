@@ -22,6 +22,7 @@ const Nav = [
     { name: 'Informasi Layanan dan Mutu', href: '/informasi-layanan-mutu' },
     { name: 'Artikel', href: '/artikel' },
     { name: 'Lokasi Puskesmas', href: '/lokasi-puskesmas' },
+    { name: 'Posyandu & Lokasi', href: '/posyandu' },
 ]
 
 const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {

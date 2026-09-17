@@ -127,8 +127,25 @@ export const skemaLayanan = z.object({
     aktif: z.boolean().optional(),
 })
 
+/** Jam dalam format 24 jam, mis. "08:00".
+ *
+ *  Divalidasi bentuknya, bukan sekadar "ada isinya", karena kartu di situs
+ *  merender "08:00 - 11:00" apa adanya — satu ketikan "8" atau "08.00 pagi"
+ *  langsung terlihat oleh warga dan tidak bisa diurutkan. Boleh dikosongkan;
+ *  yang dilarang hanya format yang salah. */
+const jamOpsional = z
+    .string()
+    .trim()
+    .optional()
+    .refine((v) => !v || /^([01]\d|2[0-3]):[0-5]\d$/.test(v), {
+        message: 'Jam harus ditulis format 24 jam, mis. "08:00". Perbaiki atau kosongkan.',
+    })
+
 export const skemaPosyandu = z.object({
     nama: teksWajib('Nama posyandu belum diisi.'),
+    deskripsi: z.string().trim().nullish(),
+    foto: relasiOpsional,
+    desa: z.string().trim().nullish(),
     alamat: z.string().trim().nullish(),
     layanan: daftarJson(z.coerce.number().int().positive()),
     jadwal: daftarJson(
@@ -136,6 +153,9 @@ export const skemaPosyandu = z.object({
             hari: z.enum(['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'], {
                 message: 'Ada baris jadwal yang harinya belum dipilih. Pilih hari atau hapus barisnya.',
             }),
+            polaMinggu: z.string().trim().optional(),
+            jamMulai: jamOpsional,
+            jamSelesai: jamOpsional,
             keterangan: z.string().trim().optional(),
         }),
     ),

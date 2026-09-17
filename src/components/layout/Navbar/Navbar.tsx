@@ -22,7 +22,7 @@ import {
 } from "./navigation-menu";
 
 /** Rute di bawah dropdown "Profil" — dipakai untuk menandai menu aktif. */
-const PROFIL_PATHS = ["/profil-puskesmas", "/struktur-organisasi", "/lokasi-puskesmas"];
+const PROFIL_PATHS = ["/profil-puskesmas", "/struktur-organisasi", "/lokasi-puskesmas", "/posyandu"];
 
 /** Nomor darurat PSC 119 (sumber: data/puskesmas.md). */
 const EMERGENCY_TEL = "tel:085249312786";
@@ -110,6 +110,7 @@ export default function Navbar() {
                             <ListItem href="/profil-puskesmas" title="Profil Puskesmas" />
                             <ListItem href="/struktur-organisasi" title="Struktur Organisasi" />
                             <ListItem href="/lokasi-puskesmas" title="Lokasi Puskesmas" />
+                            <ListItem href="/posyandu" title="Posyandu & Lokasi" />
                           </div>
                         </NavigationMenuContent>
                       </NavigationMenuItem>
@@ -172,22 +173,32 @@ export default function Navbar() {
               <a href={EMERGENCY_TEL} aria-label="Telepon darurat PSC 119" className="flex items-center justify-center rounded-full bg-secondary p-2 text-white transition-all duration-300 hover:bg-secondary/80 hover:scale-105 active:scale-95">
                 <AiOutlineAlert size={24} />
               </a>
-              <div
+              {/* <button>, bukan <div onClick>: tanpa itu menu tidak bisa dibuka
+                  lewat keyboard dan pembaca layar tidak tahu ini tombol. */}
+              <button
+                type="button"
                 onClick={toggleMobileMenu}
+                aria-label={mobileMenuOpen ? "Tutup menu" : "Buka menu"}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="menu-mobile"
                 className={cn(
                   "cursor-pointer p-2 rounded-lg transition-all duration-300",
                   mobileMenuOpen ? "bg-primary" : "bg-transparent"
                 )}
               >
-                {mobileMenuOpen ? <X size={36} /> : <Menu size={36} />}
-              </div>
+                {mobileMenuOpen ? <X size={36} aria-hidden="true" /> : <Menu size={36} aria-hidden="true" />}
+              </button>
             </div>
           </>
         </div>
         {/* Mobile Menu */}
+        {/* Navbar `fixed`, jadi isi drawer yang lebih tinggi dari layar (dua
+            accordion terbuka di ponsel pendek/lanskap) tidak bisa dijangkau
+            dengan menggulir halaman. Drawer menggulir sendiri. */}
         <section
+          id="menu-mobile"
           className={cn(
-            "bg-primary font-avenir-regular relative w-full flex-col gap-5 px-4 py-6 text-left text-lg text-base lg:hidden",
+            "bg-primary font-avenir-regular relative w-full flex-col gap-5 px-4 py-6 text-left text-lg text-base lg:hidden max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain",
             mobileMenuOpen ? "flex rounded-b-[20px] shadow-lg" : "hidden"
           )}
         >
@@ -235,6 +246,11 @@ export default function Navbar() {
                       <Link href="/lokasi-puskesmas" onClick={closeMobileMenu}>
                         <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
                           <span className="font-avenir font-medium">Lokasi Puskesmas</span>
+                        </div>
+                      </Link>
+                      <Link href="/posyandu" onClick={closeMobileMenu}>
+                        <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
+                          <span className="font-avenir font-medium">Posyandu & Lokasi</span>
                         </div>
                       </Link>
                     </motion.div>

@@ -72,6 +72,7 @@ media/*
 # begitu terunggah, berkasnya hidup di koleksi `media` (R2) dan disajikan dari
 # sana, jadi tidak perlu ada salinan kedua di repo.
 data/layanan-gambar/
+data/contoh-posyandu/
 
 # claude
 CLAUDE.md
