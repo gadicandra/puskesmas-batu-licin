@@ -24,7 +24,7 @@ function BarisInfo({ ikon, teks }: { ikon: React.ReactNode; teks: string }) {
             <span aria-hidden="true" className="shrink-0 text-secondary [&>svg]:size-4 @sm:[&>svg]:size-[18px] @lg:[&>svg]:size-5">
                 {ikon}
             </span>
-            <span className="min-w-0 text-[13px] leading-snug tracking-[-0.02em] text-tertiary @sm:text-[14px]">
+            <span className="min-w-0 text-[13px] leading-snug tracking-[-0.02em] text-tertiary-600 @sm:text-[14px]">
                 {teks}
             </span>
         </li>
@@ -49,6 +49,10 @@ function BarisInfo({ ikon, teks }: { ikon: React.ReactNode; teks: string }) {
  *   - `@xs` (≥ 320px): ukuran frame Mobile Figma (foto 100×98, ikon 16).
  *   - `@sm` (≥ 384px): ukuran antara.
  *   - `@lg` (≥ 512px): nilai desktop Figma persis.
+ *
+ * Satu penyimpangan dari Figma: warna teks memakai `tertiary-600` (#555d6a),
+ * bukan `tertiary` (#6B7584). Warna Figma hanya mencapai kontras 4.35:1 di atas
+ * latar kartu, sedikit di bawah syarat WCAG AA 4.5:1 untuk teks 13–14px.
  */
 export default function KartuPosyandu({ posyandu }: { posyandu: PosyanduPublik }) {
     const { nama, deskripsi, foto, desa, jadwal } = posyandu;
@@ -61,7 +65,7 @@ export default function KartuPosyandu({ posyandu }: { posyandu: PosyanduPublik }
                 <h3 className="text-[16px] font-black leading-tight tracking-[-0.02em] text-[#2b3d4f] @xs:text-[17px] @sm:text-[22px] @lg:text-[30px]">
                     {nama}
                 </h3>
-                <p className="mt-0.5 text-[12px] font-bold tracking-[-0.02em] text-tertiary @sm:text-[13px] @lg:text-[14px]">
+                <p className="mt-0.5 text-[12px] font-bold tracking-[-0.02em] text-tertiary-600 @sm:text-[13px] @lg:text-[14px]">
                     {deskripsi ?? DESKRIPSI_CADANGAN}
                 </p>
 

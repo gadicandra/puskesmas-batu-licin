@@ -37,7 +37,7 @@ const ProfilContent = () => {
                             UPTD Puskesmas Batulicin
                         </h2>
                     </div>
-                    <div className="flex items-center gap-3 rounded-xl bg-secondary/10 px-4 py-3 text-secondary">
+                    <div className="flex items-center gap-3 rounded-xl bg-secondary/10 px-4 py-3 text-primary">
                         <Building2 className="h-6 w-6 shrink-0" />
                         <span className="text-sm font-bold">Puskesmas Non Perawatan</span>
                     </div>
@@ -128,7 +128,7 @@ const InfoCard = ({
         <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl ${highlight ? "bg-secondary text-white" : "bg-primary/10 text-primary"}`}>
             {icon}
         </div>
-        <p className="mb-1 text-sm font-bold uppercase tracking-wide text-slate-500">{title}</p>
+        <p className="mb-1 text-sm font-bold uppercase tracking-wide text-slate-600">{title}</p>
         <p className="text-base font-semibold leading-relaxed text-slate-800">{value}</p>
     </div>
 );
