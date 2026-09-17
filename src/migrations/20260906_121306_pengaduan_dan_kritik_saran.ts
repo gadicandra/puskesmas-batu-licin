@@ -66,8 +66,16 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+  // Constraint dilepas SEBELUM tabel dihapus. Urutan hasil generator Payload
+  // terbalik: `DROP TABLE ... CASCADE` sudah ikut menghapus foreign key dari
+  // payload_locked_documents_rels yang menunjuk ke tabel itu, sehingga
+  // `DROP CONSTRAINT` sesudahnya gagal dengan "constraint ... does not exist"
+  // dan seluruh rollback dibatalkan.
   await db.execute(sql`
-   ALTER TABLE "alur_pengaduan_steps_details" DISABLE ROW LEVEL SECURITY;
+   ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_alur_pengaduan_steps_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_pengaduan_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_kritik_saran_fk";
+  ALTER TABLE "alur_pengaduan_steps_details" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "alur_pengaduan_steps" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "pengaduan" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "kritik_saran" DISABLE ROW LEVEL SECURITY;
@@ -75,12 +83,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "alur_pengaduan_steps" CASCADE;
   DROP TABLE "pengaduan" CASCADE;
   DROP TABLE "kritik_saran" CASCADE;
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_alur_pengaduan_steps_fk";
-  
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_pengaduan_fk";
-  
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_kritik_saran_fk";
-  
   DROP INDEX "payload_locked_documents_rels_alur_pengaduan_steps_id_idx";
   DROP INDEX "payload_locked_documents_rels_pengaduan_id_idx";
   DROP INDEX "payload_locked_documents_rels_kritik_saran_id_idx";
