@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { BsGeoAltFill } from "react-icons/bs";
 import { IoIosCalendar } from "react-icons/io";
 import { IoTimeSharp } from "react-icons/io5";
@@ -66,14 +67,16 @@ export default function KartuPosyandu({ posyandu }: { posyandu: PosyanduPublik }
 
                 <ul className="mt-3 flex flex-col gap-1.5 @sm:mt-4 @sm:gap-2.5 @lg:mt-5 @lg:gap-[15px]">
                     {desa && <BarisInfo ikon={<BsGeoAltFill />} teks={desa} />}
+                    {/* Hari dan jam dirender berpasangan per jadwal. Merender semua
+                        baris hari lalu semua baris jam membuat posyandu dengan dua
+                        jadwal tampil "Senin ke-1, Senin ke-3, 08:00, 13:00" —
+                        warga tidak bisa tahu jam mana milik minggu mana. */}
                     {jadwal.map((j) => (
-                        <BarisInfo key={`${j.kodeHari}-jadwal`} ikon={<IoIosCalendar />} teks={j.labelJadwal} />
+                        <Fragment key={j.id}>
+                            <BarisInfo ikon={<IoIosCalendar />} teks={j.labelJadwal} />
+                            {j.labelWaktu && <BarisInfo ikon={<IoTimeSharp />} teks={j.labelWaktu} />}
+                        </Fragment>
                     ))}
-                    {jadwal.map((j) =>
-                        j.labelWaktu ? (
-                            <BarisInfo key={`${j.kodeHari}-waktu`} ikon={<IoTimeSharp />} teks={j.labelWaktu} />
-                        ) : null,
-                    )}
                 </ul>
             </div>
 

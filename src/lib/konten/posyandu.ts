@@ -6,6 +6,10 @@ import { ringkasGambar, type GambarPublik } from './media'
 import { TAG, UMUR_CACHE_DETIK } from './tags'
 
 export type JadwalPosyandu = {
+    /** Id baris jadwal dari Payload. Dipakai sebagai `key` React: satu posyandu
+     *  bisa punya dua jadwal di hari yang sama (mis. Senin minggu ke-1 dan
+     *  Senin minggu ke-3), jadi `kodeHari` tidak unik. */
+    id: string
     kodeHari: KodeHari
     hari: string
     polaMinggu: string | null
@@ -74,7 +78,7 @@ export const ambilPosyandu = unstable_cache(
                 .filter((l): l is Exclude<typeof l, number> => typeof l !== 'number')
                 .map((l) => ({ id: l.id, nama: l.nama })),
             jadwal: (d.jadwal ?? [])
-                .map((j) => {
+                .map((j, i) => {
                     const hari = labelHari(j.hari)
                     const polaMinggu = j.polaMinggu?.trim() || null
                     const jamMulai = j.jamMulai?.trim() || null
@@ -82,6 +86,7 @@ export const ambilPosyandu = unstable_cache(
                     const keterangan = j.keterangan?.trim() || null
 
                     return {
+                        id: j.id ?? `jadwal-${i}`,
                         kodeHari: j.hari as KodeHari,
                         hari,
                         polaMinggu,
