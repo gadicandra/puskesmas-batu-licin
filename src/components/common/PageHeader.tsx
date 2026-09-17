@@ -20,6 +20,27 @@ interface PageHeaderProps {
 const PageHeader: React.FC<PageHeaderProps> = ({ image, title, subtitle, variant = "default", icon }) => {
     const isPengaduan = variant === "pengaduan";
 
+    // Tinggi hero MINIMUM, bukan tetap. Dulu tinggi hero dikunci (`h-[200px]`
+    // dst.), sehingga judul panjang yang terbungkus beberapa baris meluber ke
+    // bawah hero (mis. /informasi-layanan-mutu 24px di 320px, 8px di
+    // 1024–1279px) atau naik ke bawah navbar yang fixed (teks mulai di y=56,
+    // navbar 64px).
+    //
+    // Susunan lama (`py-16`/`py-22` + `mt-10` + `h-full`) menghasilkan kotak isi
+    // yang dimulai di y=104 (mobile) / y=128 (md+) dengan tinggi
+    // 32px / 84px (md) / 184px (lg) — dan 47px / 234px (xl) untuk varian ikon.
+    // Teks ditengahkan di kotak itu; bila lebih tinggi, teks menempel di atas
+    // dan memanjang ke bawah. Ukuran kotak itu dipertahankan persis (`min-h`
+    // pada isi), jadi posisi teks tidak berubah sepiksel pun. Bedanya: hero kini
+    // ikut bertambah tinggi bila jarak teks ke tepi bawah hero kurang dari 24px
+    // (mobile) / 48px (md+), alih-alih meluber.
+    // Varian pengaduan tidak diubah: diukur aman di 320–1920px.
+    const kelasIsi = isPengaduan
+        ? "relative z-30 flex h-full flex-col justify-center pt-10"
+        : icon
+            ? "relative z-30 flex flex-col justify-center min-h-[47px] md:min-h-[84px] lg:min-h-[184px] xl:min-h-[234px]"
+            : "relative z-30 flex flex-col justify-center min-h-8 md:min-h-[84px] lg:min-h-[184px]";
+
     return (
         <Container
             color="primary"
@@ -27,8 +48,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({ image, title, subtitle, variant
                 isPengaduan
                     ? "h-[190px] py-14 md:h-[300px] md:py-20 lg:h-[360px]"
                     : icon
-                        ? "py-16 md:py-22 h-[215px] md:h-[300px] lg:h-[400px] xl:h-[450px]"
-                        : "py-16 md:py-22 h-[200px] md:h-[300px] lg:h-[400px]"
+                        ? "pt-26 pb-6 md:pt-32 md:pb-12 min-h-[215px] md:min-h-[300px] lg:min-h-[400px] xl:min-h-[450px]"
+                        : "pt-26 pb-6 md:pt-32 md:pb-12 min-h-[200px] md:min-h-[300px] lg:min-h-[400px]"
             }
         >
             <div className="absolute inset-0">
@@ -47,7 +68,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ image, title, subtitle, variant
                         : "absolute inset-0 bg-gradient-to-r from-primary/90 from-20% to-primary/10 to-80%"
                 }
             ></div>
-            <div className={isPengaduan ? "relative z-30 flex h-full flex-col justify-center pt-10" : "relative z-30 flex flex-col h-full justify-center mt-10"}>
+            <div className={kelasIsi}>
                 {icon ? (
                     <KontenHeroParalaks>
                         <div className="flex items-center gap-3 md:gap-5">
