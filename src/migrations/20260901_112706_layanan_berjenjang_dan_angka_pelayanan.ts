@@ -29,12 +29,16 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+  // Constraint yang menunjuk ke "service_statistics" dilepas SEBELUM tabelnya
+  // dihapus. Urutan hasil generator Payload terbalik: `DROP TABLE ... CASCADE`
+  // sudah ikut menghapus foreign key itu, sehingga `DROP CONSTRAINT` sesudahnya
+  // gagal dengan "constraint ... does not exist" dan seluruh rollback dibatalkan.
+  // Sama dengan perbaikan di 20260906_121306_pengaduan_dan_kritik_saran.
   await db.execute(sql`
-   ALTER TABLE "service_statistics" DISABLE ROW LEVEL SECURITY;
+   ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_service_statistics_fk";
+  ALTER TABLE "service_statistics" DISABLE ROW LEVEL SECURITY;
   DROP TABLE "service_statistics" CASCADE;
   ALTER TABLE "services" DROP CONSTRAINT "services_induk_id_services_id_fk";
-  
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_service_statistics_fk";
   
   DROP INDEX "services_slug_idx";
   DROP INDEX "services_induk_idx";
