@@ -28,9 +28,13 @@ export default function ScrollIndicator({ labels = {} }: ScrollIndicatorProps) {
                 const progress = sectionProgress[sectionId] || 0;
 
                 return (
+                    /* Tombolnya hanya berisi titik, tanpa teks — tanpa `aria-label`
+                       pembaca layar hanya menyebutnya "button". */
                     <motion.button
                         key={sectionId}
                         onClick={() => scrollToSection(sectionId)}
+                        aria-label={`Ke bagian ${labels[sectionId] ?? sectionId}`}
+                        aria-current={isActive ? "true" : undefined}
                         className="group relative flex cursor-pointer items-center justify-end"
                         layout
                         transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -41,7 +45,7 @@ export default function ScrollIndicator({ labels = {} }: ScrollIndicatorProps) {
                                 <motion.div
                                     initial={{ opacity: 0, x: 10 }}
                                     whileHover={{ opacity: 1, x: 0 }}
-                                    className="pointer-events-none absolute right-full mr-4 whitespace-nowrap rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-base opacity-0 transition-opacity group-hover:opacity-100"
+                                    className="pointer-events-none absolute right-full mr-4 whitespace-nowrap rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-latar opacity-0 transition-opacity group-hover:opacity-100"
                                 >
                                     {labels[sectionId]}
                                     <div className="absolute right-0 top-1/2 h-2 w-2 -translate-y-1/2 translate-x-1 rotate-45 bg-primary" />

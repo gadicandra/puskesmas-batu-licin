@@ -35,6 +35,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({ image, title, subtitle, variant
     // ikut bertambah tinggi bila jarak teks ke tepi bawah hero kurang dari 24px
     // (mobile) / 48px (md+), alih-alih meluber.
     // Varian pengaduan tidak diubah: diukur aman di 320–1920px.
+    //
+    // Judul hero adalah judul halaman, jadi dirender sebagai <h1> (sebelumnya
+    // <p>, sehingga 7 halaman sama sekali tidak punya <h1>). Kelas CSS-nya tidak
+    // diubah; Tailwind preflight sudah menormalkan ukuran dan margin <h1>.
     const kelasIsi = isPengaduan
         ? "relative z-30 flex h-full flex-col justify-center pt-10"
         : icon
@@ -79,9 +83,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ image, title, subtitle, variant
                                 {icon}
                             </span>
                             <div className="min-w-0">
-                                <p className="text-white font-extrabold leading-none tracking-[-0.02em] text-[24px] md:text-[40px] lg:text-[48px] xl:text-[56px] 2xl:text-[60px]">
+                                <h1 className="text-white font-extrabold leading-none tracking-[-0.02em] text-[24px] md:text-[40px] lg:text-[48px] xl:text-[56px] 2xl:text-[60px]">
                                     {title}
-                                </p>
+                                </h1>
                                 {subtitle && (
                                     <p className="mt-1 text-white font-normal tracking-[-0.02em] text-[15px] md:text-[18px] lg:text-[24px] xl:text-[26px] 2xl:text-[30px] md:mt-2">
                                         {subtitle}
@@ -92,7 +96,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ image, title, subtitle, variant
                     </KontenHeroParalaks>
                 ) : (
                     <>
-                        <p
+                        <h1
                             className={
                                 isPengaduan
                                     ? "max-w-[760px] text-[30px] font-black leading-[1] text-white md:text-[64px] lg:text-[76px]"
@@ -100,7 +104,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ image, title, subtitle, variant
                             }
                         >
                             {title}
-                        </p>
+                        </h1>
                         {subtitle && (
                             <p className="text-white font-semibold text-[16px] md:text-[32px] lg:text-[48px]">{subtitle}</p>
                         )}

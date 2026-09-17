@@ -14,6 +14,11 @@ type TabType = 'PROFIL' | 'VISI & MISI' | 'BUDAYA KERJA' | 'MOTTO PELAYANAN' | '
 const ProfilLayout = () => {
     const [activeTab, setActiveTab] = useState<TabType>('PROFIL');
 
+    /** Id stabil untuk menghubungkan tab dengan panel isinya (aria-controls /
+     *  aria-labelledby). Label tab mengandung spasi dan '&', jadi dibersihkan. */
+    const idTab = (item: string) => `tab-profil-${item.toLowerCase().replace(/[^a-z]+/g, '-')}`;
+    const idPanel = (item: string) => `${idTab(item)}-panel`;
+
     const contentConfig: Record<TabType, { title: React.ReactNode, component: React.ReactNode }> = {
         'PROFIL': {
             title: "Profil Puskesmas",
@@ -48,9 +53,11 @@ const ProfilLayout = () => {
 
                     {/* Title Section */}
                     <div className="mb-4 lg:mb-8 text-center lg:text-left w-full">
-                        <h1 className="text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-primary mb-2 lg:mb-4 leading-tight">
+                        {/* Judul tab (berganti mengikuti tab aktif) — judul bagian,
+                            bukan judul halaman. Judul halaman ada di <h1> hero. */}
+                        <h2 className="text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-primary mb-2 lg:mb-4 leading-tight">
                             {contentConfig[activeTab].title}
-                        </h1>
+                        </h2>
                         <div className="h-1.5 w-[150px] lg:w-full lg:max-w-[200px] bg-secondary rounded-full mx-auto lg:mx-0"></div>
                     </div>
 
@@ -68,16 +75,24 @@ const ProfilLayout = () => {
                     </div>
 
                     {/* Navigation */}
-                    <div className="flex flex-row lg:flex-col gap-2 lg:gap-1 z-10 w-full lg:w-[80%] mb-8 lg:mb-10 overflow-x-auto lg:overflow-visible items-center lg:items-stretch py-2 px-4 lg:px-0 scroll-smooth snap-x animate-scroll-hint [mask-image:linear-gradient(to_right,black_85%,transparent_100%)] lg:[mask-image:none]">
+                    <div
+                        role="tablist"
+                        aria-label="Bagian profil Puskesmas"
+                        className="flex flex-row lg:flex-col gap-2 lg:gap-1 z-10 w-full lg:w-[80%] mb-8 lg:mb-10 overflow-x-auto lg:overflow-visible items-center lg:items-stretch py-2 px-4 lg:px-0 scroll-smooth snap-x animate-scroll-hint [mask-image:linear-gradient(to_right,black_85%,transparent_100%)] lg:[mask-image:none]">
                         {navItems.map((item, index) => {
                             const isActive = activeTab === item;
 
                             return (
-                                <div
+                                <button
                                     key={item}
+                                    type="button"
+                                    role="tab"
+                                    id={idTab(item)}
+                                    aria-selected={isActive}
+                                    aria-controls={idPanel(item)}
                                     onClick={() => setActiveTab(item)}
                                     className={`
-                                        snap-center shrink-0 px-4 lg:px-6 py-2 lg:py-3 font-bold cursor-pointer transition-all duration-300 border-b-4 lg:border-b-0 lg:border-l-4 text-sm whitespace-nowrap rounded-lg lg:rounded-none animate-in slide-in-from-right fade-in duration-500 fill-mode-backwards
+                                        snap-center shrink-0 px-4 lg:px-6 py-2 lg:py-3 font-bold cursor-pointer transition-all duration-300 border-b-4 lg:border-b-0 lg:border-l-4 text-sm text-left whitespace-nowrap rounded-lg lg:rounded-none animate-in slide-in-from-right fade-in duration-500 fill-mode-backwards
                                         ${isActive
                                             ? 'text-white bg-secondary border-secondary shadow-md scale-100 lg:scale-105 origin-center lg:origin-left'
                                             : 'text-primary border-transparent hover:text-secondary hover:border-secondary/50 hover:bg-slate-50'
@@ -86,14 +101,20 @@ const ProfilLayout = () => {
                                     style={{ animationDelay: `${index * 100}ms` }}
                                 >
                                     {item}
-                                </div>
+                                </button>
                             );
                         })}
                     </div>
                 </div>
 
                 {/* Main Content Area */}
-                <div className="lg:col-span-8 min-h-[500px]">
+                <div
+                    role="tabpanel"
+                    id={idPanel(activeTab)}
+                    aria-labelledby={idTab(activeTab)}
+                    tabIndex={0}
+                    className="lg:col-span-8 min-h-[500px]"
+                >
                     {contentConfig[activeTab].component}
                 </div>
             </div>
