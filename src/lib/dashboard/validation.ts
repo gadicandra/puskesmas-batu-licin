@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { METODE_LOGIN } from './metode-login'
+import { FORMAT_JAM, periksaJadwalPosyandu } from '../jadwal-posyandu'
 
 /** Pesan validasi ditulis dalam bahasa sehari-hari dan selalu memberi tahu
  *  cara memperbaiki — bukan sekadar menyatakan ada yang salah.
@@ -137,7 +138,7 @@ const jamOpsional = z
     .string()
     .trim()
     .optional()
-    .refine((v) => !v || /^([01]\d|2[0-3]):[0-5]\d$/.test(v), {
+    .refine((v) => !v || FORMAT_JAM.test(v), {
         message: 'Jam harus ditulis format 24 jam, mis. "08:00". Perbaiki atau kosongkan.',
     })
 
@@ -158,7 +159,11 @@ export const skemaPosyandu = z.object({
             jamSelesai: jamOpsional,
             keterangan: z.string().trim().optional(),
         }),
-    ),
+    ).superRefine((baris, ctx) => {
+        // Pasangan jam & urutannya: aturan yang sama dengan `validate` koleksi.
+        const pesan = periksaJadwalPosyandu(baris)
+        if (pesan) ctx.addIssue({ code: 'custom', message: pesan })
+    }),
     penanggungJawab: z.string().trim().nullish(),
     kontak: z.string().trim().nullish(),
     urutan: z.coerce.number().int().min(0, 'Urutan tidak boleh kurang dari 0.').optional(),

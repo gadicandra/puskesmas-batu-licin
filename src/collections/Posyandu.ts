@@ -2,7 +2,30 @@ import type { CollectionConfig } from 'payload'
 import { isSuperAdmin } from '../access'
 import { endpointDaftarPosyandu, endpointDetailPosyandu } from '../lib/api/posyandu'
 import { periksaFotoPosyandu } from '../lib/foto-posyandu'
+import { periksaJadwalPosyandu, type BarisJadwalMentah } from '../lib/jadwal-posyandu'
 import { HARI } from '../lib/hari'
+import { TAG } from '../lib/konten/tags'
+
+/** Segarkan cache situs publik (`ambilPosyandu()` di /posyandu dan seksi
+ *  posyandu di /profil-puskesmas) setelah data berubah.
+ *
+ *  Server action dashboard sudah memanggil `revalidateTag` sendiri, tapi
+ *  perubahan lewat REST (`POST/PATCH/DELETE /api/posyandu`) tidak melewati
+ *  server action — tanpa hook ini situs baru ikut berubah setelah cache
+ *  kedaluwarsa (maks. 1 jam).
+ *
+ *  `next/cache` diimpor dinamis dan kegagalannya diabaikan: hook ini juga
+ *  berjalan di luar server Next (`pnpm contoh-posyandu`, `payload run`), dan di
+ *  sana `revalidateTag` melempar error karena tidak ada cache Next untuk
+ *  disegarkan. Menggagalkan penyimpanan karena itu justru salah. */
+async function segarkanSitusPublik() {
+    try {
+        const { revalidateTag } = await import('next/cache')
+        revalidateTag(TAG.posyandu)
+    } catch {
+        // Di luar request Next — tidak ada cache yang perlu disegarkan.
+    }
+}
 
 /** Posyandu di wilayah kerja Puskesmas Batulicin, beserta layanan yang
  *  tersedia di masing-masing. */
@@ -29,6 +52,20 @@ export const Posyandu: CollectionConfig = {
     // Bentuk respons GET mengikuti kontrak API (Claude.md §3.6). Lihat
     // src/lib/api/posyandu.ts.
     endpoints: [endpointDaftarPosyandu, endpointDetailPosyandu],
+    hooks: {
+        afterChange: [
+            async ({ doc }) => {
+                await segarkanSitusPublik()
+                return doc
+            },
+        ],
+        afterDelete: [
+            async ({ doc }) => {
+                await segarkanSitusPublik()
+                return doc
+            },
+        ],
+    },
     fields: [
         { name: 'nama', type: 'text', required: true },
         {
@@ -72,6 +109,10 @@ export const Posyandu: CollectionConfig = {
             type: 'array',
             label: 'Jadwal Kegiatan',
             labels: { singular: 'Jadwal', plural: 'Jadwal' },
+            // Jam harus berpasangan dan jam selesai > jam mulai. Lihat
+            // src/lib/jadwal-posyandu.ts.
+            validate: (value: unknown) =>
+                periksaJadwalPosyandu(value as BarisJadwalMentah[] | null | undefined) ?? true,
             fields: [
                 { name: 'hari', type: 'select', required: true, options: [...HARI] },
                 {
