@@ -1,6 +1,7 @@
 import Container from "@/components/layout/Container/Container";
 import Image from "next/image";
 import React from "react";
+import KontenHeroParalaks from "./KontenHeroParalaks";
 
 interface PageHeaderProps {
     image: string;
@@ -48,24 +49,26 @@ const PageHeader: React.FC<PageHeaderProps> = ({ image, title, subtitle, variant
             ></div>
             <div className={isPengaduan ? "relative z-30 flex h-full flex-col justify-center pt-10" : "relative z-30 flex flex-col h-full justify-center mt-10"}>
                 {icon ? (
-                    <div className="flex items-center gap-3 md:gap-5">
-                        <span
-                            aria-hidden="true"
-                            className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary text-white shadow-lg md:size-16 lg:size-[88px] xl:size-[100px] [&>svg]:size-5 md:[&>svg]:size-8 lg:[&>svg]:size-11 xl:[&>svg]:size-[60px]"
-                        >
-                            {icon}
-                        </span>
-                        <div className="min-w-0">
-                            <p className="text-white font-extrabold leading-none tracking-[-0.02em] text-[24px] md:text-[40px] lg:text-[48px] xl:text-[56px] 2xl:text-[60px]">
-                                {title}
-                            </p>
-                            {subtitle && (
-                                <p className="mt-1 text-white font-normal tracking-[-0.02em] text-[15px] md:text-[18px] lg:text-[24px] xl:text-[26px] 2xl:text-[30px] md:mt-2">
-                                    {subtitle}
+                    <KontenHeroParalaks>
+                        <div className="flex items-center gap-3 md:gap-5">
+                            <span
+                                aria-hidden="true"
+                                className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary text-white shadow-lg md:size-16 lg:size-[88px] xl:size-[100px] [&>svg]:size-5 md:[&>svg]:size-8 lg:[&>svg]:size-11 xl:[&>svg]:size-[60px]"
+                            >
+                                {icon}
+                            </span>
+                            <div className="min-w-0">
+                                <p className="text-white font-extrabold leading-none tracking-[-0.02em] text-[24px] md:text-[40px] lg:text-[48px] xl:text-[56px] 2xl:text-[60px]">
+                                    {title}
                                 </p>
-                            )}
+                                {subtitle && (
+                                    <p className="mt-1 text-white font-normal tracking-[-0.02em] text-[15px] md:text-[18px] lg:text-[24px] xl:text-[26px] 2xl:text-[30px] md:mt-2">
+                                        {subtitle}
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    </KontenHeroParalaks>
                 ) : (
                     <>
                         <p
