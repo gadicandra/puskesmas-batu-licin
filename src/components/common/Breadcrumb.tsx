@@ -25,16 +25,11 @@ interface BreadcrumbProps {
  * Padding vertikal bawaan `Container` di mobile (`py-10`) dimatikan. Tanpa itu
  * pita breadcrumb setinggi 134px di ponsel, dan area tap 44px akan membuatnya
  * makin tinggi. Di desktop tingginya tetap 52–54px seperti sebelumnya.
- *
- * Di mobile tetap disisakan `py-4`: di beberapa halaman teks hero `PageHeader`
- * versi polos meluber keluar dari hero setinggi 200px (mis. 24px di
- * /informasi-layanan-mutu pada lebar 320px). Tanpa jarak ini luberan itu
- * menimpa teks "Beranda".
  */
 const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
     return (
         <section className="bg-latar w-full border-b border-gray-100">
-            <Container className="py-0 md:py-0" sectionClassName="py-4 md:py-1">
+            <Container className="py-0 md:py-0" sectionClassName="py-1.5 md:py-1">
                 <nav aria-label="Breadcrumb" className="text-sm font-medium text-slate-600">
                     <ol className="flex flex-wrap items-center">
                         {items.map((item, index) => {
