@@ -128,10 +128,9 @@ export interface Config {
     profile: ProfileSelect<false> | ProfileSelect<true>;
   };
   locale: null;
-  widgets: {
-    collections: CollectionsWidget;
+  user: User & {
+    collection: 'users';
   };
-  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -195,7 +194,6 @@ export interface User {
       }[]
     | null;
   password?: string | null;
-  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -533,6 +531,21 @@ export interface KritikSaran {
 export interface Posyandu {
   id: number;
   nama: string;
+  /**
+   * Satu baris keterangan di bawah nama pada kartu di halaman Posyandu. Boleh dikosongkan.
+   */
+  deskripsi?: string | null;
+  /**
+   * Tampil sebagai gambar kecil di kartu. JPG, PNG, atau WebP, maks. 5 MB.
+   */
+  foto?: (number | null) | Media;
+  /**
+   * Mis. "Desa Batulicin". Inilah yang tampil di kartu.
+   */
+  desa?: string | null;
+  /**
+   * Alamat lengkap atau titik kumpul. Boleh dikosongkan.
+   */
   alamat?: string | null;
   /**
    * Layanan yang tersedia di posyandu ini.
@@ -542,7 +555,19 @@ export interface Posyandu {
     | {
         hari: 'senin' | 'selasa' | 'rabu' | 'kamis' | 'jumat' | 'sabtu' | 'minggu';
         /**
-         * Mis. "Minggu ke-2 setiap bulan, 08.00–11.00"
+         * Mis. "Minggu ke-1". Kosongkan bila kegiatannya setiap minggu.
+         */
+        polaMinggu?: string | null;
+        /**
+         * Format 24 jam, mis. "08:00".
+         */
+        jamMulai?: string | null;
+        /**
+         * Format 24 jam, mis. "11:00".
+         */
+        jamSelesai?: string | null;
+        /**
+         * Catatan tambahan. Boleh dikosongkan.
          */
         keterangan?: string | null;
         id?: string | null;
@@ -1030,12 +1055,18 @@ export interface ServicesSelect<T extends boolean = true> {
  */
 export interface PosyanduSelect<T extends boolean = true> {
   nama?: T;
+  deskripsi?: T;
+  foto?: T;
+  desa?: T;
   alamat?: T;
   layanan?: T;
   jadwal?:
     | T
     | {
         hari?: T;
+        polaMinggu?: T;
+        jamMulai?: T;
+        jamSelesai?: T;
         keterangan?: T;
         id?: T;
       };
@@ -1340,16 +1371,6 @@ export interface ProfileSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "collections_widget".
- */
-export interface CollectionsWidget {
-  data?: {
-    [k: string]: unknown;
-  };
-  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -26,14 +26,26 @@ function DaftarDokumen({ items, akreditasi = false }: { items: DokumenSertifikat
                         </div>
                         <h3 className="text-2xl font-bold leading-tight md:text-3xl">{item.judul}</h3>
                         <p className="mt-3 max-w-[65ch] leading-relaxed">{item.penerbit}</p>
+                        {/* <dl> hanya boleh berisi <dt>/<dd> atau <div> yang langsung
+                            membungkus keduanya. Sebelumnya ikon dan satu <div> lagi ikut
+                            menjadi anak, sehingga <dt>/<dd> tidak lagi dianggap bagian
+                            dari daftar. Ikon dipindah ke dalam <dt>, dan nilainya diberi
+                            indentasi selebar ikon + jarak (24px + 12px) agar tampilannya
+                            tetap sama. */}
                         <dl className="my-6 grid gap-4 text-base">
-                            <div className="flex items-start gap-3">
-                                <AiOutlineCalendar className="mt-1 size-6 shrink-0" aria-hidden="true" />
-                                <div><dt className="text-sm">{item.tanggal ? "Tanggal terbit" : "Tahun"}</dt><dd className="font-bold">{item.tanggal ?? item.tahun}</dd></div>
+                            <div>
+                                <dt className="flex items-center gap-3 text-sm">
+                                    <AiOutlineCalendar className="size-6 shrink-0" aria-hidden="true" />
+                                    {item.tanggal ? "Tanggal terbit" : "Tahun"}
+                                </dt>
+                                <dd className="pl-9 font-bold">{item.tanggal ?? item.tahun}</dd>
                             </div>
-                            <div className="flex items-start gap-3">
-                                <BsStar className="mt-1 size-6 shrink-0" aria-hidden="true" />
-                                <div><dt className="text-sm">Kategori</dt><dd className="font-bold">{akreditasi ? "Sertifikat Akreditasi" : "Piagam Penghargaan"}</dd></div>
+                            <div>
+                                <dt className="flex items-center gap-3 text-sm">
+                                    <BsStar className="size-6 shrink-0" aria-hidden="true" />
+                                    Kategori
+                                </dt>
+                                <dd className="pl-9 font-bold">{akreditasi ? "Sertifikat Akreditasi" : "Piagam Penghargaan"}</dd>
                             </div>
                         </dl>
                         <a href={urlDokumen(item.file)} target="_blank" rel="noopener noreferrer" className={styles.documentLink}>

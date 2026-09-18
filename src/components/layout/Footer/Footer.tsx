@@ -23,6 +23,7 @@ const Nav = [
     { name: 'Dokter', href: '/dokter' },
     { name: 'Artikel', href: '/artikel' },
     { name: 'Lokasi Puskesmas', href: '/lokasi-puskesmas' },
+    { name: 'Posyandu & Lokasi', href: '/posyandu' },
 ]
 
 const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
@@ -70,17 +71,17 @@ const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
                         <div className="flex flex-col items-center lg:items-start gap-3">
                             <h3 className="font-bold text-lg">Sosial Media Kami :</h3>
                             <div className="flex gap-4">
-                                <Link href="#" className="hover:text-green-400 transition">
-                                    <FaInstagram size={24} />
+                                <Link href="#" aria-label="Instagram Puskesmas Batulicin" className="hover:text-green-400 transition">
+                                    <FaInstagram size={24} aria-hidden="true" />
                                 </Link>
-                                <Link href="#" className="hover:text-green-400 transition">
-                                    <FaYoutube size={24} />
+                                <Link href="#" aria-label="YouTube Puskesmas Batulicin" className="hover:text-green-400 transition">
+                                    <FaYoutube size={24} aria-hidden="true" />
                                 </Link>
-                                <Link href="#" className="hover:text-green-400 transition">
-                                    <FaTwitter size={24} />
+                                <Link href="#" aria-label="Twitter Puskesmas Batulicin" className="hover:text-green-400 transition">
+                                    <FaTwitter size={24} aria-hidden="true" />
                                 </Link>
-                                <Link href="#" className="hover:text-green-400 transition">
-                                    <FaWhatsapp size={24} />
+                                <Link href="#" aria-label="WhatsApp Puskesmas Batulicin" className="hover:text-green-400 transition">
+                                    <FaWhatsapp size={24} aria-hidden="true" />
                                 </Link>
                             </div>
                         </div>
@@ -153,6 +154,7 @@ const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
                         {/* Map Integration */}
                         <div className="w-full h-40 bg-gray-300 rounded-xl overflow-hidden relative shadow-lg">
                             <iframe
+                                title="Peta lokasi Puskesmas Batulicin"
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3986.366299136979!2d115.95574577496796!3d-3.4566739965157836!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2de64f69741634ad%3A0x6295556213768228!2sPuskesmas%20Batulicin%201!5e0!3m2!1sen!2sid!4v1706691234567!5m2!1sen!2sid"
                                 width="100%"
                                 height="100%"

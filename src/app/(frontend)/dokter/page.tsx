@@ -16,7 +16,6 @@ export default async function DokterPage() {
     return (
         <div className="min-h-screen bg-base">
             <PageHeader image="/batulicin.webp" title="Dokter Kami" />
-            <h1 className="sr-only">Dokter Kami</h1>
             <Breadcrumb
                 items={[
                     { label: "Beranda", href: "/" },

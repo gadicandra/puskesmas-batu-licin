@@ -66,11 +66,11 @@ export default function WaktuPelayanan() {
 		<section className="w-full py-12 px-[20px] md:px-[60px]">
 			<div className="text-center mb-6">
 				<h2 className="text-3xl md:text-4xl font-semibold text-slate-800">Waktu Pelayanan</h2>
-				<p className="text-sm md:text-lg text-slate-500 mt-2">Informasi jam operasional untuk setiap jenis pelayanan di Puskesmas kami.</p>
+				<p className="text-sm md:text-lg text-slate-600 mt-2">Informasi jam operasional untuk setiap jenis pelayanan di Puskesmas kami.</p>
 				<div className="inline-flex items-center gap-3 mt-4 bg-white border rounded-full px-4 py-2 shadow-sm">
 					<span className={`w-3 h-3 rounded-full ${open ? 'bg-green-500' : 'bg-red-500'}`}></span>
 					<span className={`${open ? 'text-green-700' : 'text-red-600'} font-medium`}>{open ? 'Buka' : 'Tutup'}</span>
-					<span className="text-slate-500">·</span>
+					<span className="text-slate-600">·</span>
 					<span className="text-sm text-slate-600">{open ? `Sampai ${jamTutupHariIni(now)}` : nextOpenMessage(now)}</span>
 				</div>
 			</div>
@@ -85,16 +85,16 @@ export default function WaktuPelayanan() {
 					<div className="flex items-start justify-between mb-3">
 						<div>
 							<h3 className="font-semibold text-slate-800 lg:text-2xl">Rawat Jalan</h3>
-							<p className="text-xs text-slate-500">Poli Umum, Gigi, KIA, dll</p>
+							<p className="text-xs text-slate-600">Poli Umum, Gigi, KIA, dll</p>
 						</div>
 						<span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full">Terjadwal</span>
 					</div>
 
 					<ul className="space-y-2 text-sm">
-						<li className="flex items-center justify-between"><span className="text-slate-600">Senin - Kamis</span><span className="text-green-600">08:00 - 11:00</span></li>
-						<li className="flex items-center justify-between"><span className="text-slate-600">Jumat</span><span className="text-green-600">07:30 - 10:30</span></li>
-						<li className="flex items-center justify-between"><span className="text-slate-600">Sabtu</span><span className="text-green-600">08:00 - 11:00</span></li>
-						<li className="flex items-center justify-between"><span className="text-slate-600">Minggu</span><span className="text-red-500">Tutup</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Senin - Kamis</span><span className="text-green-700">08:00 - 11:00</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Jumat</span><span className="text-green-700">07:30 - 10:30</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Sabtu</span><span className="text-green-700">08:00 - 11:00</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Minggu</span><span className="text-red-600">Tutup</span></li>
 					</ul>
 				</article>
 
@@ -107,15 +107,15 @@ export default function WaktuPelayanan() {
 					<div className="flex items-start justify-between mb-3">
 						<div>
 							<h3 className="font-semibold text-slate-800 lg:text-2xl">Laboratorium</h3>
-							<p className="text-xs text-slate-500">Pemeriksaan Lab</p>
+							<p className="text-xs text-slate-600">Pemeriksaan Lab</p>
 						</div>
 						<span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full">Terjadwal</span>
 					</div>
 					<ul className="space-y-2 text-sm">
-						<li className="flex items-center justify-between"><span className="text-slate-600">Senin - Kamis</span><span className="text-green-600">08:00 - 11:00</span></li>
-						<li className="flex items-center justify-between"><span className="text-slate-600">Jumat</span><span className="text-green-600">07:30 - 10:30</span></li>
-						<li className="flex items-center justify-between"><span className="text-slate-600">Sabtu</span><span className="text-green-600">08:00 - 11:00</span></li>
-						<li className="flex items-center justify-between"><span className="text-slate-600">Minggu</span><span className="text-red-500">Tutup</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Senin - Kamis</span><span className="text-green-700">08:00 - 11:00</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Jumat</span><span className="text-green-700">07:30 - 10:30</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Sabtu</span><span className="text-green-700">08:00 - 11:00</span></li>
+						<li className="flex items-center justify-between"><span className="text-slate-600">Minggu</span><span className="text-red-600">Tutup</span></li>
 					</ul>
 				</article>
 
@@ -128,7 +128,7 @@ export default function WaktuPelayanan() {
 					<div className="flex items-start justify-between mb-3">
 						<div>
 							<h3 className="font-semibold text-slate-800 lg:text-2xl">UGD (Gawat Darurat)</h3>
-							<p className="text-xs text-slate-500">Pelayanan Darurat 24 Jam</p>
+							<p className="text-xs text-slate-600">Pelayanan Darurat 24 Jam</p>
 						</div>
 						<span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full">24 Jam</span>
 					</div>
@@ -144,7 +144,7 @@ export default function WaktuPelayanan() {
 					<div className="flex items-start justify-between mb-3">
 						<div>
 							<h3 className="font-semibold text-slate-800 lg:text-2xl">PONED</h3>
-							<p className="text-xs text-slate-500">Persalinan Normal & Darurat</p>
+							<p className="text-xs text-slate-600">Persalinan Normal & Darurat</p>
 						</div>
 						<span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full">24 Jam</span>
 					</div>

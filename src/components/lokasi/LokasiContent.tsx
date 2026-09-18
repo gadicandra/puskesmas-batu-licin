@@ -89,6 +89,7 @@ const LokasiContent = () => {
                     {/* Right Column: Map */}
                     <div className="w-full h-[400px] lg:h-full min-h-[400px] rounded-2xl overflow-hidden shadow-lg border-4 border-white">
                         <iframe
+                            title="Peta lokasi Puskesmas Batulicin"
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3982.5953688857967!2d116.0046296078733!3d-3.448132600453725!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2de8b6653897fc7b%3A0xe4508941a810ff17!2sPuskesmas%20Batulicin!5e0!3m2!1sen!2sid!4v1770201356598!5m2!1sen!2sid"
                             className="w-full h-full border-0"
                             allowFullScreen

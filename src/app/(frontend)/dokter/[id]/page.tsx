@@ -35,7 +35,6 @@ export default async function DetailDokterPage({ params }: Props) {
     return (
         <div className="min-h-screen bg-base">
             <PageHeader image="/batulicin.webp" title="Dokter Kami" />
-            <h1 className="sr-only">Profil {dokter.nama}</h1>
             <Breadcrumb
                 items={[
                     { label: "Beranda", href: "/" },

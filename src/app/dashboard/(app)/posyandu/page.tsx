@@ -12,7 +12,21 @@ export const metadata = { title: 'Posyandu | Dashboard' }
 function bangunFields(pilihanLayanan: { value: string; label: string }[]): SpesifikasiField[] {
     return [
         { nama: 'nama', label: 'Nama posyandu', tipe: 'teks', wajib: true, diTabel: true, contoh: 'Posyandu Melati' },
-        { nama: 'alamat', label: 'Alamat', tipe: 'panjang', contoh: 'RT/RW, desa atau kelurahan.' },
+        {
+            nama: 'deskripsi',
+            label: 'Keterangan singkat',
+            tipe: 'teks',
+            contoh: 'Informasi Detail Posyandu',
+            keterangan: 'Satu baris di bawah nama pada kartu di situs. Boleh dikosongkan.',
+        },
+        {
+            nama: 'foto',
+            label: 'Foto posyandu',
+            tipe: 'berkas',
+            keterangan: 'Tampil sebagai gambar kecil di kartu. Boleh dikosongkan.',
+        },
+        { nama: 'desa', label: 'Desa / kelurahan', tipe: 'teks', diTabel: true, contoh: 'Desa Batulicin', keterangan: 'Inilah yang tampil di kartu situs.' },
+        { nama: 'alamat', label: 'Alamat lengkap', tipe: 'panjang', contoh: 'RT/RW, patokan, atau titik kumpul.', keterangan: 'Boleh dikosongkan.' },
         {
             nama: 'layanan',
             label: 'Layanan yang tersedia',
@@ -28,9 +42,12 @@ function bangunFields(pilihanLayanan: { value: string; label: string }[]): Spesi
             labelBaris: 'Jadwal',
             subFields: [
                 { nama: 'hari', label: 'Hari', tipe: 'pilihan', pilihan: HARI.map((h) => ({ value: h.value, label: h.label })) },
-                { nama: 'keterangan', label: 'Keterangan', tipe: 'teks', contoh: 'Minggu ke-2 setiap bulan, 08.00–11.00' },
+                { nama: 'polaMinggu', label: 'Minggu ke-', tipe: 'teks', contoh: 'Minggu ke-1' },
+                { nama: 'jamMulai', label: 'Jam mulai', tipe: 'teks', contoh: '08:00' },
+                { nama: 'jamSelesai', label: 'Jam selesai', tipe: 'teks', contoh: '11:00' },
+                { nama: 'keterangan', label: 'Catatan', tipe: 'teks', contoh: 'Boleh dikosongkan' },
             ],
-            keterangan: 'Satu baris untuk satu hari kegiatan.',
+            keterangan: 'Satu baris untuk satu hari kegiatan. Jam ditulis format 24 jam, mis. 08:00.',
         },
         { nama: 'ringkasJadwal', label: 'Jadwal', tipe: 'teks', diTabel: true, hanyaTabel: true },
         { nama: 'penanggungJawab', label: 'Penanggung jawab', tipe: 'teks', diTabel: true, contoh: 'Nama kader atau bidan penanggung jawab' },
@@ -71,7 +88,11 @@ export default async function HalamanPosyandu() {
         ...d,
         ringkasJadwal:
             (d.jadwal ?? [])
-                .map((j) => [labelHari(j.hari), j.keterangan].filter(Boolean).join(' — '))
+                .map((j) => {
+                    const hariPola = [labelHari(j.hari), j.polaMinggu].filter(Boolean).join(', ')
+                    const jam = j.jamMulai && j.jamSelesai ? `${j.jamMulai}-${j.jamSelesai}` : j.keterangan
+                    return [hariPola, jam].filter(Boolean).join(' — ')
+                })
                 .join('; ') || '-',
     }))
 

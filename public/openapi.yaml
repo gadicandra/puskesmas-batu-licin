@@ -350,30 +350,114 @@ components:
         updatedAt: { type: string, format: date-time, readOnly: true }
 
     Posyandu:
+      description: |
+        Bentuk **tulis** (body `POST`/`PATCH`) dan bentuk yang disimpan Payload.
+        Nama isian berbahasa Indonesia. Untuk bentuk **baca** dari
+        `GET /api/posyandu` dan `GET /api/posyandu/{id}`, lihat `PosyanduKontrak`.
       type: object
       required: [nama]
       properties:
         id: { type: integer, readOnly: true }
-        nama: { type: string }
-        alamat: { type: [string, 'null'] }
+        nama: { type: string, examples: ['Posyandu Melati'] }
+        deskripsi:
+          type: [string, 'null']
+          description: Satu baris keterangan di bawah nama pada kartu situs.
+          examples: ['Informasi Detail Posyandu']
+        foto:
+          $ref: '#/components/schemas/Relasi'
+          description: |
+            Id dokumen `media`. Ditolak (400) bila berkasnya bukan JPG, PNG, atau
+            WebP, atau lebih dari 5 MB.
+        desa:
+          type: [string, 'null']
+          description: Nama desa/kelurahan yang tampil di kartu.
+          examples: ['Desa Batulicin']
+        alamat: { type: [string, 'null'], description: Alamat lengkap atau titik kumpul. }
         layanan:
           type: array
           items: { $ref: '#/components/schemas/Relasi' }
           description: Relasi banyak ke `services`.
         jadwal:
           type: array
+          description: |
+            Satu baris untuk satu hari kegiatan. Aturan jam (400 bila dilanggar):
+            `jamMulai` dan `jamSelesai` diisi berpasangan atau dikosongkan
+            keduanya, formatnya `HH:mm` 24 jam, dan `jamSelesai` harus lebih besar
+            dari `jamMulai`.
           items:
             type: object
             required: [hari]
             properties:
+              id: { type: string, readOnly: true }
               hari: { type: string, enum: [senin, selasa, rabu, kamis, jumat, sabtu, minggu] }
-              keterangan: { type: [string, 'null'], examples: ['Minggu ke-2 setiap bulan, 08.00–11.00'] }
+              polaMinggu: { type: [string, 'null'], examples: ['Minggu ke-1'] }
+              jamMulai: { type: [string, 'null'], pattern: '^([01]\d|2[0-3]):[0-5]\d$', examples: ['08:00'] }
+              jamSelesai: { type: [string, 'null'], pattern: '^([01]\d|2[0-3]):[0-5]\d$', examples: ['11:00'] }
+              keterangan:
+                type: [string, 'null']
+                description: Catatan bebas. Tampil di kartu hanya bila jam dikosongkan.
         penanggungJawab: { type: [string, 'null'] }
         kontak: { type: [string, 'null'] }
         urutan: { type: integer, default: 0 }
-        aktif: { type: boolean, default: true }
+        aktif:
+          type: boolean
+          default: true
+          description: Posyandu nonaktif hanya terlihat oleh superadmin.
         createdAt: { type: string, format: date-time, readOnly: true }
         updatedAt: { type: string, format: date-time, readOnly: true }
+
+    JadwalKontrak:
+      type: object
+      required: [day, weekPattern, startTime, endTime]
+      properties:
+        day: { type: string, description: Nama hari berbahasa Indonesia., examples: ['Senin'] }
+        weekPattern: { type: [string, 'null'], examples: ['Minggu ke-1'] }
+        startTime: { type: [string, 'null'], examples: ['08:00'] }
+        endTime: { type: [string, 'null'], examples: ['11:00'] }
+
+    PosyanduKontrak:
+      description: |
+        Bentuk **baca** kontrak API posyandu (Claude.md §3.6), hasil pemetaan
+        `src/lib/api/posyandu.ts` dari skema Payload `Posyandu`.
+      type: object
+      required: [id, name, description, image, location, schedule, schedules, isActive, order]
+      properties:
+        id: { type: string, examples: ['7'] }
+        name: { type: string, examples: ['Posyandu Melati'] }
+        description: { type: [string, 'null'], examples: ['Informasi Detail Posyandu'] }
+        image:
+          description: URL absolut berkas foto. `null` bila foto belum diisi.
+          oneOf:
+            - type: 'null'
+            - type: object
+              required: [url, alt]
+              properties:
+                url: { type: string, examples: ['https://puskesmas-batulicin.example/api/media/file/posyandu-melati.webp'] }
+                alt: { type: string, examples: ['Kegiatan Posyandu Melati'] }
+        location:
+          type: object
+          required: [villageName, address]
+          properties:
+            villageName: { type: [string, 'null'], examples: ['Desa Batulicin'] }
+            address: { type: [string, 'null'] }
+        schedule:
+          description: Jadwal pertama (urut Senin → Minggu). `null` bila belum ada jadwal.
+          oneOf:
+            - type: 'null'
+            - $ref: '#/components/schemas/JadwalKontrak'
+        schedules:
+          type: array
+          description: Seluruh jadwal (tambahan di luar kontrak §3.6, karena satu posyandu bisa punya lebih dari satu).
+          items: { $ref: '#/components/schemas/JadwalKontrak' }
+        isActive: { type: boolean }
+        order: { type: number, examples: [1] }
+
+    PesanGalat:
+      description: Bentuk galat dari endpoint kustom (bukan bentuk `errors[]` bawaan Payload).
+      type: object
+      required: [message]
+      properties:
+        message: { type: string }
 
     Fasilitas:
       type: object
@@ -1044,38 +1128,65 @@ paths:
   /api/posyandu:
     get:
       tags: [Data layanan]
-      summary: Daftar posyandu
-      description: Bisa dibaca publik tanpa login.
+      summary: Daftar posyandu (bentuk kontrak API)
+      description: |
+        **Berbeda dari koleksi lain:** endpoint ini kustom (`src/lib/api/posyandu.ts`)
+        dan mengembalikan bentuk kontrak `PosyanduKontrak`, **tanpa paginasi** dan
+        tanpa parameter `limit`/`page`/`sort`/`depth`/`where`.
+
+        - Tanpa `all`: hanya posyandu aktif, urut `urutan` lalu nama. Bisa dibaca publik.
+        - `all=true`: termasuk yang nonaktif, **khusus superadmin**.
       security: []
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/sort'
-        - $ref: '#/components/parameters/depth'
-        - $ref: '#/components/parameters/where'
+        - name: all
+          in: query
+          required: false
+          description: Sertakan posyandu nonaktif. Butuh login superadmin.
+          schema: { type: string, enum: ['true'] }
       responses:
         '200':
           description: Berhasil.
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/Paginasi'
-                  - type: object
-                    properties:
-                      docs:
-                        type: array
-                        items: { $ref: '#/components/schemas/Posyandu' }
+                type: object
+                required: [docs, totalDocs]
+                properties:
+                  docs:
+                    type: array
+                    items: { $ref: '#/components/schemas/PosyanduKontrak' }
+                  totalDocs: { type: integer }
+        '401':
+          description: '`all=true` tanpa login.'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PesanGalat' }
+              example: { message: 'Parameter all=true hanya untuk superadmin yang sudah login.' }
+        '403':
+          description: '`all=true` oleh pengguna yang bukan superadmin.'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PesanGalat' }
+              example: { message: 'Parameter all=true hanya untuk superadmin yang sudah login.' }
     post:
       tags: [Data layanan]
       summary: Tambah posyandu
-      description: Hanya superadmin.
+      description: |
+        Hanya superadmin. Body memakai nama isian Payload (skema `Posyandu`),
+        **bukan** bentuk kontrak. Setelah tersimpan, cache halaman `/posyandu` dan
+        `/profil-puskesmas` langsung disegarkan.
       security: [{ cookieAuth: [] }, { bearerJWT: [] }]
       requestBody:
         required: true
         content:
           application/json:
             schema: { $ref: '#/components/schemas/Posyandu' }
+            example:
+              nama: Posyandu Melati
+              deskripsi: Informasi Detail Posyandu
+              desa: Desa Batulicin
+              jadwal:
+                - { hari: senin, polaMinggu: Minggu ke-1, jamMulai: '08:00', jamSelesai: '11:00' }
       responses:
         '201':
           description: Dibuat.
@@ -1087,7 +1198,23 @@ paths:
                   - type: object
                     properties:
                       doc: { $ref: '#/components/schemas/Posyandu' }
-        '400': { $ref: '#/components/responses/Galat400' }
+        '400':
+          description: |
+            Isian tidak lolos validasi, termasuk foto yang bukan JPG/PNG/WebP atau
+            lebih dari 5 MB, dan aturan jam jadwal.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ValidationError' }
+              example:
+                errors:
+                  - name: ValidationError
+                    message: 'The following field is invalid: Jadwal Kegiatan'
+                    data:
+                      collection: posyandu
+                      errors:
+                        - label: Jadwal Kegiatan
+                          message: 'Jadwal ke-1: jam selesai (08:00) harus lebih besar dari jam mulai (11:00). Perbaiki salah satunya.'
+                          path: jadwal
         '403': { $ref: '#/components/responses/Galat403' }
 
   /api/posyandu/{id}:
@@ -1095,23 +1222,32 @@ paths:
       - $ref: '#/components/parameters/idPath'
     get:
       tags: [Data layanan]
-      summary: Satu posyandu
+      summary: Satu posyandu (bentuk kontrak API)
+      description: |
+        Endpoint kustom, bentuk `PosyanduKontrak`. Tanpa login, posyandu nonaktif
+        dijawab 404. `id` harus angka — `/api/posyandu/count` tetap endpoint
+        bawaan Payload.
       security: []
-      parameters:
-        - $ref: '#/components/parameters/depth'
       responses:
         '200':
           description: Berhasil.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Posyandu' }
-        '404': { $ref: '#/components/responses/Galat404' }
+              schema: { $ref: '#/components/schemas/PosyanduKontrak' }
+        '404':
+          description: Tidak ada, atau nonaktif dan pemanggil bukan superadmin.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PesanGalat' }
+              example: { message: Posyandu tidak ditemukan. }
     patch:
       tags: [Data layanan]
       summary: Ubah posyandu
       description: |
         **Gunakan `PATCH`, bukan `PUT`.** `PUT` pada alamat ini menjawab
-        `404 Route not found`. Kirim hanya field yang berubah.
+        `404 Route not found`. Kirim hanya field yang berubah, memakai nama isian
+        Payload (skema `Posyandu`). Untuk `jadwal`, kirim seluruh daftar (sertakan
+        `id` baris yang dipertahankan). Cache situs publik langsung disegarkan.
       security: [{ cookieAuth: [] }, { bearerJWT: [] }]
       requestBody:
         required: true
@@ -1135,7 +1271,7 @@ paths:
     delete:
       tags: [Data layanan]
       summary: Hapus posyandu
-      description: Hanya superadmin. Tidak bisa dibatalkan.
+      description: Hanya superadmin. Tidak bisa dibatalkan. Cache situs publik langsung disegarkan.
       security: [{ cookieAuth: [] }, { bearerJWT: [] }]
       responses:
         '200':

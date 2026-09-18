@@ -30,7 +30,7 @@ export default async function LayananPage() {
                     <h1 className="text-3xl font-bold text-primary md:text-4xl">
                         Layanan Kesehatan Kami
                     </h1>
-                    <p className="mt-3 text-sm leading-relaxed text-tertiary md:text-[16px]">
+                    <p className="mt-3 text-sm leading-relaxed text-tertiary-600 md:text-[16px]">
                         Puskesmas Batulicin menyediakan berbagai layanan kesehatan untuk memenuhi
                         kebutuhan masyarakat dengan tenaga kesehatan yang profesional
                     </p>

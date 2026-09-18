@@ -47,9 +47,9 @@ export default function DaftarBaris({
             )}
 
             {baris.map((b, i) => (
-                <div key={i} className="flex flex-col gap-2 rounded-xl border border-primary/10 bg-latar/40 p-3 sm:flex-row sm:items-end">
+                <div key={i} className="flex flex-col gap-2 rounded-xl border border-primary/10 bg-latar/40 p-3 sm:flex-row sm:flex-wrap sm:items-end">
                     {subFields.map((s) => (
-                        <div key={s.nama} className="flex-1">
+                        <div key={s.nama} className="min-w-[9rem] flex-1">
                             <label className="mb-1 block text-xs font-semibold text-tertiary">{s.label}</label>
                             {s.tipe === 'pilihan' ? (
                                 <Select value={b[s.nama] ?? ''} onChange={(e) => ubah(i, s.nama, e.target.value)}>

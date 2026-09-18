@@ -33,7 +33,7 @@ export default function Layanan({ items = [], moreHref = "/layanan" }: Props) {
 					<h2 className="text-3xl md:text-4xl font-semibold text-slate-800 mb-2">
 						Layanan Kesehatan
 					</h2>
-					<p className="text-sm md:text-lg md:text-slate-500 text-slate-600 max-w-2xl mx-auto">
+					<p className="text-sm md:text-lg md:text-slate-600 text-slate-600 max-w-2xl mx-auto">
 						Puskesmas Batulicin menyediakan berbagai layanan kesehatan untuk memenuhi kebutuhan masyarakat dengan tenaga kesehatan yang profesional
 					</p>
 				</div>

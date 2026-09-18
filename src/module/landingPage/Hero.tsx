@@ -71,15 +71,15 @@ export default function Hero() {
                             <Link href="/layanan" className="group bg-white rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
                                 <div className="flex items-center gap-4 flex-1 min-w-0">
                                     <div className="relative w-10 h-10 shrink-0 rounded-xl bg-green-50 flex items-center justify-center">
-                                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-bold text-slate-900 group-hover:text-green-600 transition-colors text-sm">
+                                        <h3 className="font-bold text-slate-900 group-hover:text-green-700 transition-colors text-sm">
                                             Layanan Puskesmas
                                         </h3>
-                                        <p className="text-xs text-slate-500 font-medium truncate">
+                                        <p className="text-xs text-slate-600 font-medium truncate">
                                             Daftar layanan yang ada di UPTD...
                                         </p>
                                     </div>
@@ -95,15 +95,15 @@ export default function Hero() {
                             <Link href="/posyandu" className="group bg-white rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
                                 <div className="flex items-center gap-4 flex-1 min-w-0">
                                     <div className="relative w-10 h-10 shrink-0 rounded-xl bg-green-50 flex items-center justify-center">
-                                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                         </svg>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-bold text-slate-900 group-hover:text-green-600 transition-colors text-sm">
+                                        <h3 className="font-bold text-slate-900 group-hover:text-green-700 transition-colors text-sm">
                                             Posyandu
                                         </h3>
-                                        <p className="text-xs text-slate-500 font-medium truncate">
+                                        <p className="text-xs text-slate-600 font-medium truncate">
                                             Jadwal posyandu dan juga...
                                         </p>
                                     </div>
@@ -118,16 +118,16 @@ export default function Hero() {
                             {/* Item 3 - Jadwal Puskesmas */}
                             <Link href="/jadwal" className="group bg-white rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
                                 <div className="flex items-center gap-4 flex-1 min-w-0">
-                                    <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 shrink-0">
+                                    <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-700 shrink-0">
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-bold text-slate-900 group-hover:text-green-600 transition-colors text-sm">
+                                        <h3 className="font-bold text-slate-900 group-hover:text-green-700 transition-colors text-sm">
                                             Jadwal Puskesmas
                                         </h3>
-                                        <p className="text-xs text-slate-500 font-medium truncate">
+                                        <p className="text-xs text-slate-600 font-medium truncate">
                                             Jadwal semua fasilitas...
                                         </p>
                                     </div>
@@ -142,16 +142,16 @@ export default function Hero() {
 
                         {/* Jam Operasional Badge - Bottom Left 
                         <div className="absolute -bottom-4 -left-4 bg-white py-3 px-4 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-100">
-                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
                             <div>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide">
+                                <p className="text-[10px] text-slate-600 font-bold uppercase tracking-wide">
                                     Jam Operasional
                                 </p>
-                                <p className="text-sm font-bold text-green-600">08.00 - 11.00</p>
+                                <p className="text-sm font-bold text-green-700">08.00 - 11.00</p>
                             </div>
                         </div>
 

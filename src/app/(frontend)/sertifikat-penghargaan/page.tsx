@@ -14,7 +14,6 @@ export const metadata = {
 export default function SertifikatPenghargaanPage() {
     return (
         <div className="min-h-screen bg-latar">
-            <h1 className="sr-only">Akreditasi &amp; Penghargaan</h1>
             <div className={styles.hero}>
                 <PageHeader
                     image="/Design%20Puskesmas%20Batulicin%20(4)/hero-penghargaan.png"

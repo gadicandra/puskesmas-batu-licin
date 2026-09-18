@@ -63,7 +63,7 @@ tidak aktif serta mengurutkannya.
 | `ambilLayananDetail(slug)` | `layanan.ts` | `LayananLengkap \| null` — satu layanan + sub-layanan bertingkat + `dokter` (dokter layanan itu **dan** seluruh sub-layanannya) |
 | `ambilSlugLayanan()` | `layanan.ts` | `string[]` — untuk `generateStaticParams()` |
 | `ambilAngkaPelayanan(periode?)` | `angka-pelayanan.ts` | `AngkaPelayanan \| null` — 16.688 kunjungan 2025, 4 pengelompokan + persentase |
-| `ambilPosyandu()` | `posyandu.ts` | `PosyanduPublik[]` — termasuk daftar layanannya |
+| `ambilPosyandu()` | `posyandu.ts` | `PosyanduPublik[]` — termasuk foto, desa, jadwal terstruktur, dan daftar layanannya |
 | `ambilFasilitas()` | `fasilitas.ts` | `FasilitasPublik[]` — 68 sarana & ruangan |
 | `ambilSertifikat()` | `sertifikat.ts` | `SertifikatPublik[]` — akreditasi + penghargaan |
 | `ambilAkreditasi()` | `sertifikat.ts` | `SertifikatPublik[]` — akreditasi saja |
@@ -415,3 +415,9 @@ Seed bersifat idempoten — dijalankan berkali-kali tidak menggandakan apa pun.
 
 Data nakes, posyandu, fasilitas, sertifikat, dan struktur organisasi menyusul
 dari berkas mentah di `data/sumber/` setelah pemetaan kolomnya disepakati.
+
+Khusus posyandu, daftar resminya belum diterima. Untuk menguji tampilan
+`/posyandu` tersedia `pnpm contoh-posyandu` — perintah TERPISAH dari `pnpm seed`
+yang mengisi 6 entri karangan dan berhenti sendiri bila tabelnya sudah terisi.
+Jangan pernah memindahkan isinya ke `src/seed/index.ts`: berkas itu ikut jalan
+di produksi dan hanya boleh berisi data resmi.

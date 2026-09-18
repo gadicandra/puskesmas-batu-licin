@@ -35,7 +35,7 @@ export function SectionIntro({
             className="mx-auto mb-10 md:mb-14 max-w-2xl text-center"
         >
             {eyebrow && (
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-secondary">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary">
                     {eyebrow}
                 </p>
             )}
@@ -43,7 +43,7 @@ export function SectionIntro({
                 {title}
             </h2>
             {description && (
-                <p className="mt-4 text-base leading-relaxed text-tertiary">
+                <p className="mt-4 text-base leading-relaxed text-tertiary-600">
                     {description}
                 </p>
             )}
