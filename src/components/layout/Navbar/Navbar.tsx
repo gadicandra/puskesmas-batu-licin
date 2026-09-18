@@ -22,7 +22,14 @@ import {
 } from "./navigation-menu";
 
 /** Rute di bawah dropdown "Profil" — dipakai untuk menandai menu aktif. */
-const PROFIL_PATHS = ["/profil-puskesmas", "/struktur-organisasi", "/lokasi-puskesmas", "/posyandu"];
+const PROFIL_PATHS = [
+  "/profil-puskesmas",
+  "/struktur-organisasi",
+  "/lokasi-puskesmas",
+  "/posyandu",
+  "/fasilitas",
+  "/sertifikat-penghargaan",
+];
 
 /** Nomor darurat PSC 119 (sumber: data/puskesmas.md). */
 const EMERGENCY_TEL = "tel:085249312786";
@@ -111,6 +118,8 @@ export default function Navbar() {
                             <ListItem href="/struktur-organisasi" title="Struktur Organisasi" />
                             <ListItem href="/lokasi-puskesmas" title="Lokasi Puskesmas" />
                             <ListItem href="/posyandu" title="Posyandu & Lokasi" />
+                            <ListItem href="/fasilitas" title="Fasilitas" />
+                            <ListItem href="/sertifikat-penghargaan" title="Sertifikat dan Penghargaan" />
                           </div>
                         </NavigationMenuContent>
                       </NavigationMenuItem>
@@ -129,6 +138,17 @@ export default function Navbar() {
                             </ListItem>
                           </div>
                         </NavigationMenuContent>
+                      </NavigationMenuItem>
+                      <NavigationMenuItem>
+                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                          <Link
+                            href="/dokter"
+                            className={`cursor-pointer hover:text-white transition-all duration-300 ease-out hover:bg-white/20 hover:scale-105 hover:shadow-md active:scale-95 ${pathname.startsWith("/dokter") ? "text-white bg-white/20 scale-105" : ""
+                              }`}
+                          >
+                            <p className="text-base">Dokter</p>
+                          </Link>
+                        </NavigationMenuLink>
                       </NavigationMenuItem>
                       <NavigationMenuItem>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
@@ -178,7 +198,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={toggleMobileMenu}
-                aria-label={mobileMenuOpen ? "Tutup menu" : "Buka menu"}
+                aria-label={mobileMenuOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
                 aria-expanded={mobileMenuOpen}
                 aria-controls="menu-mobile"
                 className={cn(
@@ -253,6 +273,16 @@ export default function Navbar() {
                           <span className="font-avenir font-medium">Posyandu & Lokasi</span>
                         </div>
                       </Link>
+                      <Link href="/fasilitas" onClick={closeMobileMenu}>
+                        <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
+                          <span className="font-avenir font-medium">Fasilitas</span>
+                        </div>
+                      </Link>
+                      <Link href="/sertifikat-penghargaan" onClick={closeMobileMenu}>
+                        <div className="font-avenir-regular flex flex-col items-start text-base hover:text-secondary transition-colors">
+                          <span className="font-avenir font-medium">Sertifikat dan Penghargaan</span>
+                        </div>
+                      </Link>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -300,6 +330,18 @@ export default function Navbar() {
                     </motion.div>
                   )}
                 </AnimatePresence>
+              </div>
+
+              {/* Dokter */}
+              <div key="dokter-wrapper">
+                <Link href="/dokter" onClick={closeMobileMenu}>
+                  <div
+                    className={`font-avenir-regular w-full p-2 hover:text-secondary transition-colors ${pathname.startsWith("/dokter") ? "font-semibold text-secondary" : ""
+                      }`}
+                  >
+                    Dokter
+                  </div>
+                </Link>
               </div>
 
               {/* Artikel */}

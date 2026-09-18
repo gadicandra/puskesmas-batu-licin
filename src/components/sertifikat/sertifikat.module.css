@@ -1,0 +1,28 @@
+.hero > section > div { height: 280px; padding-top: 48px; padding-bottom: 40px; }
+.hero p:first-child { max-width: 950px; font-size: clamp(32px, 4.6vw, 72px); line-height: 1.08; text-wrap: balance; }
+.hero p + p { margin-top: 16px; max-width: 650px; font-size: clamp(16px, 2vw, 26px); line-height: 1.5; }
+.content { padding-top: 32px; }
+.summary { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 32px 0; }
+.summaryCard { border-radius: 24px; padding: 28px 20px; text-align: center; }
+.summaryCenter { order: -1; }
+.categories { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--color-secondary); }
+.categories a { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 8px; font-weight: 700; text-decoration: underline; text-underline-offset: 6px; }
+.categories a:hover { background: rgb(105 118 68 / 12%); }
+.document { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+.documentLink { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; text-decoration: underline; text-underline-offset: 6px; font-weight: 700; white-space: nowrap; }
+.documentLink:hover { text-decoration-thickness: 2px; }
+.content a:focus-visible { outline: 3px solid currentColor; outline-offset: 5px; border-radius: 4px; }
+.content ::selection { color: var(--color-latar); background: var(--color-primary); }
+@media (min-width: 768px) {
+    .hero > section > div { height: 380px; }
+    .content { padding-top: 48px; }
+    .summary { grid-template-columns: 1fr 1.08fr 1fr; gap: 12px; margin: 56px 18px 100px; }
+    .summaryLeft { transform: translateY(35px) rotate(-8deg); }
+    .summaryRight { transform: translateY(35px) rotate(8deg); }
+    .summaryCenter { order: 0; position: relative; z-index: 1; }
+    .categories { grid-template-columns: 1fr 1fr; }
+    .document { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 36px; }
+}
+
+/* Slightly lighter than latar to meet AA contrast on the olive cards. */
+.summaryCard, .document { color: #f8faf5; }
