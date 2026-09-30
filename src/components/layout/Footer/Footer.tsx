@@ -53,6 +53,7 @@ const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
                                     src="/logo_puskesmas.webp"
                                     alt="Logo Puskesmas"
                                     fill
+                                    sizes="50px"
                                     className="object-contain"
                                 />
                             </div>
