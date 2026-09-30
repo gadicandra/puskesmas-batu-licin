@@ -195,8 +195,10 @@ const StrukturOrganisasiContent = () => {
                 </div>
             </div>
 
-            {/* Desktop Tree View */}
-            <div className="hidden lg:flex min-w-[1000px] flex-col items-center gap-20 p-10 overflow-x-auto">
+            {/* Desktop Tree View — bagan lebih lebar dari layar laptop, jadi yang
+                bergulir menyamping cukup kotak ini, bukan seluruh halaman. */}
+            <div className="hidden lg:block w-full overflow-x-auto">
+            <div className="flex w-max min-w-full flex-col items-center gap-20 p-10">
 
                 {/* Level 1: Kepala Puskesmas */}
                 <div className="relative">
@@ -249,6 +251,7 @@ const StrukturOrganisasiContent = () => {
                     ))}
                 </div>
 
+            </div>
             </div>
         </div>
     );
