@@ -86,6 +86,7 @@ export default function MediaPicker({
                             value={cari}
                             onChange={(e) => setCari(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), muat(cari))}
+                            aria-label="Cari gambar"
                             placeholder="Cari nama berkas atau keterangan"
                             className="pl-9"
                         />

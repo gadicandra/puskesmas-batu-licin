@@ -50,8 +50,8 @@ export default function FormAkun({
                     <Field label="Nama" htmlFor="name" wajib error={stateProfil.fieldErrors?.name}>
                         <Input id="name" name="name" defaultValue={nama} required />
                     </Field>
-                    <Field label="Email" keterangan="Email hanya bisa diubah oleh Super Admin lewat menu Pengguna.">
-                        <Input value={email} disabled />
+                    <Field label="Email" htmlFor="email-akun" keterangan="Email hanya bisa diubah oleh Super Admin lewat menu Pengguna.">
+                        <Input id="email-akun" value={email} disabled />
                     </Field>
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-primary">Hak akses:</span>
