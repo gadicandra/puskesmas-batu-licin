@@ -112,6 +112,7 @@ const OrgNode = ({ name, role, image, isTextOnly = false }: { name: string, role
                     src={image || "/placeholder_avatar.webp"}
                     alt={role}
                     fill
+                    sizes="128px"
                     className="object-cover"
                 />
             </div>
