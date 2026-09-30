@@ -46,7 +46,7 @@ export default function Hero() {
                             Lihat Layanan
                         </Link>
                         <Link
-                            href="/kontak"
+                            href="/lokasi-puskesmas"
                             className="px-3 md:px-8 py-2 md:py-3.5 rounded-lg bg-secondary text-white font-bold shadow-sm shadow-secondary hover:bg-secondary hover:shadow-sm hover:shadow-secondary transition-all flex items-center justify-center gap-2"
                         >
                             <svg className="w-10 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,7 +116,7 @@ export default function Hero() {
                             </Link>
 
                             {/* Item 3 - Jadwal Puskesmas */}
-                            <Link href="/jadwal" className="group bg-white rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+                            <Link href="/#waktulayanan" className="group bg-white rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
                                 <div className="flex items-center gap-4 flex-1 min-w-0">
                                     <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-700 shrink-0">
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
