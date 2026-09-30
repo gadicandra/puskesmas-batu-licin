@@ -93,7 +93,7 @@ export default function Navbar() {
             <ImageAction
               src="/logo_puskesmas.webp"
               alt="Logo Puskesmas Batulicin"
-              className="w-[36px]transition-transform duration-500 hover:scale-[1.05]"
+              className="w-[36px] h-auto transition-transform duration-500 hover:scale-[1.05]"
             />
             <div className="flex flex-col">
               <p className="font-avenir sm:text-[20px] text-[16px] font-black text-white leading-none"> UPTD Puskesmas</p>
