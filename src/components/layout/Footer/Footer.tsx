@@ -91,7 +91,7 @@ const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
                     {/* Column 2: Contact Info */}
                     <div className="flex flex-col items-center lg:items-start space-y-6">
                         <h3 className="text-xl font-bold">Hubungi Kami</h3>
-                        <ul className="space-y-4  text-sm text-gray-200">
+                        <ul className="space-y-1 text-sm text-gray-200">
                             <li className="flex items-start gap-3">
                                 <FaMapMarkerAlt className="mt-1 text-green-400 flex-shrink-0" size={16} />
                                 <span>
@@ -101,19 +101,19 @@ const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
                             </li>
                             <li className="flex items-center gap-3">
                                 <FaEnvelope className="text-green-400 flex-shrink-0" size={16} />
-                                <a href="mailto:puskesmasbatulicin@yahoo.com" className="hover:underline">
+                                <a href="mailto:puskesmasbatulicin@yahoo.com" className="inline-flex min-h-11 items-center hover:underline">
                                     puskesmasbatulicin@yahoo.com
                                 </a>
                             </li>
                             <li className="flex items-center gap-3">
                                 <FaPhoneAlt className="text-green-400 flex-shrink-0" size={16} />
-                                <a href="tel:081148812882" className="hover:underline">
+                                <a href="tel:081148812882" className="inline-flex min-h-11 items-center hover:underline">
                                     0811 4881 2882 (Telepon / WhatsApp)
                                 </a>
                             </li>
                             <li className="flex items-center gap-3">
                                 <FaPhoneAlt className="text-green-400 flex-shrink-0" size={16} />
-                                <a href="tel:085249312786" className="hover:underline">
+                                <a href="tel:085249312786" className="inline-flex min-h-11 items-center hover:underline">
                                     0852 4931 2786 (Darurat / PSC 119)
                                 </a>
                             </li>

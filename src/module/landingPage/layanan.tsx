@@ -130,7 +130,7 @@ export default function Layanan({ items = [], moreHref = "/layanan" }: Props) {
 					<div className="absolute bottom-4 left-0 right-0 text-center z-10 pointer-events-none">
 						<Link
 							href={moreHref}
-							className="inline-flex text-md items-center gap-2 text-secondary font-semibold text-sm hover:text-secondary transition-colors pointer-events-auto"
+							className="inline-flex min-h-11 items-center gap-2 px-3 text-secondary font-semibold text-sm hover:text-secondary transition-colors pointer-events-auto"
 						>
 							Selengkapnya
 							<ChevronDown className="w-4 h-4" />
