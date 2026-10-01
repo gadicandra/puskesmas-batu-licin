@@ -77,7 +77,11 @@ docker compose down -v                  # HAPUS database beserta isinya
 
 ## Mulai cepat (tanpa Docker)
 
-Butuh Node 22+, pnpm 10.24, dan Postgres 16.
+Butuh Node 24.15+ (lihat `.nvmrc`), pnpm 10.24, dan Postgres 16.
+
+> Versi Node di bawah 24.15 punya race pada `TransformStream` (nodejs/node#62036)
+> yang muncul di log Next.js sebagai `TypeError: controller[kState].transformAlgorithm
+> is not a function` — permintaan sesekali terputus di tengah streaming.
 
 ```bash
 docker compose up -d db     # atau pakai Postgres yang sudah ada
