@@ -2,7 +2,10 @@ import Link from "next/link";
 
 export default function Hero() {
     return (
-        <section className="relative w-full max-h-screen flex flex-col overflow-hidden font-sans">
+        // Tanpa max-h-screen + overflow-hidden: tinggi hero mengikuti isinya. Dulu apa
+        // pun yang melebihi satu layar dipotong begitu saja — di ponsel 375×667 itu
+        // 307px, yaitu seluruh kartu Akses Cepat; di 1024×768 masih 65px.
+        <section className="relative w-full flex flex-col font-sans">
             {/* Background Image */}
 
 
@@ -10,7 +13,7 @@ export default function Hero() {
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent -z-10" />
 
             {/* Main Content */}
-            <div className=" relative z-10 flex flex-col lg:flex-row gap-10 lg:gap-20 items-center lg:items-center flex-1 justify-start md:pt-30 ">
+            <div className=" relative z-10 flex flex-col lg:flex-row gap-10 lg:gap-12 xl:gap-20 items-center lg:items-center flex-1 justify-start pt-8 sm:pt-10 md:pt-30">
 
                 {/* Left Section: Text & CTAs */}
                 <div className="w-full lg:w-1/2 flex flex-col items-start text-left space-y-6">
@@ -57,8 +60,11 @@ export default function Hero() {
                 </div>
 
                 {/* Right Section: Akses Cepat Card */}
-                <div className="w-full lg:w-auto lg:ml-auto flex flex-col items-stretch lg:items-end">
-                    <div className="relative w-auto lg:w-[650px]  bg-primary backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-slate-700/50">
+                {/* min-w-0 + lebar maksimum, bukan lebar tetap 650px: di 1024px kolom
+                    kiri sudah memakan setengah layar dan kartu 650px terdorong keluar
+                    tepi kanan. */}
+                <div className="w-full min-w-0 lg:w-1/2 lg:ml-auto flex flex-col items-stretch lg:items-end">
+                    <div className="relative w-full lg:max-w-[650px] bg-primary backdrop-blur-xl rounded-3xl p-5 sm:p-8 shadow-2xl border border-slate-700/50">
                         {/* Header Card */}
                         <div className="mb-5">
                             <h2 className="text-xl font-bold text-white">Akses Cepat</h2>
