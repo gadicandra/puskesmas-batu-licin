@@ -309,6 +309,10 @@ body {
 
 html {
   scroll-behavior: smooth;
+  /* `useScroll({ target })` di Section mengukur posisi bagian terhadap
+     wadah gulir (dokumen ini). Wadah ber-position static membuat motion
+     menghitung offset dari acuan yang salah dan memperingatkannya. */
+  position: relative;
   /* Situs ini hanya punya satu tema (terang) — tidak ada satu pun varian
      `dark:` di src/. Deklarasi ini menutup pintu bagi browser dengan
      auto-dark-mode (flag Chrome, sebagian browser Android) untuk
