@@ -125,7 +125,7 @@ export default function ArticleForm({ awal }: { awal: ArtikelAwal }) {
                             <button
                                 type="button"
                                 onClick={() => setUbahSlug((v) => !v)}
-                                className="text-xs font-semibold text-secondary hover:underline"
+                                className="-my-2 inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 text-sm font-semibold text-secondary hover:underline"
                             >
                                 {ubahSlug ? 'Selesai' : 'Ubah'}
                             </button>
