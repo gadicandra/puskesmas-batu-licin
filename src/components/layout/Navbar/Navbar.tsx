@@ -89,15 +89,15 @@ export default function Navbar() {
           className={`${mobileMenuOpen ? "overflow-y-clip" : ""} mx-auto flex h-16 w-full items-center justify-between gap-2 rounded-b-[20px] px-6 text-base transition-all md:px-10 ${mobileMenuOpen ? "duration-0" : "duration-300"} ease-in-out`}
         >
           {/* Logo */}
-          <Link className="flex flex-row items-center gap-2" href="/">
+          <Link className="flex shrink-0 flex-row items-center gap-2" href="/">
             <ImageAction
               src="/logo_puskesmas.webp"
               alt="Logo Puskesmas Batulicin"
               className="w-[36px] h-auto transition-transform duration-500 hover:scale-[1.05]"
             />
             <div className="flex flex-col">
-              <p className="font-avenir sm:text-[20px] text-[16px] font-black text-white leading-none"> UPTD Puskesmas</p>
-              <p className="font-avenir sm:text-[20px] text-[16px] font-black text-white leading-none">Batulicin</p>
+              <p className="font-avenir whitespace-nowrap sm:text-[20px] lg:text-[18px] xl:text-[20px] text-[16px] font-black text-white leading-none"> UPTD Puskesmas</p>
+              <p className="font-avenir whitespace-nowrap sm:text-[20px] lg:text-[18px] xl:text-[20px] text-[16px] font-black text-white leading-none">Batulicin</p>
             </div>
           </Link>
           <>
@@ -107,7 +107,7 @@ export default function Navbar() {
                 //viewport harus selalu false untuk menghindari error
                 viewport={false}
               >
-                <div className="mr-6 hidden lg:block">
+                <div className="mr-2 hidden lg:block xl:mr-6">
                   <AnimatePresence>
                     <NavigationMenuList className="gap-1">
                       <NavigationMenuItem>
@@ -181,7 +181,7 @@ export default function Navbar() {
                   <Button
                     text="Emergency Call"
                     leftIcon={<AiOutlineAlert size={18} />}
-                    className="cursor-pointer border-0 bg-secondary text-white hover:bg-secondary/80 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-300 ease-out"
+                    className="whitespace-nowrap cursor-pointer border-0 bg-secondary text-white hover:bg-secondary/80 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-300 ease-out"
                   />
                 </a>
               </div>
