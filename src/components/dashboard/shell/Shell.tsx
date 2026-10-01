@@ -113,33 +113,39 @@ export default function Shell({
                 <DaftarMenu menu={menu} pathname={pathname} />
             </aside>
 
-            {/* Drawer ponsel */}
-            {menuPonselTerbuka && (
-                <div className="fixed inset-0 z-50 lg:hidden">
-                    <button
-                        aria-label="Tutup menu"
-                        onClick={() => setMenuPonselTerbuka(false)}
-                        className="absolute inset-0 bg-black/50"
-                    />
-                    <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-primary px-4 py-6">
-                        <div className="mb-8 flex items-center justify-between px-2">
-                            <span className="text-sm font-black leading-tight text-white">
-                                UPTD Puskesmas
-                                <br />
-                                Batulicin
-                            </span>
-                            <button
-                                onClick={() => setMenuPonselTerbuka(false)}
-                                aria-label="Tutup menu"
-                                className="rounded-lg p-2 text-white/70 hover:bg-white/10 hover:text-white"
-                            >
-                                <X size={22} />
-                            </button>
-                        </div>
-                        <DaftarMenu menu={menu} pathname={pathname} onKlik={() => setMenuPonselTerbuka(false)} />
-                    </aside>
-                </div>
-            )}
+            {/* Drawer ponsel — SELALU terpasang, hanya disembunyikan. Dulu dibuang
+                dari DOM setiap kali ditutup ({terbuka && …}), sehingga setiap
+                dibuka lagi posisi gulirnya kembali ke atas: staf yang memilih
+                menu di bagian bawah harus menggulir ulang tiap kali. Elemen yang
+                hanya `hidden` menyimpan scrollTop-nya sendiri.
+                `inert` menjauhkannya dari Tab dan pembaca layar saat tertutup. */}
+            <div
+                className={cn('fixed inset-0 z-50 lg:hidden', !menuPonselTerbuka && 'hidden')}
+                inert={!menuPonselTerbuka}
+            >
+                <button
+                    aria-label="Tutup menu"
+                    onClick={() => setMenuPonselTerbuka(false)}
+                    className="absolute inset-0 bg-black/50"
+                />
+                <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-primary px-4 py-6">
+                    <div className="mb-8 flex items-center justify-between px-2">
+                        <span className="text-sm font-black leading-tight text-white">
+                            UPTD Puskesmas
+                            <br />
+                            Batulicin
+                        </span>
+                        <button
+                            onClick={() => setMenuPonselTerbuka(false)}
+                            aria-label="Tutup menu"
+                            className="rounded-lg p-2 text-white/70 hover:bg-white/10 hover:text-white"
+                        >
+                            <X size={22} />
+                        </button>
+                    </div>
+                    <DaftarMenu menu={menu} pathname={pathname} onKlik={() => setMenuPonselTerbuka(false)} />
+                </aside>
+            </div>
 
             {/* Kolom konten */}
             <div className="flex min-w-0 flex-1 flex-col lg:pl-64">
