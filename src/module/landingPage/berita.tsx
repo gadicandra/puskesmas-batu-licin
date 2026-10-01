@@ -106,21 +106,22 @@ const BeritaCard = ({ item }: { item: typeof DUMMY_DATA[0] }) => {
 
 export default function BeritaSection() {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [isDesktop, setIsDesktop] = useState(false);
+    // Jumlah kartu per layar HARUS sama dengan lebar kartu di CSS di bawah
+    // (w-full / md:w-1/2 / lg:w-1/4). Dulu JS hanya mengenal 1 atau 4 sementara
+    // CSS sudah 1/4 sejak 768px: di tablet empat kartu sempit tampil sekaligus
+    // dan tiap geser melompat satu layar penuh.
+    const [itemsPerPage, setItemsPerPage] = useState(1);
 
-    // Initial check and resize listener
     useEffect(() => {
-        const checkIsDesktop = () => setIsDesktop(window.innerWidth >= 1024);
-        checkIsDesktop();
-        window.addEventListener("resize", checkIsDesktop);
-        return () => window.removeEventListener("resize", checkIsDesktop);
+        const hitung = () => setItemsPerPage(window.innerWidth >= 1024 ? 4 : window.innerWidth >= 768 ? 2 : 1);
+        hitung();
+        window.addEventListener("resize", hitung);
+        return () => window.removeEventListener("resize", hitung);
     }, []);
 
-    // Configuration
-    const itemsPerPage = isDesktop ? 4 : 1;
     const totalItems = DUMMY_DATA.length;
     // For desktop, we don't need a slider if items <= 4
-    const enableSlider = isDesktop ? totalItems > 4 : totalItems > 1;
+    const enableSlider = totalItems > itemsPerPage;
 
     // Max index we can slide to
     // Example: 5 items, 4 per page.
@@ -186,7 +187,7 @@ export default function BeritaSection() {
                 <div className="relative group">
                     <div className="overflow-hidden">
                         <div
-                            className={`flex transition-transform duration-500 ease-in-out ${!enableSlider ? 'grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 md:gap-6 transform-none' : ''}`}
+                            className={`flex transition-transform duration-500 ease-in-out ${!enableSlider ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 transform-none' : ''}`}
                             style={{
                                 transform: enableSlider ? `translateX(-${safeSlide * (100 / itemsPerPage)}%)` : "none",
                                 gap: enableSlider ? "0" : undefined // Gap is handled by grid
@@ -197,7 +198,7 @@ export default function BeritaSection() {
                                     key={item.id}
                                     className={`
                                         ${enableSlider ? 'flex-shrink-0' : ''}
-                                        w-full md:w-1/4 lg:w-1/4
+                                        w-full md:w-1/2 lg:w-1/4
                                         ${enableSlider ? 'px-1.5 sm:px-2 md:px-3' : ''}
                                     `}
                                 >
