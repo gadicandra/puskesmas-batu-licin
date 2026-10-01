@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
+import Link from "next/link";
 import { FaChevronLeft, FaChevronRight, FaRegCalendarAlt } from "react-icons/fa";
 import { IoMdPricetag } from "react-icons/io";
 import { BsArrowRight } from "react-icons/bs";
@@ -91,10 +91,12 @@ const BeritaCard = ({ item }: { item: typeof DUMMY_DATA[0] }) => {
 
             {/* Footer */}
             <div className="mt-auto">
-                <button className="flex items-center gap-2 text-green-700 font-bold text-xs sm:text-sm hover:gap-3 transition-all group">
+                {/* Masih kartu contoh (DUMMY_DATA) — sampai berita beranda disambung
+                    ke CMS (T3.3) tautannya ke daftar artikel, bukan tombol mati. */}
+                <Link href="/artikel" className="inline-flex min-h-11 items-center gap-2 text-green-700 font-bold text-xs sm:text-sm hover:gap-3 transition-all group">
                     Baca selengkapnya
                     <BsArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
-                </button>
+                </Link>
             </div>
         </div>
     );
@@ -104,21 +106,22 @@ const BeritaCard = ({ item }: { item: typeof DUMMY_DATA[0] }) => {
 
 export default function BeritaSection() {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [isDesktop, setIsDesktop] = useState(false);
+    // Jumlah kartu per layar HARUS sama dengan lebar kartu di CSS di bawah
+    // (w-full / md:w-1/2 / lg:w-1/4). Dulu JS hanya mengenal 1 atau 4 sementara
+    // CSS sudah 1/4 sejak 768px: di tablet empat kartu sempit tampil sekaligus
+    // dan tiap geser melompat satu layar penuh.
+    const [itemsPerPage, setItemsPerPage] = useState(1);
 
-    // Initial check and resize listener
     useEffect(() => {
-        const checkIsDesktop = () => setIsDesktop(window.innerWidth >= 1024);
-        checkIsDesktop();
-        window.addEventListener("resize", checkIsDesktop);
-        return () => window.removeEventListener("resize", checkIsDesktop);
+        const hitung = () => setItemsPerPage(window.innerWidth >= 1024 ? 4 : window.innerWidth >= 768 ? 2 : 1);
+        hitung();
+        window.addEventListener("resize", hitung);
+        return () => window.removeEventListener("resize", hitung);
     }, []);
 
-    // Configuration
-    const itemsPerPage = isDesktop ? 4 : 1;
     const totalItems = DUMMY_DATA.length;
     // For desktop, we don't need a slider if items <= 4
-    const enableSlider = isDesktop ? totalItems > 4 : totalItems > 1;
+    const enableSlider = totalItems > itemsPerPage;
 
     // Max index we can slide to
     // Example: 5 items, 4 per page.
@@ -173,10 +176,10 @@ export default function BeritaSection() {
 
                     {/* Desktop "See All" Button */}
                     <div className="hidden md:block shrink-0">
-                        <button className="inline-flex text-slate-900  items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl border border-green-500 text-green-700 font-bold text-sm md:text-green-700 hover:bg-green-50 transition-colors">
+                        <Link href="/artikel" className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl border border-green-500 text-green-700 font-bold text-sm hover:bg-green-50 transition-colors">
                             Lihat Semua
                             <BsArrowRight className="w-4 h-4 md:w-5 md:h-5" />
-                        </button>
+                        </Link>
                     </div>
                 </div>
 
@@ -184,7 +187,7 @@ export default function BeritaSection() {
                 <div className="relative group">
                     <div className="overflow-hidden">
                         <div
-                            className={`flex transition-transform duration-500 ease-in-out ${!enableSlider ? 'grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 md:gap-6 transform-none' : ''}`}
+                            className={`flex transition-transform duration-500 ease-in-out ${!enableSlider ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 transform-none' : ''}`}
                             style={{
                                 transform: enableSlider ? `translateX(-${safeSlide * (100 / itemsPerPage)}%)` : "none",
                                 gap: enableSlider ? "0" : undefined // Gap is handled by grid
@@ -195,7 +198,7 @@ export default function BeritaSection() {
                                     key={item.id}
                                     className={`
                                         ${enableSlider ? 'flex-shrink-0' : ''}
-                                        w-full md:w-1/4 lg:w-1/4
+                                        w-full md:w-1/2 lg:w-1/4
                                         ${enableSlider ? 'px-1.5 sm:px-2 md:px-3' : ''}
                                     `}
                                 >
@@ -211,14 +214,14 @@ export default function BeritaSection() {
                             <button
                                 onClick={prevSlide}
                                 className="absolute top-1/2 -left-3 -translate-y-1/2 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-green-700 z-10 hover:scale-110 transition-transform md:-left-5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
-                                aria-label="Previous Slide"
+                                aria-label="Slide sebelumnya"
                             >
                                 <FaChevronLeft className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={nextSlide}
                                 className="absolute top-1/2 -right-3 -translate-y-1/2 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-green-700 z-10 hover:scale-110 transition-transform md:-right-5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
-                                aria-label="Next Slide"
+                                aria-label="Slide berikutnya"
                             >
                                 <FaChevronRight className="w-5 h-5" />
                             </button>
@@ -227,16 +230,21 @@ export default function BeritaSection() {
 
                     {/* Pagination Dots (Mobile Only mainly, or Desktop if desired) */}
                     {enableSlider && (
-                        <div className="flex justify-center gap-2 mt-6 md:mt-8">
+                        <div className="flex justify-center mt-4 md:mt-6">
                             {/* Show dots only for valid slide positions */}
                             {Array.from({ length: maxSlideIndex + 1 }).map((_, index) => (
+                                // Titik tetap kecil secara visual, tapi area sentuhnya 44px.
                                 <button
                                     key={index}
                                     onClick={() => goToSlide(index)}
-                                    className={`h-2.5 rounded-full transition-all duration-300 ${safeSlide === index ? "w-8 bg-green-500" : "w-2.5 bg-green-200"
-                                        }`}
-                                    aria-label={`Go to slide ${index + 1}`}
-                                />
+                                    className="flex h-11 min-w-6 items-center justify-center px-1"
+                                    aria-label={`Ke slide ${index + 1}`}
+                                    aria-current={safeSlide === index ? "true" : undefined}
+                                >
+                                    <span
+                                        className={`block h-2.5 rounded-full transition-all duration-300 ${safeSlide === index ? "w-8 bg-green-500" : "w-2.5 bg-green-200"}`}
+                                    />
+                                </button>
                             ))}
                         </div>
                     )}
@@ -244,10 +252,10 @@ export default function BeritaSection() {
 
                 {/* Mobile "See All" Button (Bottom) */}
                 <div className="mt-6 md:mt-8 text-center md:hidden">
-                    <button className="inline-flex items-center gap-2 text-green-700 font-bold text-sm hover:gap-3 transition-all">
+                    <Link href="/artikel" className="inline-flex min-h-11 items-center gap-2 text-green-700 font-bold text-sm hover:gap-3 transition-all">
                         Lihat Semua Berita
                         <BsArrowRight className="w-4 h-4" />
-                    </button>
+                    </Link>
                 </div>
             </div>
         </section>

@@ -2,11 +2,6 @@
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
-interface SectionInfo {
-    id: string;
-    progress: number;
-}
-
 interface SectionContextType {
     sections: string[];
     activeSection: string;

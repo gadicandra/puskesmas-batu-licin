@@ -112,6 +112,7 @@ const OrgNode = ({ name, role, image, isTextOnly = false }: { name: string, role
                     src={image || "/placeholder_avatar.webp"}
                     alt={role}
                     fill
+                    sizes="128px"
                     className="object-cover"
                 />
             </div>
@@ -130,8 +131,10 @@ const StrukturOrganisasiContent = () => {
     return (
         <div className="w-full flex flex-col items-center">
 
-            {/* Mobile/Tablet Navigation */}
-            <div className="flex lg:hidden w-full overflow-x-auto py-2 px-4 gap-2 mb-8 items-center scroll-smooth snap-x animate-scroll-hint md:justify-center">
+            {/* Mobile/Tablet Navigation — `safe center`: bila deretan tombol lebih
+                lebar dari layar, tombol pertama tidak terdorong keluar sisi kiri
+                (wilayah yang tidak bisa digulir) seperti pada `center` biasa. */}
+            <div className="flex lg:hidden w-full overflow-x-auto scrollbar-merek py-2 px-4 gap-2 mb-8 items-center scroll-smooth snap-x animate-scroll-hint md:[justify-content:safe_center]">
                 {orgData.clusters.map((cluster, index) => {
                     const isActive = activeClusterIndex === index;
                     const label = cluster.role.split(':')[0];
@@ -195,8 +198,10 @@ const StrukturOrganisasiContent = () => {
                 </div>
             </div>
 
-            {/* Desktop Tree View */}
-            <div className="hidden lg:flex min-w-[1000px] flex-col items-center gap-20 p-10 overflow-x-auto">
+            {/* Desktop Tree View — bagan lebih lebar dari layar laptop, jadi yang
+                bergulir menyamping cukup kotak ini, bukan seluruh halaman. */}
+            <div className="hidden lg:block w-full overflow-x-auto">
+            <div className="flex w-max min-w-full flex-col items-center gap-20 p-10">
 
                 {/* Level 1: Kepala Puskesmas */}
                 <div className="relative">
@@ -249,6 +254,7 @@ const StrukturOrganisasiContent = () => {
                     ))}
                 </div>
 
+            </div>
             </div>
         </div>
     );

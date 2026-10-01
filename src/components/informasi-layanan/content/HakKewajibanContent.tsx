@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { HeartHandshake, ShieldCheck, Check } from "lucide-react";
-import { containerVariants, itemVariants, SectionIntro, Panel } from "../_shared";
+import { containerVariants, SectionIntro, Panel } from "../_shared";
 
 const hak: string[] = [
     "Memperoleh pelayanan yang manusiawi, adil, dan tanpa diskriminasi.",

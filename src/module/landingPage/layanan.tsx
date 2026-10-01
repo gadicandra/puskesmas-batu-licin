@@ -130,7 +130,7 @@ export default function Layanan({ items = [], moreHref = "/layanan" }: Props) {
 					<div className="absolute bottom-4 left-0 right-0 text-center z-10 pointer-events-none">
 						<Link
 							href={moreHref}
-							className="inline-flex text-md items-center gap-2 text-secondary font-semibold text-sm hover:text-secondary transition-colors pointer-events-auto"
+							className="inline-flex min-h-11 items-center gap-2 px-3 text-secondary font-semibold text-sm hover:text-secondary transition-colors pointer-events-auto"
 						>
 							Selengkapnya
 							<ChevronDown className="w-4 h-4" />
@@ -160,7 +160,10 @@ export default function Layanan({ items = [], moreHref = "/layanan" }: Props) {
 									href={item.href || moreHref}
 									className={`flex-shrink-0 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group ${isLast ? 'relative' : ''
 										}`}
-									style={{ width: 'calc((100vw - 8rem) / 4.5)' }}
+									// 4,5 kartu per layar di laptop; di tablet (768–1023px) rumus
+									// itu tinggal ~140px dan deskripsi mendorong judul keluar kartu,
+									// jadi diberi lebar minimum.
+									style={{ width: 'max(15rem, calc((100vw - 8rem) / 4.5))' }}
 								>
 									<div className="relative h-70 bg-gray-200">
 										{item.image ? (
@@ -184,7 +187,7 @@ export default function Layanan({ items = [], moreHref = "/layanan" }: Props) {
 											<h3 className="text-white font-bold text-lg mb-2 leading-tight">
 												{item.title}
 											</h3>
-											<p className="text-white/95 text-sm leading-relaxed">
+											<p className="text-white/95 text-sm leading-relaxed line-clamp-4">
 												{item.subtitle}
 											</p>
 										</div>

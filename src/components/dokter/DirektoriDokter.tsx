@@ -56,7 +56,7 @@ export default function DirektoriDokter({ dokter }: DirektoriDokterProps) {
 
     return (
         <section aria-labelledby="judul-direktori-dokter">
-            <div className="grid gap-5 rounded-[28px] bg-base pb-3 md:grid-cols-[auto_minmax(240px,1fr)_auto_minmax(260px,1fr)] md:items-end md:gap-7">
+            <div className="grid gap-5 rounded-[28px] bg-base pb-3 md:grid-cols-2 md:items-end md:gap-x-7 xl:grid-cols-[auto_minmax(240px,1fr)_auto_minmax(260px,1fr)]">
                 <h2 id="judul-direktori-dokter" className="text-2xl font-black text-primary md:text-[30px]">
                     Pilih Spesialis
                 </h2>
@@ -117,7 +117,7 @@ export default function DirektoriDokter({ dokter }: DirektoriDokterProps) {
                         <article
                             key={item.id}
                             id={"dokter-" + item.id}
-                            className="grid gap-6 rounded-[28px] bg-base md:grid-cols-[320px_minmax(230px,0.8fr)_minmax(420px,1.45fr)] md:items-center md:gap-8 lg:gap-10"
+                            className="grid gap-6 rounded-[28px] bg-base md:grid-cols-[minmax(0,240px)_minmax(0,1fr)] md:items-center md:gap-8 xl:grid-cols-[280px_minmax(200px,0.8fr)_minmax(0,1.45fr)] xl:gap-10"
                         >
                             <div className="overflow-hidden rounded-[18px] border border-primary/15 bg-white p-2 shadow-[0_24px_55px_-42px_rgba(35,49,21,0.85)]">
                                 <FotoDokter nama={item.nama} foto={item.foto} />
@@ -143,7 +143,7 @@ export default function DirektoriDokter({ dokter }: DirektoriDokterProps) {
                                 </Link>
                             </div>
 
-                            <div>
+                            <div className="min-w-0 md:col-span-2 xl:col-span-1">
                                 <div className="mb-3 flex items-center gap-2 text-primary">
                                     <CalendarDays aria-hidden className="h-5 w-5 text-secondary" />
                                     <h4 className="text-[24px] font-black leading-none">Jadwal</h4>

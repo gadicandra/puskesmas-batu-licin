@@ -4,7 +4,7 @@
 # - Jalankan migrasi sebelum start: `pnpm payload migrate` (lihat PAYLOAD_PLAN Fase 7).
 # - Set `push: false` di adapter untuk produksi (gunakan migrasi, bukan auto-push).
 
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 RUN corepack enable
 # sharp butuh ini di beberapa lingkungan Alpine
@@ -14,7 +14,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 RUN corepack enable
 ENV NODE_ENV=production

@@ -71,15 +71,15 @@ export default async function DaftarArtikelPage({
             <form className="mb-5 flex flex-col gap-3 sm:flex-row">
                 <div className="relative flex-1">
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
-                    <Input name="cari" defaultValue={cari} placeholder="Cari judul artikel" className="pl-9" />
+                    <Input name="cari" defaultValue={cari} aria-label="Cari judul artikel" placeholder="Cari judul artikel" className="pl-9" />
                 </div>
-                <Select name="kategori" defaultValue={kategori ?? ''} className="sm:w-48">
+                <Select name="kategori" aria-label="Saring menurut kategori" defaultValue={kategori ?? ''} className="sm:w-48">
                     <option value="">Semua kategori</option>
                     {Object.entries(KATEGORI).map(([v, l]) => (
                         <option key={v} value={v}>{l}</option>
                     ))}
                 </Select>
-                <Select name="status" defaultValue={status ?? ''} className="sm:w-44">
+                <Select name="status" aria-label="Saring menurut status terbit" defaultValue={status ?? ''} className="sm:w-44">
                     <option value="">Semua status</option>
                     <option value="terbit">Sudah terbit</option>
                     <option value="draf">Belum terbit</option>

@@ -1,7 +1,6 @@
 import React from "react";
 import Container from "@/components/layout/Container/Container";
 import { Phone, Mail, ChevronRight } from "lucide-react";
-import Link from "next/link";
 import { FaTiktok, FaInstagram, FaFacebook, FaYoutube } from "react-icons/fa";
 
 const LokasiContent = () => {

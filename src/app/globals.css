@@ -225,6 +225,54 @@ body {
    ======================================== */
 
 /* ========================================
+   SCROLLBAR BERMEREK (.scrollbar-merek)
+   Untuk deretan tab yang bisa digeser menyamping di layar sempit
+   (tab Profil Puskesmas, tab klaster Struktur Organisasi). Bilah tipis
+   membulat: rel hijau pucat, pegangan warna secondary, gelap saat disentuh.
+   Disengaja tetap terlihat — itu satu-satunya tanda bahwa tab di kanan bisa
+   digeser masuk.
+   ======================================== */
+.scrollbar-merek {
+  padding-bottom: 10px;
+}
+
+/* Chrome/Edge/Safari. Jangan pasang scrollbar-color/scrollbar-width untuk
+   browser ini: sejak Chrome 121, keberadaan properti standar itu membuat
+   seluruh ::-webkit-scrollbar di bawah diabaikan (sudut membulat, hover, dan
+   tombol panah bawaan muncul lagi). */
+.scrollbar-merek::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-merek::-webkit-scrollbar-button {
+  display: none;
+}
+
+.scrollbar-merek::-webkit-scrollbar-track {
+  margin-inline: 16px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-secondary) 14%, transparent);
+}
+
+.scrollbar-merek::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: var(--color-secondary);
+}
+
+.scrollbar-merek::-webkit-scrollbar-thumb:hover,
+.scrollbar-merek::-webkit-scrollbar-thumb:active {
+  background: var(--color-primary);
+}
+
+/* Firefox — tidak mengenal ::-webkit-scrollbar, hanya properti standar. */
+@supports not selector(::-webkit-scrollbar) {
+  .scrollbar-merek {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secondary) color-mix(in srgb, var(--color-secondary) 14%, transparent);
+  }
+}
+
+/* ========================================
    HIDE DEFAULT SCROLLBAR (Humane-style)
    ======================================== */
 
@@ -309,6 +357,10 @@ body {
 
 html {
   scroll-behavior: smooth;
+  /* `useScroll({ target })` di Section mengukur posisi bagian terhadap
+     wadah gulir (dokumen ini). Wadah ber-position static membuat motion
+     menghitung offset dari acuan yang salah dan memperingatkannya. */
+  position: relative;
   /* Situs ini hanya punya satu tema (terang) — tidak ada satu pun varian
      `dark:` di src/. Deklarasi ini menutup pintu bagi browser dengan
      auto-dark-mode (flag Chrome, sebagian browser Android) untuk

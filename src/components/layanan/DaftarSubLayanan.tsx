@@ -36,7 +36,7 @@ export default function DaftarSubLayanan({ sub }: { sub: LayananLengkap[] }) {
                                 {s.subLayanan.length > 0 || s.deskripsi || s.persyaratan.length > 0 ? (
                                     <Link
                                         href={`/layanan/${s.slug}`}
-                                        className="text-sm leading-relaxed text-primary underline-offset-4 hover:text-secondary hover:underline md:text-[16px]"
+                                        className="-my-2.5 inline-flex min-h-11 items-center text-sm leading-relaxed text-primary underline-offset-4 hover:text-secondary hover:underline md:text-[16px]"
                                     >
                                         {s.nama}
                                     </Link>

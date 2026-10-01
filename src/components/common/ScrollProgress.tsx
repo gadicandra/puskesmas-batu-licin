@@ -22,7 +22,7 @@ export default function ScrollIndicator({ labels = {} }: ScrollIndicatorProps) {
     if (sections.length === 0) return null;
 
     return (
-        <div className="fixed right-6 top-1/2 z-50 hidden -translate-y-1/2 flex-col items-center gap-2 md:flex">
+        <div className="fixed right-3 top-1/2 z-50 hidden -translate-y-1/2 flex-col items-center md:flex">
             {sections.map((sectionId) => {
                 const isActive = activeSection === sectionId;
                 const progress = sectionProgress[sectionId] || 0;
@@ -35,7 +35,9 @@ export default function ScrollIndicator({ labels = {} }: ScrollIndicatorProps) {
                         onClick={() => scrollToSection(sectionId)}
                         aria-label={`Ke bagian ${labels[sectionId] ?? sectionId}`}
                         aria-current={isActive ? "true" : undefined}
-                        className="group relative flex cursor-pointer items-center justify-end"
+                        // Titiknya hanya 8px; padding memberi area sentuh ≥24px di tablet
+                        // tanpa mengubah tampilan (jarak antar titik tetap ±8px).
+                        className="group relative flex min-h-6 min-w-11 cursor-pointer items-center justify-center py-1"
                         layout
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                     >

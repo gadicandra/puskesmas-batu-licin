@@ -44,7 +44,7 @@ export default function KontrolProfilDokter({ dokter, dokterAktif }: KontrolProf
     return (
         <form
             onSubmit={cariDokter}
-            className="grid gap-5 rounded-[28px] bg-base pb-3 md:grid-cols-[auto_minmax(240px,1fr)_auto_minmax(260px,1fr)] md:items-end md:gap-7"
+            className="grid gap-5 rounded-[28px] bg-base pb-3 md:grid-cols-2 md:items-end md:gap-x-7 xl:grid-cols-[auto_minmax(240px,1fr)_auto_minmax(260px,1fr)]"
         >
             <label htmlFor="filter-spesialis-detail" className="text-2xl font-black text-primary md:text-[30px]">
                 Pilih Spesialis

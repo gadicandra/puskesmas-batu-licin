@@ -53,6 +53,7 @@ const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
                                     src="/logo_puskesmas.webp"
                                     alt="Logo Puskesmas"
                                     fill
+                                    sizes="50px"
                                     className="object-contain"
                                 />
                             </div>
@@ -90,7 +91,7 @@ const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
                     {/* Column 2: Contact Info */}
                     <div className="flex flex-col items-center lg:items-start space-y-6">
                         <h3 className="text-xl font-bold">Hubungi Kami</h3>
-                        <ul className="space-y-4  text-sm text-gray-200">
+                        <ul className="space-y-1 text-sm text-gray-200">
                             <li className="flex items-start gap-3">
                                 <FaMapMarkerAlt className="mt-1 text-green-400 flex-shrink-0" size={16} />
                                 <span>
@@ -100,19 +101,19 @@ const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
                             </li>
                             <li className="flex items-center gap-3">
                                 <FaEnvelope className="text-green-400 flex-shrink-0" size={16} />
-                                <a href="mailto:puskesmasbatulicin@yahoo.com" className="hover:underline">
+                                <a href="mailto:puskesmasbatulicin@yahoo.com" className="inline-flex min-h-11 items-center hover:underline">
                                     puskesmasbatulicin@yahoo.com
                                 </a>
                             </li>
                             <li className="flex items-center gap-3">
                                 <FaPhoneAlt className="text-green-400 flex-shrink-0" size={16} />
-                                <a href="tel:081148812882" className="hover:underline">
+                                <a href="tel:081148812882" className="inline-flex min-h-11 items-center hover:underline">
                                     0811 4881 2882 (Telepon / WhatsApp)
                                 </a>
                             </li>
                             <li className="flex items-center gap-3">
                                 <FaPhoneAlt className="text-green-400 flex-shrink-0" size={16} />
-                                <a href="tel:085249312786" className="hover:underline">
+                                <a href="tel:085249312786" className="inline-flex min-h-11 items-center hover:underline">
                                     0852 4931 2786 (Darurat / PSC 119)
                                 </a>
                             </li>
@@ -151,11 +152,13 @@ const Footer = ({ jamPelayanan }: { jamPelayanan: JamPelayanan }) => {
                     <div className="flex flex-col space-y-6">
                         <h3 className="text-xl font-bold text-green-400">Lokasi Kami</h3>
 
-                        {/* Map Integration */}
+                        {/* Peta yang sama dengan /lokasi-puskesmas (pin "Puskesmas Batulicin",
+                            H223+QRJ). Sematan lama menunjuk "Puskesmas Batulicin 1", ±5,5 km
+                            dari alamat resmi di Jl. Pemerintahan. */}
                         <div className="w-full h-40 bg-gray-300 rounded-xl overflow-hidden relative shadow-lg">
                             <iframe
                                 title="Peta lokasi Puskesmas Batulicin"
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3986.366299136979!2d115.95574577496796!3d-3.4566739965157836!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2de64f69741634ad%3A0x6295556213768228!2sPuskesmas%20Batulicin%201!5e0!3m2!1sen!2sid!4v1706691234567!5m2!1sen!2sid"
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3982.5953688857967!2d116.0046296078733!3d-3.448132600453725!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2de8b6653897fc7b%3A0xe4508941a810ff17!2sPuskesmas%20Batulicin!5e0!3m2!1sen!2sid!4v1770201356598!5m2!1sen!2sid"
                                 width="100%"
                                 height="100%"
                                 style={{ border: 0 }}

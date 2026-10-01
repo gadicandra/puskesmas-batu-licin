@@ -338,12 +338,15 @@ export default function KoleksiSederhana({
                                 {kolomTabel.map((k) => (
                                     <th key={k.nama} className="px-5 py-3 font-bold">{k.label}</th>
                                 ))}
-                                <th className="px-5 py-3 text-right font-bold">Tindakan</th>
+                                {/* Kolom tindakan menempel di kanan: di tablet tabelnya lebih
+                                    lebar dari layar dan tombol Ubah/Hapus terpotong — staf tidak
+                                    akan tahu harus menggeser tabel ke samping untuk menemukannya. */}
+                                <th className="sticky right-0 bg-[#F7F8F5] px-5 py-3 text-right font-bold shadow-[-8px_0_12px_-10px_rgba(35,49,21,0.35)]">Tindakan</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-primary/10">
                             {potongan.map((baris) => (
-                                <tr key={baris.id} className="transition hover:bg-latar/40">
+                                <tr key={baris.id} className="group transition hover:bg-latar/40">
                                     {kolomTabel.map((k, i) => {
                                         const nilai = baris[k.nama]
                                         // Kolom pertama adalah kolom identitas
@@ -372,7 +375,7 @@ export default function KoleksiSederhana({
                                             </td>
                                         )
                                     })}
-                                    <td className="px-5 py-3">
+                                    <td className="sticky right-0 bg-white px-5 py-3 shadow-[-8px_0_12px_-10px_rgba(35,49,21,0.35)] transition group-hover:bg-[#F9F9F7]">
                                         <div className="flex justify-end gap-2">
                                             <Button ukuran="sm" varian="ghost" onClick={() => bukaForm(baris)} leftIcon={<Pencil size={16} />}>
                                                 Ubah

@@ -59,18 +59,29 @@ export const Pengaduan: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      async ({ data, operation, req }) => {
-        if (operation === 'create') {
-          enforceFeedbackRateLimit(req)
-          await sendCompanyNotification('pengaduan', {
-            name: String(data.name),
-            contact: String(data.contact),
-            subject: String(data.subject),
-            message: String(data.message),
-          })
-        }
-
+      ({ data, operation, req }) => {
+        if (operation === 'create') enforceFeedbackRateLimit(req)
         return data
+      },
+    ],
+    // Email hanya pemberitahuan — isinya sudah tersimpan dan terbaca di
+    // /dashboard/pengaduan. Dikirim SESUDAH tersimpan dan kegagalannya cuma
+    // dicatat: kalau dilempar dari beforeChange, satu gangguan layanan email
+    // membuat pesan warga hilang begitu saja dan mereka melihat galat 500.
+    afterChange: [
+      async ({ doc, operation, req }) => {
+        if (operation !== 'create') return doc
+        try {
+          await sendCompanyNotification('pengaduan', {
+            name: String(doc.name),
+            contact: String(doc.contact),
+            subject: String(doc.subject),
+            message: String(doc.message),
+          })
+        } catch (err) {
+          req.payload.logger.error({ err, id: doc.id }, 'Notifikasi email pengaduan gagal dikirim')
+        }
+        return doc
       },
     ],
   },

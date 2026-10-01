@@ -110,7 +110,7 @@ export default function GaleriMedia({
             <form className="flex gap-3">
                 <div className="relative flex-1">
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
-                    <Input name="cari" defaultValue={cari} placeholder="Cari nama berkas atau keterangan" className="pl-9" />
+                    <Input name="cari" defaultValue={cari} aria-label="Cari gambar" placeholder="Cari nama berkas atau keterangan" className="pl-9" />
                 </div>
                 <Button type="submit" varian="secondary">Cari</Button>
             </form>

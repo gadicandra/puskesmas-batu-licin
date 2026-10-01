@@ -13,7 +13,7 @@ import {
     Ambulance,
     type LucideIcon,
 } from "lucide-react";
-import { containerVariants, itemVariants, SectionIntro, Panel } from "../_shared";
+import { containerVariants, SectionIntro, Panel } from "../_shared";
 
 const jalur: {
     tone: "primary" | "secondary";

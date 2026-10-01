@@ -1,4 +1,4 @@
-import { BadgeCheck, BriefcaseMedical, CalendarDays, GraduationCap, Stethoscope } from "lucide-react";
+import { BadgeCheck, BriefcaseMedical, CalendarDays, GraduationCap } from "lucide-react";
 import type { DokterPublik } from "@/lib/konten/dokter";
 import FotoDokter from "./FotoDokter";
 import JadwalMingguanDokter from "./JadwalMingguanDokter";
@@ -15,8 +15,11 @@ export default function ProfilDokterDetail({ dokter }: ProfilDokterDetailProps) 
     return (
         <article className="mt-8 overflow-hidden rounded-[22px] bg-white p-5 shadow-[0_18px_45px_-35px_rgba(35,49,21,0.85)] ring-1 ring-primary/10 md:mt-9 md:p-7">
             <div className="grid gap-6 md:grid-cols-[260px_minmax(0,1fr)] md:gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
-                <div className="overflow-hidden rounded-[18px] border border-primary/15 bg-white p-2 shadow-[0_24px_55px_-42px_rgba(35,49,21,0.85)]">
-                    <FotoDokter nama={dokter.nama} foto={dokter.foto} className="h-full min-h-[260px] md:min-h-[360px]" />
+                {/* self-start + rasio tetap: dulu kotak foto ikut setinggi kolom teks
+                    (h-full), jadi di tablet tingginya ~900px dan placeholder ikon
+                    tergeser keluar bidang pandang. */}
+                <div className="self-start overflow-hidden rounded-[18px] border border-primary/15 bg-white p-2 shadow-[0_24px_55px_-42px_rgba(35,49,21,0.85)]">
+                    <FotoDokter nama={dokter.nama} foto={dokter.foto} className="md:aspect-[3/4]" />
                 </div>
 
                 <div className="min-w-0 md:pt-2">
