@@ -17,7 +17,9 @@ import { ambilLayanan } from "@/lib/konten/layanan";
 const sectionLabels: Record<string, string> = {
     hero: "Beranda",
     layanan: "Layanan",
-    info: "Informasi",
+    waktulayanan: "Jam Pelayanan",
+    statistik: "Statistik",
+    berita: "Berita",
 };
 
 export default async function Home() {
