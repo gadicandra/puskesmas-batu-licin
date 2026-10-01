@@ -17,12 +17,34 @@
     .hero > section > div { height: 380px; }
     .content { padding-top: 48px; }
     .summary { grid-template-columns: 1fr 1.08fr 1fr; gap: 12px; margin: 56px 18px 100px; }
-    .summaryLeft { transform: translateY(35px) rotate(-8deg); }
-    .summaryRight { transform: translateY(35px) rotate(8deg); }
+    /* Kemiringan dan angkatan dipisah ke variabel supaya efek hover hanya
+       menambah angkatan; kartu samping tetap miring saat terangkat. */
+    .summaryCard {
+        --turun: 0px;
+        --miring: 0deg;
+        --angkat: 0px;
+        transform: translateY(calc(var(--turun) - var(--angkat))) rotate(var(--miring));
+        box-shadow: 0 10px 24px -18px rgb(35 49 21 / 55%);
+        transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease;
+        will-change: transform;
+    }
+    .summaryLeft { --turun: 35px; --miring: -8deg; }
+    .summaryRight { --turun: 35px; --miring: 8deg; }
     .summaryCenter { order: 0; position: relative; z-index: 1; }
+    .summaryCard:hover {
+        --angkat: 14px;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 30px 50px -22px rgb(35 49 21 / 60%);
+    }
     .categories { grid-template-columns: 1fr 1fr; }
     .document { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 36px; }
 }
 
 /* Slightly lighter than latar to meet AA contrast on the olive cards. */
 .summaryCard, .document { color: #f8faf5; }
+
+/* Tanpa animasi bagi yang mematikan gerak di sistem operasinya. */
+@media (prefers-reduced-motion: reduce) {
+    .summaryCard { transition: none; }
+}
