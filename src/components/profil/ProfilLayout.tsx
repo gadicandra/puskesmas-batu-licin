@@ -78,7 +78,7 @@ const ProfilLayout = () => {
                     <div
                         role="tablist"
                         aria-label="Bagian profil Puskesmas"
-                        className="flex flex-row lg:flex-col gap-2 lg:gap-1 z-10 w-full lg:w-[80%] mb-8 lg:mb-10 overflow-x-auto lg:overflow-visible items-center lg:items-stretch py-2 px-4 lg:px-0 scroll-smooth snap-x animate-scroll-hint [mask-image:linear-gradient(to_right,black_85%,transparent_100%)] lg:[mask-image:none]">
+                        className="flex flex-row lg:flex-col gap-2 lg:gap-1 z-10 w-full lg:w-[80%] mb-8 lg:mb-10 overflow-x-auto lg:overflow-visible scrollbar-merek lg:pb-2 items-center lg:items-stretch py-2 px-4 lg:px-0 scroll-smooth snap-x animate-scroll-hint [mask-image:linear-gradient(to_right,black_85%,transparent_100%),linear-gradient(black,black)] [mask-size:100%_calc(100%_-_10px),100%_10px] [mask-position:top,bottom] [mask-repeat:no-repeat] lg:[mask-image:none]">
                         {navItems.map((item, index) => {
                             const isActive = activeTab === item;
 
