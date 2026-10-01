@@ -131,8 +131,10 @@ const StrukturOrganisasiContent = () => {
     return (
         <div className="w-full flex flex-col items-center">
 
-            {/* Mobile/Tablet Navigation */}
-            <div className="flex lg:hidden w-full overflow-x-auto py-2 px-4 gap-2 mb-8 items-center scroll-smooth snap-x animate-scroll-hint md:justify-center">
+            {/* Mobile/Tablet Navigation — `safe center`: bila deretan tombol lebih
+                lebar dari layar, tombol pertama tidak terdorong keluar sisi kiri
+                (wilayah yang tidak bisa digulir) seperti pada `center` biasa. */}
+            <div className="flex lg:hidden w-full overflow-x-auto py-2 px-4 gap-2 mb-8 items-center scroll-smooth snap-x animate-scroll-hint md:[justify-content:safe_center]">
                 {orgData.clusters.map((cluster, index) => {
                     const isActive = activeClusterIndex === index;
                     const label = cluster.role.split(':')[0];
