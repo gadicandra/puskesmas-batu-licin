@@ -13,36 +13,39 @@ interface VisitorStatItem {
     suffix?: string;
 }
 
+// Angka tetap — di luar komponen supaya tidak dibuat ulang tiap render dan
+// aman dipakai di dependency efek hitung-naik di bawah.
+const statistics: VisitorStatItem[] = [
+    {
+        id: 1,
+        label: "Total Pengunjung Website",
+        value: 125847,
+        icon: <FaUsers className="w-6 h-6 sm:w-8 sm:h-8" />,
+    },
+    {
+        id: 2,
+        label: "Pengunjung Bulan Ini",
+        value: 3542,
+        icon: <FaEye className="w-6 h-6 sm:w-8 sm:h-8" />,
+    },
+    {
+        id: 3,
+        label: "Tahun Berserdiri",
+        value: 1977,
+        icon: <FaCalendarAlt className="w-6 h-6 sm:w-8 sm:h-8" />,
+    },
+    {
+        id: 4,
+        label: "Pasien Dilayani",
+        value: 89243,
+        icon: <FaHeartbeat className="w-6 h-6 sm:w-8 sm:h-8" />,
+        suffix: "+",
+    },
+];
+
 const PengunjungModule = () => {
     const [displayValues, setDisplayValues] = useState<{ [key: number]: number }>({});
 
-    const statistics: VisitorStatItem[] = [
-        {
-            id: 1,
-            label: "Total Pengunjung Website",
-            value: 125847,
-            icon: <FaUsers className="w-6 h-6 sm:w-8 sm:h-8" />,
-        },
-        {
-            id: 2,
-            label: "Pengunjung Bulan Ini",
-            value: 3542,
-            icon: <FaEye className="w-6 h-6 sm:w-8 sm:h-8" />,
-        },
-        {
-            id: 3,
-            label: "Tahun Berserdiri",
-            value: 1977,
-            icon: <FaCalendarAlt className="w-6 h-6 sm:w-8 sm:h-8" />,
-        },
-        {
-            id: 4,
-            label: "Pasien Dilayani",
-            value: 89243,
-            icon: <FaHeartbeat className="w-6 h-6 sm:w-8 sm:h-8" />,
-            suffix: "+",
-        },
-    ];
 
     // Counter animation
     useEffect(() => {

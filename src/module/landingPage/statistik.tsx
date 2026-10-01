@@ -14,40 +14,43 @@ interface StatisticItem {
     suffix?: string;
 }
 
+// Angka tetap — di luar komponen supaya tidak dibuat ulang tiap render dan
+// aman dipakai di dependency efek hitung-naik di bawah.
+const statistics: StatisticItem[] = [
+    {
+        id: 1,
+        label: "Pasien Terlayani",
+        value: 5847,
+        icon: <HiOutlineUsers className="w-8 h-8 sm:w-10 sm:h-10" />,
+        color: "from-blue-500 to-blue-600",
+        suffix: "+",
+    },
+    {
+        id: 2,
+        label: "Program Kesehatan",
+        value: 24,
+        icon: <HiOutlineHeart className="w-8 h-8 sm:w-10 sm:h-10" />,
+        color: "from-red-500 to-red-600",
+    },
+    {
+        id: 3,
+        label: "Tenaga Profesional",
+        value: 42,
+        icon: <HiOutlineAcademicCap className="w-8 h-8 sm:w-10 sm:h-10" />,
+        color: "from-green-500 to-green-600",
+    },
+    {
+        id: 4,
+        label: "Layanan Medis",
+        value: 18,
+        icon: <HiOutlineAcademicCap className="w-8 h-8 sm:w-10 sm:h-10" />,
+        color: "from-purple-500 to-purple-600",
+    },
+];
+
 const StatistikModule = () => {
     const [displayValues, setDisplayValues] = useState<{ [key: number]: number }>({});
 
-    const statistics: StatisticItem[] = [
-        {
-            id: 1,
-            label: "Pasien Terlayani",
-            value: 5847,
-            icon: <HiOutlineUsers className="w-8 h-8 sm:w-10 sm:h-10" />,
-            color: "from-blue-500 to-blue-600",
-            suffix: "+",
-        },
-        {
-            id: 2,
-            label: "Program Kesehatan",
-            value: 24,
-            icon: <HiOutlineHeart className="w-8 h-8 sm:w-10 sm:h-10" />,
-            color: "from-red-500 to-red-600",
-        },
-        {
-            id: 3,
-            label: "Tenaga Profesional",
-            value: 42,
-            icon: <HiOutlineAcademicCap className="w-8 h-8 sm:w-10 sm:h-10" />,
-            color: "from-green-500 to-green-600",
-        },
-        {
-            id: 4,
-            label: "Layanan Medis",
-            value: 18,
-            icon: <HiOutlineAcademicCap className="w-8 h-8 sm:w-10 sm:h-10" />,
-            color: "from-purple-500 to-purple-600",
-        },
-    ];
 
     // Counter animation
     useEffect(() => {

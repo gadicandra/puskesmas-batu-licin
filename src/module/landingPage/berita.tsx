@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { FaChevronLeft, FaChevronRight, FaRegCalendarAlt } from "react-icons/fa";
 import { IoMdPricetag } from "react-icons/io";
 import { BsArrowRight } from "react-icons/bs";

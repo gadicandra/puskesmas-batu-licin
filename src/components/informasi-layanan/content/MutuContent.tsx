@@ -11,7 +11,7 @@ import {
     PersonStanding,
     type LucideIcon,
 } from "lucide-react";
-import { containerVariants, itemVariants, SectionIntro, Panel } from "../_shared";
+import { containerVariants, SectionIntro, Panel } from "../_shared";
 
 const indikator: { label: string; value: number; target: number }[] = [
     { label: "Kepatuhan Kebersihan Tangan", value: 92, target: 85 },

@@ -3,11 +3,9 @@
 // dengan "use client". Menjadikannya server-side yang memungkinkan daftar
 // layanan dibaca lewat kontrak konten, bukan di-hardcode.
 import Container from "@/components/layout/Container/Container";
-import Button from "@/components/elements/Button";
 import Section from "@/components/common/Section";
 import ScrollIndicator from "@/components/common/ScrollProgress";
 import { SectionProvider } from "@/context/SectionContext";
-import { Heart, Clock, Users, Phone, MapPin, Calendar } from "lucide-react";
 import Berita from "@/module/landingPage/berita";
 import WaktuPelayanan from "@/module/landingPage/waktuPelayanan";
 import Layanan from "@/module/landingPage/layanan";

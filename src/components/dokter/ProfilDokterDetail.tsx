@@ -1,4 +1,4 @@
-import { BadgeCheck, BriefcaseMedical, CalendarDays, GraduationCap, Stethoscope } from "lucide-react";
+import { BadgeCheck, BriefcaseMedical, CalendarDays, GraduationCap } from "lucide-react";
 import type { DokterPublik } from "@/lib/konten/dokter";
 import FotoDokter from "./FotoDokter";
 import JadwalMingguanDokter from "./JadwalMingguanDokter";
