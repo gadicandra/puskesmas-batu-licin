@@ -160,7 +160,10 @@ export default function Layanan({ items = [], moreHref = "/layanan" }: Props) {
 									href={item.href || moreHref}
 									className={`flex-shrink-0 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group ${isLast ? 'relative' : ''
 										}`}
-									style={{ width: 'calc((100vw - 8rem) / 4.5)' }}
+									// 4,5 kartu per layar di laptop; di tablet (768–1023px) rumus
+									// itu tinggal ~140px dan deskripsi mendorong judul keluar kartu,
+									// jadi diberi lebar minimum.
+									style={{ width: 'max(15rem, calc((100vw - 8rem) / 4.5))' }}
 								>
 									<div className="relative h-70 bg-gray-200">
 										{item.image ? (
@@ -184,7 +187,7 @@ export default function Layanan({ items = [], moreHref = "/layanan" }: Props) {
 											<h3 className="text-white font-bold text-lg mb-2 leading-tight">
 												{item.title}
 											</h3>
-											<p className="text-white/95 text-sm leading-relaxed">
+											<p className="text-white/95 text-sm leading-relaxed line-clamp-4">
 												{item.subtitle}
 											</p>
 										</div>
